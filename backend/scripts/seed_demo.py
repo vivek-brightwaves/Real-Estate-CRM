@@ -2,6 +2,7 @@ import os
 import sys
 import json
 from datetime import date, timedelta
+from decimal import Decimal
 from passlib.context import CryptContext
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -11,6 +12,7 @@ from app.db.base import Base
 from app.models.users import User, RoleEnum, Company, Branch
 from app.models.leads import Lead, LeadStatusEnum
 from app.models.customers import Customer
+from app.models.projects import Project, Tower, Block, Unit, UnitStatusEnum
 from app.models.sales import Booking, BookingStatusEnum, Payment, PaymentStatusEnum, PaymentModeEnum
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -38,7 +40,7 @@ def seed_db():
         db.commit()
 
         print("Seeding Users (1 Super Admin, 2 Managers, 6 Employees)...")
-        super_admin = User(name="Alice Admin", email="admin@example.com", phone="1234567890", role=RoleEnum.SUPER_ADMIN, branch_id=branch1.id, password_hash=get_password_hash("admin123"))
+        super_admin = User(name="Super Admin", email="admin@gmail.com", phone="1234567890", role=RoleEnum.SUPER_ADMIN, branch_id=branch1.id, password_hash=get_password_hash("admin123"))
         mgr1 = User(name="Bob Manager (DT)", email="mgr1@example.com", phone="1234567891", role=RoleEnum.MANAGER, branch_id=branch1.id, password_hash=get_password_hash("mgr123"))
         mgr2 = User(name="Charlie Manager (UT)", email="mgr2@example.com", phone="1234567892", role=RoleEnum.MANAGER, branch_id=branch2.id, password_hash=get_password_hash("mgr123"))
         
@@ -102,7 +104,7 @@ def seed_db():
             if lead.status == LeadStatusEnum.WON:
                 cust = Customer(
                     name=lead.name, phone=lead.phone, email=lead.email,
-                    lead_id=lead.id, created_by_id=lead.created_by_id
+                    lead_id=lead.id, assigned_to_id=lead.created_by_id
                 )
                 db.add(cust)
                 customers.append(cust)
@@ -115,7 +117,7 @@ def seed_db():
             unit = available_units[i]
             booking = Booking(
                 unit_id=unit.id, customer_id=cust.id, 
-                created_by_id=cust.created_by_id, 
+                created_by_id=cust.assigned_to_id, 
                 status=BookingStatusEnum.CONFIRMED if i % 2 == 0 else BookingStatusEnum.APPROVED,
                 approved_by_id=mgr1.id
             )
@@ -124,17 +126,18 @@ def seed_db():
             db.commit()
             
             # Add Payments
+            price_decimal = unit.price if isinstance(unit.price, Decimal) else Decimal(str(unit.price))
             payment1 = Payment(
-                booking_id=booking.id, amount=unit.price * 0.1, 
+                booking_id=booking.id, amount=price_decimal * Decimal('0.1'),
                 due_date=date.today(), status=PaymentStatusEnum.RECEIVED, 
                 mode=PaymentModeEnum.BANK_TRANSFER, received_date=date.today(),
-                recorded_by_id=cust.created_by_id
+                recorded_by_id=cust.assigned_to_id
             )
             payment2 = Payment(
-                booking_id=booking.id, amount=unit.price * 0.9, 
+                booking_id=booking.id, amount=price_decimal * Decimal('0.9'),
                 due_date=date.today() + timedelta(days=30), status=PaymentStatusEnum.PENDING, 
                 mode=None, received_date=None,
-                recorded_by_id=cust.created_by_id
+                recorded_by_id=cust.assigned_to_id
             )
             db.add_all([payment1, payment2])
         db.commit()

@@ -5,7 +5,7 @@ from app.db.session import get_db
 from app.api.deps import require_roles
 from app.models.users import User, RoleEnum
 from app.schemas.users import (
-    UserCreate, UserUpdateRole, UserReassignManager, UserResetPassword, UserOut
+    UserCreate, UserUpdate, UserUpdateRole, UserReassignManager, UserResetPassword, UserOut
 )
 from app.core.security import get_password_hash
 
@@ -37,11 +37,32 @@ def get_users(role: Optional[RoleEnum] = None, branch_id: Optional[int] = None, 
         query = query.filter(User.branch_id == branch_id)
     return query.offset(skip).limit(limit).all()
 
-@router.put("/{user_id}/deactivate", response_model=UserOut)
-def deactivate_user(user_id: int, db: Session = Depends(get_db)):
+@router.put("/{user_id}", response_model=UserOut)
+def update_user(user_id: int, payload: UserUpdate, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check email uniqueness if being changed
+    if payload.email and payload.email != user.email:
+        existing = db.query(User).filter(User.email == payload.email).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already registered")
+    
+    update_data = payload.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(user, field, value)
+    db.commit()
+    db.refresh(user)
+    return user
+
+@router.put("/{user_id}/deactivate", response_model=UserOut)
+def deactivate_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_roles([RoleEnum.SUPER_ADMIN]))):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot deactivate your own account")
     user.is_active = not user.is_active # Toggle active status
     db.commit()
     db.refresh(user)

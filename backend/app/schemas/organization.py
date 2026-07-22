@@ -1,12 +1,23 @@
 from typing import Optional
 from typing import Optional, Dict, Any
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+import json
 
 # Company Schemas
 class CompanyBase(BaseModel):
     name: str
     logo_url: Optional[str] = None
     settings_json: Optional[Dict[str, Any]] = None
+
+    @field_validator("settings_json", mode="before")
+    @classmethod
+    def parse_settings_json(cls, v):
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except (json.JSONDecodeError, TypeError):
+                return None
+        return v
 
 class SettingsUpdate(BaseModel):
     general: Optional[Dict[str, Any]] = None

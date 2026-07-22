@@ -15,6 +15,15 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
 
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    role: Optional[RoleEnum] = None
+    branch_id: Optional[int] = None
+    manager_id: Optional[int] = None
+    is_active: Optional[bool] = None
+
 class UserUpdateRole(BaseModel):
     role: RoleEnum
 

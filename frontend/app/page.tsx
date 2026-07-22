@@ -102,7 +102,6 @@ export default function DashboardPage() {
           {(user.role === 'SUPER_ADMIN') && (
             <>
               <a href="/admin/organization" className="block px-4 py-2 hover:bg-slate-800 rounded">Organization Setup</a>
-              <a href="/admin/users" className="block px-4 py-2 hover:bg-slate-800 rounded">User Management</a>
               <a href="/admin/approvals" className="block px-4 py-2 hover:bg-slate-800 rounded">Approvals Inbox</a>
               <a href="/admin/audit" className="block px-4 py-2 hover:bg-slate-800 rounded">Audit Logs</a>
               <a href="/admin/settings" className="block px-4 py-2 hover:bg-slate-800 rounded text-purple-400 font-bold">Global Settings</a>

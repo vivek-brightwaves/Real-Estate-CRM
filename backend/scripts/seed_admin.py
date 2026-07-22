@@ -37,10 +37,10 @@ def seed():
         db.commit()
         db.refresh(branch)
 
-        # Create a Super Admin user
+        # Create a Super Admin user (credentials from owner.md)
         admin = User(
             name="Super Admin",
-            email="admin@example.com",
+            email="admin@gmail.com",
             phone="1234567890",
             password_hash=get_password_hash("admin123"),
             role=RoleEnum.SUPER_ADMIN,
@@ -49,8 +49,38 @@ def seed():
         )
         db.add(admin)
         db.commit()
-        
-        print("Super Admin user created: admin@example.com / admin123")
+        db.refresh(admin)
+        print("Super Admin created: admin@gmail.com / admin123")
+
+        # Create a Manager user
+        manager = User(
+            name="Manager",
+            email="manager@example.com",
+            phone="1234567891",
+            password_hash=get_password_hash("manager123"),
+            role=RoleEnum.MANAGER,
+            branch_id=branch.id,
+            is_active=True
+        )
+        db.add(manager)
+        db.commit()
+        db.refresh(manager)
+        print("Manager created:       manager@example.com / manager123")
+
+        # Create an Employee user
+        employee = User(
+            name="Employee",
+            email="employee@example.com",
+            phone="1234567892",
+            password_hash=get_password_hash("employee123"),
+            role=RoleEnum.EMPLOYEE,
+            branch_id=branch.id,
+            manager_id=manager.id,
+            is_active=True
+        )
+        db.add(employee)
+        db.commit()
+        print("Employee created:     employee@example.com / employee123")
     except Exception as e:
         print(f"Error seeding database: {e}")
         db.rollback()
