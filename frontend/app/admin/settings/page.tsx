@@ -68,21 +68,8 @@ export default function SettingsPage() {
   if (!user || user.role !== "SUPER_ADMIN") return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-slate-900 text-white p-6 hidden md:block">
-        <h1 className="text-2xl font-bold mb-8 text-primary">CRM Admin</h1>
-        <nav className="space-y-4">
-          <a href="/" className="block px-4 py-2 hover:bg-slate-800 rounded">Back to Dashboard</a>
-          <a href="/admin/users" className="block px-4 py-2 hover:bg-slate-800 rounded">User Management</a>
-          <a href="/admin/approvals" className="block px-4 py-2 hover:bg-slate-800 rounded">Approvals Inbox</a>
-          <a href="/admin/audit" className="block px-4 py-2 hover:bg-slate-800 rounded">Audit Logs</a>
-          <a href="/admin/settings" className="block px-4 py-2 bg-slate-800 rounded">Global Settings</a>
-        </nav>
-      </div>
-
-      <div className="flex-1 p-8 overflow-auto">
-        <div className="flex justify-between items-center mb-8">
+    <div>
+      <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-gray-800">Global Settings</h2>
           <button 
             onClick={saveSettings}
@@ -238,6 +225,5 @@ export default function SettingsPage() {
           </div>
         )}
       </div>
-    </div>
   );
 }

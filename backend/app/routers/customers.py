@@ -59,6 +59,15 @@ def get_customers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
     query = db.query(Customer).filter(scope_query_to_branch(current_user, Customer))
     return query.offset(skip).limit(limit).all()
 
+@router.get("/verified-documents", response_model=List[CustomerDocumentOut], dependencies=[Depends(require_roles([RoleEnum.SUPER_ADMIN, RoleEnum.MANAGER]))])
+def get_verified_documents(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    """Returns all KYC documents that have been VERIFIED, with verifier details."""
+    docs = db.query(CustomerDocument).filter(
+        CustomerDocument.status == DocStatusEnum.VERIFIED
+    ).all()
+    return docs
+
+
 @router.get("/{customer_id}", response_model=CustomerOut)
 def get_customer(customer_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     customer = get_customer_or_404(db, customer_id)
@@ -128,12 +137,22 @@ async def upload_document(
     return doc
 
 @router.patch("/documents/{doc_id}/verify", response_model=CustomerDocumentOut, dependencies=[Depends(require_roles([RoleEnum.SUPER_ADMIN, RoleEnum.MANAGER]))])
-def verify_document(doc_id: int, payload: CustomerVerifyDocument, db: Session = Depends(get_db)):
+def verify_document(doc_id: int, payload: CustomerVerifyDocument, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     doc = db.query(CustomerDocument).filter(CustomerDocument.id == doc_id).first()
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
-        
+
+    from datetime import datetime
     doc.status = payload.status
+    if payload.status == DocStatusEnum.VERIFIED:
+        doc.verified_by_id = current_user.id
+        doc.verified_at = datetime.utcnow()
+    else:
+        # If rejected/reverted, clear verification metadata
+        doc.verified_by_id = None
+        doc.verified_at = None
+
     db.commit()
     db.refresh(doc)
     return doc
+

@@ -62,19 +62,9 @@ export default function InventoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar Navigation (Reused) */}
-      <div className="w-64 bg-slate-900 text-white p-6 hidden md:block">
-        <h1 className="text-2xl font-bold mb-8 text-primary">CRM</h1>
-        <nav className="space-y-4">
-          <a href="/" className="block px-4 py-2 hover:bg-slate-800 rounded">Dashboard</a>
-          <a href="/inventory" className="block px-4 py-2 bg-slate-800 rounded">Inventory</a>
-        </nav>
-      </div>
-
-      <div className="flex-1 p-8 flex gap-8">
-        {/* Tree View Main Area */}
-        <div className="flex-1 bg-white p-6 rounded-xl shadow-sm border overflow-auto">
+    <div className="flex gap-8">
+      {/* Tree View Main Area */}
+      <div className="flex-1 bg-white p-6 rounded-xl shadow-sm border overflow-auto">
           <h2 className="text-2xl font-bold mb-6 text-gray-800">Inventory Tree</h2>
           
           {loading ? <p>Loading...</p> : (
@@ -167,6 +157,5 @@ export default function InventoryPage() {
           </div>
         )}
       </div>
-    </div>
   );
 }

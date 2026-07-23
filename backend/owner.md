@@ -1,2 +1,2 @@
-admin=admin@gmail.com
+username=admin@gmail.com
 password=admin123

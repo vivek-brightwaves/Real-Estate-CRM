@@ -1,5 +1,6 @@
 import enum
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 
@@ -33,5 +34,8 @@ class CustomerDocument(Base):
     doc_type = Column(String(50), nullable=False)
     file_url = Column(String(255), nullable=False)
     status = Column(Enum(DocStatusEnum), default=DocStatusEnum.UPLOADED, index=True)
+    verified_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    verified_at = Column(DateTime, nullable=True)
 
     customer = relationship("Customer", back_populates="documents")
+    verified_by = relationship("User", foreign_keys=[verified_by_id])

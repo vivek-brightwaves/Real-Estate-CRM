@@ -91,18 +91,8 @@ export default function CollectionsPage() {
   const filteredPayments = payments.filter((p: any) => p.status === activeTab);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <div className="w-64 bg-slate-900 text-white p-6 hidden md:block">
-        <h1 className="text-2xl font-bold mb-8 text-primary">CRM</h1>
-        <nav className="space-y-4">
-          <a href="/" className="block px-4 py-2 hover:bg-slate-800 rounded">Dashboard</a>
-          <a href="/bookings" className="block px-4 py-2 hover:bg-slate-800 rounded">Bookings</a>
-          <a href="/collections" className="block px-4 py-2 bg-slate-800 rounded">Collections</a>
-        </nav>
-      </div>
-
-      <div className="flex-1 p-8 overflow-auto">
-        <div className="flex justify-between items-center mb-8">
+    <div>
+      <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-gray-800">Collections Dashboard</h2>
           <button onClick={() => setShowNew(true)} className="bg-primary text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition font-bold">
             + Record Scheduled Payment
@@ -232,6 +222,5 @@ export default function CollectionsPage() {
           </div>
         )}
       </div>
-    </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAuthStore } from "../../../store/authStore";
 import api from "../../../lib/axios";
 
@@ -44,12 +45,12 @@ export default function ApprovalsPage() {
   if (!user || user.role !== "SUPER_ADMIN") return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Approvals Inbox</h1>
-        <button onClick={() => router.push("/")} className="text-primary font-bold hover:underline">
+        <Link href="/" className="text-primary font-bold hover:underline">
           &larr; Back to Dashboard
-        </button>
+        </Link>
       </div>
 
       {loading ? (

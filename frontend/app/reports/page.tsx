@@ -40,33 +40,8 @@ export default function ReportsPage() {
   if (!user || user.role === "EMPLOYEE") return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-slate-900 text-white p-6 hidden md:block">
-        <h1 className="text-2xl font-bold mb-8 text-primary">CRM</h1>
-        <nav className="space-y-4">
-          <a href="/" className="block px-4 py-2 hover:bg-slate-800 rounded">Dashboard</a>
-          
-          {(user.role === 'SUPER_ADMIN') && (
-            <>
-              <a href="/admin/users" className="block px-4 py-2 hover:bg-slate-800 rounded">User Management</a>
-              <a href="/admin/approvals" className="block px-4 py-2 hover:bg-slate-800 rounded">Approvals Inbox</a>
-              <a href="/admin/audit" className="block px-4 py-2 hover:bg-slate-800 rounded">Audit Logs</a>
-            </>
-          )}
-          
-          <a href="/inventory" className="block px-4 py-2 hover:bg-slate-800 rounded">Inventory</a>
-          <a href="/leads" className="block px-4 py-2 hover:bg-slate-800 rounded">Leads</a>
-          <a href="/visits" className="block px-4 py-2 hover:bg-slate-800 rounded">Site Visits</a>
-          <a href="/customers" className="block px-4 py-2 hover:bg-slate-800 rounded">Customers</a>
-          <a href="/bookings" className="block px-4 py-2 hover:bg-slate-800 rounded">Bookings</a>
-          <a href="/collections" className="block px-4 py-2 hover:bg-slate-800 rounded">Collections</a>
-          <a href="/reports" className="block px-4 py-2 bg-slate-800 rounded">Reports Center</a>
-        </nav>
-      </div>
-
-      <div className="flex-1 p-8 overflow-auto">
-        <h2 className="text-3xl font-bold text-gray-800 mb-8">Reports Center</h2>
+    <div>
+      <h2 className="text-3xl font-bold text-gray-800 mb-8">Reports Center</h2>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border mb-8 flex flex-col md:flex-row gap-6 items-end">
           <div className="flex-1">
@@ -136,6 +111,5 @@ export default function ReportsPage() {
           <p className="text-red-500">Failed to load preview.</p>
         )}
       </div>
-    </div>
   );
 }
