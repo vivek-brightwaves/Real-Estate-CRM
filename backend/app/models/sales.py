@@ -41,6 +41,7 @@ class Booking(Base):
     created_by = relationship("User", foreign_keys=[created_by_id])
     approved_by = relationship("User", foreign_keys=[approved_by_id])
     payments = relationship("Payment", back_populates="booking")
+    # discounts are fetched via the bookings router since ApprovalRequest links via JSON payload
 
 class Payment(Base):
     __tablename__ = "payments"

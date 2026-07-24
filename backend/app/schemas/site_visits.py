@@ -11,6 +11,13 @@ class SiteVisitUpdate(BaseModel):
     status: Optional[SiteVisitStatusEnum] = None
     is_approved: Optional[bool] = None
 
+class LeadMinimal(BaseModel):
+    id: int
+    name: str
+    phone: Optional[str] = None
+    class Config:
+        from_attributes = True
+
 class SiteVisitOut(BaseModel):
     id: int
     lead_id: int
@@ -22,6 +29,8 @@ class SiteVisitOut(BaseModel):
     check_in_time: Optional[datetime] = None
     photo_url: Optional[str] = None
     is_approved: bool
+    
+    lead: Optional[LeadMinimal] = None
     
     class Config:
         from_attributes = True

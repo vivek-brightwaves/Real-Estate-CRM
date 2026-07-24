@@ -34,6 +34,9 @@ def get_site_visits(date: Optional[str] = None, skip: int = 0, limit: int = 100,
         from sqlalchemy import cast, Date
         query = query.filter(cast(SiteVisit.scheduled_at, Date) == today)
         
+    from sqlalchemy.orm import joinedload
+    query = query.options(joinedload(SiteVisit.lead))
+        
     return query.offset(skip).limit(limit).all()
 
 @router.post("/{visit_id}/check-in", response_model=SiteVisitOut)

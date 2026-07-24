@@ -19,12 +19,20 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Add KYC verification tracking columns to customer_documents table."""
-    op.add_column('customer_documents',
-        sa.Column('verified_by_id', sa.Integer(), sa.ForeignKey('users.id'), nullable=True)
-    )
-    op.add_column('customer_documents',
-        sa.Column('verified_at', sa.DateTime(), nullable=True)
-    )
+    # Use inspect to check existing columns so this migration is idempotent
+    # (i.e., safe to run even if the columns were already added directly to the DB)
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    existing_columns = [col['name'] for col in inspector.get_columns('customer_documents')]
+
+    if 'verified_by_id' not in existing_columns:
+        op.add_column('customer_documents',
+            sa.Column('verified_by_id', sa.Integer(), sa.ForeignKey('users.id'), nullable=True)
+        )
+    if 'verified_at' not in existing_columns:
+        op.add_column('customer_documents',
+            sa.Column('verified_at', sa.DateTime(), nullable=True)
+        )
 
 
 def downgrade() -> None:

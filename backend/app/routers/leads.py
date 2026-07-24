@@ -123,7 +123,7 @@ def schedule_visit(lead_id: int, visit_in: SiteVisitCreate, db: Session = Depend
     visit = SiteVisit(
         lead_id=lead.id,
         scheduled_at=visit_in.scheduled_at,
-        employee_id=visit_in.employee_id or current_user.id
+        employee_id=visit_in.employee_id or lead.assigned_to_id or current_user.id
     )
     db.add(visit)
     db.commit()

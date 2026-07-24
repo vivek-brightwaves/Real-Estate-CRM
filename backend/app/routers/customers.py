@@ -55,8 +55,9 @@ def convert_lead_to_customer(customer_in: CustomerCreate, db: Session = Depends(
 
 @router.get("/", response_model=List[CustomerOut])
 def get_customers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    from sqlalchemy.orm import joinedload
     # Using the same scoping logic
-    query = db.query(Customer).filter(scope_query_to_branch(current_user, Customer))
+    query = db.query(Customer).filter(scope_query_to_branch(current_user, Customer)).options(joinedload(Customer.documents))
     return query.offset(skip).limit(limit).all()
 
 @router.get("/verified-documents", response_model=List[CustomerDocumentOut], dependencies=[Depends(require_roles([RoleEnum.SUPER_ADMIN, RoleEnum.MANAGER]))])

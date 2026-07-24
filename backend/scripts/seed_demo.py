@@ -11,7 +11,7 @@ from app.db.session import SessionLocal, engine
 from app.db.base import Base
 from app.models.users import User, RoleEnum, Company, Branch
 from app.models.leads import Lead, LeadStatusEnum
-from app.models.customers import Customer
+from app.models.customers import Customer, CustomerDocument, DocStatusEnum
 from app.models.projects import Project, Tower, Block, Unit, UnitStatusEnum
 from app.models.sales import Booking, BookingStatusEnum, Payment, PaymentStatusEnum, PaymentModeEnum
 
@@ -107,6 +107,19 @@ def seed_db():
                     lead_id=lead.id, assigned_to_id=lead.created_by_id
                 )
                 db.add(cust)
+                db.flush() # flush to get cust.id
+                
+                # Create verified KYC docs for demo customers to comply with business rules
+                doc = CustomerDocument(
+                    customer_id=cust.id,
+                    doc_type="ID_PROOF",
+                    file_url="https://example.com/dummy_id.pdf",
+                    status=DocStatusEnum.VERIFIED,
+                    verified_by_id=super_admin.id,
+                    verified_at=date.today()
+                )
+                db.add(doc)
+                
                 customers.append(cust)
         db.commit()
 
