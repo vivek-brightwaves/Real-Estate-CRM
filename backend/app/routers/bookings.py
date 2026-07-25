@@ -60,6 +60,10 @@ def create_booking(booking_in: BookingCreate, db: Session = Depends(get_db), cur
     if not customer:
         raise HTTPException(status_code=404, detail="Customer not found")
 
+    has_verified_kyc = any(doc.status == DocStatusEnum.VERIFIED for doc in customer.documents)
+    if not has_verified_kyc:
+        raise HTTPException(status_code=400, detail="Cannot create booking: Customer KYC documents are missing or unverified.")
+
     unit.status = UnitStatusEnum.HOLD
     unit.hold_expires_at = datetime.utcnow() + timedelta(hours=24) 
     

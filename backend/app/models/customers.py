@@ -13,6 +13,8 @@ class SiteVisitStatusEnum(str, enum.Enum):
     SCHEDULED = "SCHEDULED"
     COMPLETED = "COMPLETED"
     CANCELLED = "CANCELLED"
+    RESCHEDULED = "RESCHEDULED"
+    NO_SHOW = "NO_SHOW"
 
 class Customer(Base):
     __tablename__ = "customers"

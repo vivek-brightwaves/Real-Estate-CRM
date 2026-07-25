@@ -8,9 +8,9 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.api.deps import get_current_user, require_roles, scope_query_to_branch
 from app.models.users import User, RoleEnum
-from app.models.leads import SiteVisit
+from app.models.leads import SiteVisit, LeadNote
 from app.models.customers import SiteVisitStatusEnum
-from app.schemas.site_visits import SiteVisitOut, SiteVisitFeedback
+from app.schemas.site_visits import SiteVisitOut, SiteVisitFeedback, SiteVisitResultUpdate
 
 router = APIRouter()
 
@@ -77,6 +77,40 @@ def submit_feedback(visit_id: int, feedback_in: SiteVisitFeedback, db: Session =
 def approve_visit(visit_id: int, db: Session = Depends(get_db)):
     visit = get_visit_or_404(db, visit_id)
     visit.is_approved = True
+    db.commit()
+    db.refresh(visit)
+    return visit
+
+@router.post("/{visit_id}/result", response_model=SiteVisitOut)
+def update_visit_result(visit_id: int, result_in: SiteVisitResultUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    visit = get_visit_or_404(db, visit_id)
+    
+    if current_user.role == RoleEnum.EMPLOYEE and visit.employee_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+        
+    visit.status = result_in.status
+    if result_in.feedback:
+        visit.feedback = result_in.feedback
+    if result_in.sales_notes:
+        visit.sales_notes = result_in.sales_notes
+    if result_in.remarks:
+        visit.remarks = result_in.remarks
+        
+    if result_in.status == SiteVisitStatusEnum.RESCHEDULED and result_in.scheduled_at:
+        visit.scheduled_at = result_in.scheduled_at
+        
+    # Add timeline note
+    note_content = f"Visit marked as {result_in.status.value}."
+    if result_in.feedback:
+        note_content += f"\nCustomer Feedback: {result_in.feedback}"
+    if result_in.sales_notes:
+        note_content += f"\nSales Notes: {result_in.sales_notes}"
+    if result_in.next_follow_up_date:
+        note_content += f"\nNext Follow Up: {result_in.next_follow_up_date.strftime('%Y-%m-%d %H:%M')}"
+        
+    note = LeadNote(lead_id=visit.lead_id, note=note_content, created_by_id=current_user.id)
+    db.add(note)
+    
     db.commit()
     db.refresh(visit)
     return visit

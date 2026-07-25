@@ -39,7 +39,7 @@ def convert_lead_to_customer(customer_in: CustomerCreate, db: Session = Depends(
     if existing_customer:
         raise HTTPException(status_code=400, detail="Customer already exists for this lead")
         
-    lead.status = LeadStatusEnum.WON
+    lead.status = LeadStatusEnum.CONVERTED
     
     customer = Customer(
         name=customer_in.name,

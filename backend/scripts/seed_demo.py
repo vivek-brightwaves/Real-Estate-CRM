@@ -83,7 +83,7 @@ def seed_db():
 
         print("Seeding Leads & Customers...")
         leads = []
-        statuses = [LeadStatusEnum.NEW, LeadStatusEnum.CONTACTED, LeadStatusEnum.VISIT_SCHEDULED, LeadStatusEnum.NEGOTIATION, LeadStatusEnum.WON, LeadStatusEnum.LOST]
+        statuses = [LeadStatusEnum.NEW, LeadStatusEnum.CONTACTED, LeadStatusEnum.VISIT_SCHEDULED, LeadStatusEnum.NEGOTIATION, LeadStatusEnum.CONVERTED, LeadStatusEnum.LOST]
         for l in range(1, 21):
             lead = Lead(
                 name=f"Lead {l}", 
@@ -101,7 +101,7 @@ def seed_db():
         # Convert some WON leads to Customers
         customers = []
         for lead in leads:
-            if lead.status == LeadStatusEnum.WON:
+            if lead.status == LeadStatusEnum.CONVERTED:
                 cust = Customer(
                     name=lead.name, phone=lead.phone, email=lead.email,
                     lead_id=lead.id, assigned_to_id=lead.created_by_id
