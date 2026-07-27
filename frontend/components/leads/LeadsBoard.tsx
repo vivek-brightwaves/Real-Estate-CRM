@@ -1,0 +1,104 @@
+"use client";
+
+import React, { useMemo } from "react";
+import LeadsToolbar from "./LeadsToolbar";
+import LeadSection from "./LeadSection";
+import { Lead, StatusOption } from "./LeadCard";
+
+const SECTIONS = [
+  { key: "NEW", label: "New", badgeClass: "bg-[#EFF6FF] text-[#2563EB] border border-[#3B82F6]" },
+  { key: "CONTACTED", label: "Contacted", badgeClass: "bg-[#FFF7ED] text-[#B45309] border border-[#F59E0B]" },
+  { key: "VISIT_SCHEDULED", label: "Visit Scheduled", badgeClass: "bg-[#F0F9FF] text-[#0EA5E9] border border-[#0EA5E9]" },
+  { key: "NEGOTIATION", label: "Negotiation", badgeClass: "bg-[#FAF5FF] text-[#7C3AED] border border-[#A855F7]" },
+  { key: "CONVERTED", label: "Converted", badgeClass: "bg-[#ECFDF5] text-[#047857] border border-[#10B981]" },
+  { key: "LOST", label: "Lost", badgeClass: "bg-[#FEF2F2] text-[#B91C1C] border border-[#EF4444]" },
+];
+
+const iconMap: Record<string, React.ReactNode> = {
+  NEW: (
+    <svg className="h-5 w-5 text-cyan-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 5v14" />
+      <path d="M5 12h14" />
+    </svg>
+  ),
+  CONTACTED: (
+    <svg className="h-5 w-5 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 10a8 8 0 11-16 0 8 8 0 0116 0z" />
+      <path d="M8 12l2 2 4-4" />
+    </svg>
+  ),
+  VISIT_SCHEDULED: (
+    <svg className="h-5 w-5 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 7V3" />
+      <path d="M16 7V3" />
+      <path d="M3 11h18" />
+      <path d="M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  ),
+  NEGOTIATION: (
+    <svg className="h-5 w-5 text-violet-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 12h18" />
+      <path d="M12 3v18" />
+      <path d="M8 8l8 8" />
+    </svg>
+  ),
+  CONVERTED: (
+    <svg className="h-5 w-5 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6L9 17l-5-5" />
+    </svg>
+  ),
+  LOST: (
+    <svg className="h-5 w-5 text-rose-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 18L18 6" />
+      <path d="M6 6l12 12" />
+    </svg>
+  ),
+};
+
+interface LeadsBoardProps {
+  leads: Lead[];
+  loading: boolean;
+  onSearch: (query: string) => void;
+  onAdd: () => void;
+  onStatusChange: (leadId: number, status: string) => void;
+  onViewAll: () => void;
+}
+
+export default function LeadsBoard({ leads, loading, onSearch, onAdd, onStatusChange, onViewAll }: LeadsBoardProps) {
+  const statusOptions: StatusOption[] = SECTIONS.map((section) => ({ value: section.key, label: section.label }));
+
+  const groupedLeads = useMemo(() => {
+    return SECTIONS.reduce((acc, section) => {
+      acc[section.key] = leads.filter((lead) => lead.status === section.key);
+      return acc;
+    }, {} as Record<string, Lead[]>);
+  }, [leads]);
+
+  return (
+    <div className="space-y-6 pb-4">
+      <LeadsToolbar onSearch={onSearch} onAdd={onAdd} />
+
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {SECTIONS.map((section) => (
+          <LeadSection
+            key={section.key}
+            title={section.label}
+            leads={groupedLeads[section.key] ?? []}
+            statusOptions={statusOptions}
+            icon={iconMap[section.key]}
+            badgeClass={section.badgeClass}
+            onAdd={onAdd}
+            onStatusChange={onStatusChange}
+            onViewAll={onViewAll}
+          />
+        ))}
+      </div>
+
+      {loading && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm text-center text-slate-500">
+          Loading premium leads board...
+        </div>
+      )}
+    </div>
+  );
+}

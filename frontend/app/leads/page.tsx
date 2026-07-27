@@ -1,32 +1,55 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import api from "../../lib/axios";
-import { useAuthStore } from "../../store/authStore";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "../../store/authStore";
+import api from "../../lib/axios";
+import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import LeadsBoard from "../../components/leads/LeadsBoard";
 
-export default function LeadsBoardPage() {
-  const [leads, setLeads] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const { user } = useAuthStore();
+export default function LeadsPage() {
   const router = useRouter();
+  const { user, accessToken, clearAuth } = useAuthStore();
 
-  // Kanban Statuses
-  const statuses = ["NEW", "CONTACTED", "VISIT_SCHEDULED", "NEGOTIATION", "CONVERTED", "LOST"];
+  const [leads, setLeads] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
+    if (!accessToken) {
+      router.push("/login");
+      return;
+    }
+
     fetchLeads();
-  }, []);
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [accessToken, router]);
 
   const fetchLeads = async () => {
     setLoading(true);
     try {
       const res = await api.get("/leads");
-      setLeads(res.data);
+      setLeads(res.data || []);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const [countRes, listRes] = await Promise.all([
+        api.get("/notifications/unread-count"),
+        api.get("/notifications"),
+      ]);
+      setUnreadCount(countRes.data.count ?? 0);
+      setNotifications(listRes.data || []);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -35,68 +58,49 @@ export default function LeadsBoardPage() {
       await api.patch(`/leads/${leadId}`, { status });
       fetchLeads();
     } catch (err) {
-      alert("Error updating status");
+      console.error(err);
+      alert("Unable to update lead status. Please try again.");
     }
   };
 
+  const markRead = async (id: number) => {
+    try {
+      await api.patch(`/notifications/${id}/mark-read`);
+      fetchNotifications();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleLogout = () => {
+    clearAuth();
+    router.push("/login");
+  };
+
+  if (!user) return null;
+
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <div className="w-64 bg-slate-900 text-white p-6 hidden md:block">
-        <h1 className="text-2xl font-bold mb-8 text-primary">CRM</h1>
-        <nav className="space-y-4">
-          <a href="/" className="block px-4 py-2 hover:bg-slate-800 rounded">Dashboard</a>
-          <a href="/leads" className="block px-4 py-2 bg-slate-800 rounded">Leads</a>
-          <a href="/inventory" className="block px-4 py-2 hover:bg-slate-800 rounded">Inventory</a>
-        </nav>
-      </div>
-
-      <div className="flex-1 p-8 overflow-auto flex flex-col">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800">Leads Board</h2>
-          <button className="bg-primary text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition">
-            + Add Lead
-          </button>
-        </div>
-
-        {/* Board Columns */}
-        {loading ? <p>Loading...</p> : (
-          <div className="flex gap-6 overflow-x-auto pb-4 flex-1">
-            {statuses.map(status => (
-              <div key={status} className="bg-gray-100 rounded-lg p-4 w-80 shrink-0 flex flex-col">
-                <h3 className="font-bold text-gray-700 mb-4 tracking-wide text-sm">{status.replace('_', ' ')}</h3>
-                
-                <div className="space-y-3 flex-1 overflow-y-auto">
-                  {leads.filter((l: any) => l.status === status).map((lead: any) => (
-                    <div 
-                      key={lead.id} 
-                      className="bg-white p-4 rounded shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition"
-                      onClick={() => router.push(`/leads/${lead.id}`)}
-                    >
-                      <h4 className="font-bold text-gray-900">{lead.name}</h4>
-                      <p className="text-sm text-gray-500 mb-3">{lead.phone}</p>
-                      
-                      {/* Quick Status Move Dropdown */}
-                      <select 
-                        className="text-xs border rounded p-1 w-full mt-2 bg-gray-50 outline-none"
-                        value={lead.status}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          updateStatus(lead.id, e.target.value);
-                        }}
-                      >
-                        {statuses.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
-                      </select>
-                    </div>
-                  ))}
-                  {leads.filter((l: any) => l.status === status).length === 0 && (
-                    <p className="text-sm text-gray-400 text-center py-4 border-2 border-dashed rounded">No leads</p>
-                  )}
-                </div>
-              </div>
-            ))}
+    <DashboardLayout
+      user={user}
+      unreadCount={unreadCount}
+      notifications={notifications}
+      onMarkRead={markRead}
+      onLogout={handleLogout}
+    >
+      <div className="min-h-full flex flex-col bg-[linear-gradient(180deg,_#F8FAFC_0%,_#F1F5F9_100%)]">
+        <div className="mx-auto max-w-7xl px-8 py-10">
+          <div className="rounded-[32px] border border-[#E2E8F0] bg-white p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+            <LeadsBoard
+              leads={leads}
+              loading={loading}
+              onSearch={() => {}}
+              onAdd={() => router.push("/leads/new")}
+              onStatusChange={updateStatus}
+              onViewAll={() => router.push("/leads")}
+            />
           </div>
-        )}
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

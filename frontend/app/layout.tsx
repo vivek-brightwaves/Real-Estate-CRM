@@ -12,8 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased font-sans">
+    <html lang="en" className="overflow-hidden h-screen">
+      <body className="antialiased font-sans overflow-hidden h-screen">
         {children}
       </body>
     </html>

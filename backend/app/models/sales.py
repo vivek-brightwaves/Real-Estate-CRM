@@ -33,6 +33,7 @@ class Booking(Base):
     unit_id = Column(Integer, ForeignKey("units.id"), nullable=False, index=True)
     customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False, index=True)
     created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     status = Column(Enum(BookingStatusEnum), default=BookingStatusEnum.PENDING, index=True)
     approved_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
 
