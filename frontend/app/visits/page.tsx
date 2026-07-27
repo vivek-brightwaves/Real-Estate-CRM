@@ -107,7 +107,7 @@ export default function VisitsPage() {
                   <div key={visit.id} className="bg-white p-6 rounded-xl shadow-sm border flex flex-col">
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <p className="font-bold text-gray-800 text-lg">Lead ID: {visit.lead_id}</p>
+                        <p className="font-bold text-gray-800 text-lg">Lead: {visit.lead?.name || `ID: ${visit.lead_id}`}</p>
                         <p className="text-sm text-gray-500">Scheduled: {new Date(visit.scheduled_at).toLocaleTimeString()}</p>
                       </div>
                       <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded text-xs font-bold">

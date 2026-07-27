@@ -23,7 +23,7 @@ export default function CustomersPage() {
   const fetchCustomers = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/customers");
+      const res = await api.get(`/customers?t=${Date.now()}`);
       setCustomers(res.data);
     } catch (err) {
       console.error(err);
@@ -34,7 +34,7 @@ export default function CustomersPage() {
 
   const fetchVerifiedDocs = async () => {
     try {
-      const res = await api.get("/customers/verified-documents");
+      const res = await api.get(`/customers/verified-documents?t=${Date.now()}`);
       setVerifiedDocs(res.data);
     } catch (err) {
       console.error(err);

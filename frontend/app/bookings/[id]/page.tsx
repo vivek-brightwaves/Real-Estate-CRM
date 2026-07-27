@@ -8,6 +8,7 @@ import { useAuthStore } from "../../../store/authStore";
 export default function BookingDetailPage({ params }: { params: { id: string } }) {
   const [booking, setBooking] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
   
   const [showDiscount, setShowDiscount] = useState(false);
   const [discountAmount, setDiscountAmount] = useState("");
@@ -32,37 +33,54 @@ export default function BookingDetailPage({ params }: { params: { id: string } }
   };
 
   const handleStatusUpdate = async (action: string) => {
+    if (['verify-documents', 'approve', 'confirm'].includes(action) && !booking.has_verified_kyc) {
+      alert("Cannot proceed: Customer KYC documents are missing or unverified.");
+      return;
+    }
+    if (actionLoading) return;
+    setActionLoading(true);
     try {
       await api.patch(`/bookings/${params.id}/${action}`);
-      alert(`Booking successfully marked as ${action.toUpperCase()}`);
-      fetchBooking();
+      await fetchBooking();
     } catch (err: any) {
       alert("Error: " + (err.response?.data?.detail || "Action failed"));
+    } finally {
+      setActionLoading(false);
     }
   };
 
   const handleRequestDiscount = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (actionLoading) return;
+    setActionLoading(true);
     try {
+      // Calls /request-discount which matches the backend alias route
       await api.post(`/bookings/${params.id}/request-discount`, {
         amount: Number(discountAmount)
       });
       alert("Discount requested successfully!");
       setShowDiscount(false);
-      fetchBooking();
+      setDiscountAmount("");
+      await fetchBooking();
     } catch (err: any) {
-      alert("Error requesting discount: " + err.response?.data?.detail);
+      alert("Error requesting discount: " + (err.response?.data?.detail || "Failed"));
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  // Mock function for Super Admin action
   const handleApproveDiscount = async (discountId: number) => {
+    if (actionLoading) return;
+    setActionLoading(true);
     try {
-      await api.patch(`/bookings/discount-approvals/${discountId}/approve`);
+      // Approvals are managed via the system/approvals endpoint
+      await api.patch(`/system/approvals/${discountId}/approve`);
       alert("Discount approved!");
-      fetchBooking();
+      await fetchBooking();
     } catch (err: any) {
-      alert("Error approving discount: " + err.response?.data?.detail);
+      alert("Error approving discount: " + (err.response?.data?.detail || "Failed"));
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -90,7 +108,14 @@ export default function BookingDetailPage({ params }: { params: { id: string } }
             <div className="bg-gray-50 p-6 rounded-lg border">
               <h3 className="text-gray-500 text-sm font-bold uppercase tracking-wider mb-2">Customer Details</h3>
               <p className="text-xl font-medium text-gray-900">ID: {booking.customer_id}</p>
-              <button onClick={() => router.push(`/customers/${booking.customer_id}`)} className="text-primary text-sm hover:underline mt-2 inline-block">View Customer Profile</button>
+              <div className="mt-2 mb-2">
+                {booking.has_verified_kyc ? (
+                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded font-bold">✓ KYC Verified</span>
+                ) : (
+                  <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded font-bold">⚠ KYC Pending</span>
+                )}
+              </div>
+              <button onClick={() => router.push(`/customers/${booking.customer_id}`)} className="text-primary text-sm hover:underline inline-block">View Customer Profile</button>
             </div>
             <div className="bg-gray-50 p-6 rounded-lg border">
               <h3 className="text-gray-500 text-sm font-bold uppercase tracking-wider mb-2">Unit Details</h3>
@@ -136,21 +161,46 @@ export default function BookingDetailPage({ params }: { params: { id: string } }
             {(user?.role === "MANAGER" || user?.role === "SUPER_ADMIN") && (
               <>
                 {booking.status === "PENDING" && (
-                  <button onClick={() => handleStatusUpdate('verify-documents')} className="flex-1 bg-yellow-500 text-white py-3 rounded-lg font-bold shadow hover:bg-yellow-600">Verify Documents</button>
+                  <button
+                    onClick={() => handleStatusUpdate('verify-documents')}
+                    disabled={actionLoading}
+                    className="flex-1 bg-yellow-500 text-white py-3 rounded-lg font-bold shadow hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {actionLoading ? "Processing..." : "Verify Documents"}
+                  </button>
                 )}
                 {booking.status === "DOCS_VERIFIED" && (
-                  <button onClick={() => handleStatusUpdate('approve')} className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-bold shadow hover:bg-blue-600">Approve Booking</button>
+                  <button
+                    onClick={() => handleStatusUpdate('approve')}
+                    disabled={actionLoading}
+                    className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-bold shadow hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {actionLoading ? "Processing..." : "Approve Booking"}
+                  </button>
                 )}
                 {booking.status === "APPROVED" && (
-                  <button onClick={() => handleStatusUpdate('confirm')} className="flex-1 bg-green-500 text-white py-3 rounded-lg font-bold shadow hover:bg-green-600">Confirm Booking (Verify Payments)</button>
+                  <button
+                    onClick={() => handleStatusUpdate('confirm')}
+                    disabled={actionLoading}
+                    className="flex-1 bg-green-500 text-white py-3 rounded-lg font-bold shadow hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {actionLoading ? "Processing..." : "Confirm Booking (Verify Payments)"}
+                  </button>
                 )}
               </>
             )}
             
             {user?.role === "SUPER_ADMIN" && booking.status !== "CANCELLED" && booking.status !== "CONFIRMED" && (
-              <button onClick={() => handleStatusUpdate('cancel')} className="flex-1 bg-red-500 text-white py-3 rounded-lg font-bold shadow hover:bg-red-600">Cancel Booking</button>
+              <button
+                onClick={() => handleStatusUpdate('cancel')}
+                disabled={actionLoading}
+                className="flex-1 bg-red-500 text-white py-3 rounded-lg font-bold shadow hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {actionLoading ? "Processing..." : "Cancel Booking"}
+              </button>
             )}
           </div>
+
         </div>
 
         {/* Discount Modal */}

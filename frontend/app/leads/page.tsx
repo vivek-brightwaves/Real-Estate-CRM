@@ -18,8 +18,8 @@ export default function LeadsBoardPage() {
   const [newSource, setNewSource] = useState("");
   const [newInitialNote, setNewInitialNote] = useState("");
 
-  // Kanban Statuses
-  const statuses = ["NEW", "CONTACTED", "VISIT_SCHEDULED", "NEGOTIATION", "CONVERTED", "LOST"];
+  // Kanban Statuses — CONVERTED leads are handled in the Customers module
+  const statuses = ["NEW", "CONTACTED", "VISIT_SCHEDULED", "NEGOTIATION", "LOST"];
 
   useEffect(() => {
     fetchLeads();
@@ -34,15 +34,6 @@ export default function LeadsBoardPage() {
       console.error(err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const updateStatus = async (leadId: number, status: string) => {
-    try {
-      await api.patch(`/leads/${leadId}`, { status });
-      fetchLeads();
-    } catch (err) {
-      alert("Error updating status");
     }
   };
 
@@ -98,23 +89,19 @@ export default function LeadsBoardPage() {
                   {leads.filter((l: any) => l.status === status).map((lead: any) => (
                     <div 
                       key={lead.id} 
-                      className="bg-white p-4 rounded shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition"
-                      onClick={() => router.push(`/leads/${lead.id}`)}
+                      className="bg-white p-4 rounded shadow-sm border border-gray-200 hover:shadow-md transition"
                     >
                       <h4 className="font-bold text-gray-900">{lead.name}</h4>
-                      <p className="text-sm text-gray-500 mb-3">{lead.phone}</p>
-                      
-                      {/* Quick Status Move Dropdown */}
-                      <select 
-                        className="text-xs border rounded p-1 w-full mt-2 bg-gray-50 outline-none"
-                        value={lead.status}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          updateStatus(lead.id, e.target.value);
-                        }}
+                      <p className="text-sm text-gray-500">{lead.phone}</p>
+                      {lead.email && <p className="text-xs text-gray-400 mb-3">{lead.email}</p>}
+
+                      {/* View Details — the ONLY way to navigate and change lead status */}
+                      <button
+                        onClick={() => router.push(`/leads/${lead.id}`)}
+                        className="mt-3 w-full text-xs text-primary border border-primary rounded py-1 hover:bg-primary hover:text-white transition font-semibold"
                       >
-                        {statuses.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
-                      </select>
+                        View Details →
+                      </button>
                     </div>
                   ))}
                   {leads.filter((l: any) => l.status === status).length === 0 && (

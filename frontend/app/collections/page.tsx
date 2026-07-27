@@ -72,10 +72,30 @@ export default function CollectionsPage() {
 
   const generateReceipt = async (paymentId: number) => {
     try {
-      const res = await api.post(`/payments/${paymentId}/generate-receipt`);
-      window.open(`http://localhost:8000${res.data.receipt_url}`, "_blank");
+      // Use the raw axios instance configured with auth headers,
+      // but request a binary blob response type for the PDF
+      const res = await api.post(
+        `/payments/${paymentId}/generate-receipt`,
+        {},
+        { responseType: "blob" }
+      );
+
+      // Create a temporary object URL and open the PDF in a new tab
+      const blob = new Blob([res.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const newTab = window.open(url, "_blank");
+      if (!newTab) {
+        // Fallback: trigger a download if popup was blocked
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `receipt_${paymentId}.pdf`;
+        a.click();
+      }
+      // Revoke after a short delay to free memory
+      setTimeout(() => window.URL.revokeObjectURL(url), 10000);
     } catch (err: any) {
-      alert("Error generating receipt: " + (err.response?.data?.detail || "Error"));
+      const detail = err.response?.data?.detail;
+      alert("Error generating receipt: " + (detail || err.message || "Unknown error"));
     }
   };
 

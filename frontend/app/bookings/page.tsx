@@ -8,6 +8,7 @@ import { useAuthStore } from "../../store/authStore";
 export default function BookingsBoardPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
   const { user } = useAuthStore();
   const router = useRouter();
 
@@ -56,44 +57,72 @@ export default function BookingsBoardPage() {
     }
   };
 
-  const handleVerifyDocs = async (bookingId: number) => {
+  const handleVerifyDocs = async (booking: any) => {
+    if (!booking.has_verified_kyc) {
+      alert("Cannot proceed: Customer KYC documents are missing or unverified.");
+      return;
+    }
+    if (actionLoading) return;
+    setActionLoading(booking.id);
     try {
-      await api.patch(`/bookings/${bookingId}/verify-documents`);
-      alert("Documents verified successfully!");
-      fetchBookings();
+      await api.patch(`/bookings/${booking.id}/verify-documents`);
+      await fetchBookings();
     } catch (err: any) {
       alert("Error: " + (err.response?.data?.detail || "Failed to verify documents"));
+      await fetchBookings(); // always refresh so stale cards are corrected
+    } finally {
+      setActionLoading(null);
     }
   };
 
-  const handleApprove = async (bookingId: number) => {
+  const handleApprove = async (booking: any) => {
+    if (!booking.has_verified_kyc) {
+      alert("Cannot proceed: Customer KYC documents are missing or unverified.");
+      return;
+    }
+    if (actionLoading) return;
+    setActionLoading(booking.id);
     try {
-      await api.patch(`/bookings/${bookingId}/approve`);
-      alert("Booking approved!");
-      fetchBookings();
+      await api.patch(`/bookings/${booking.id}/approve`);
+      await fetchBookings();
     } catch (err: any) {
       alert("Error: " + (err.response?.data?.detail || "Failed to approve booking"));
+      await fetchBookings(); // always refresh so stale cards are corrected
+    } finally {
+      setActionLoading(null);
     }
   };
 
-  const handleConfirm = async (bookingId: number) => {
+  const handleConfirm = async (booking: any) => {
+    if (!booking.has_verified_kyc) {
+      alert("Cannot proceed: Customer KYC documents are missing or unverified.");
+      return;
+    }
+    if (actionLoading) return;
+    setActionLoading(booking.id);
     try {
-      await api.patch(`/bookings/${bookingId}/confirm`);
-      alert("Booking confirmed!");
-      fetchBookings();
+      await api.patch(`/bookings/${booking.id}/confirm`);
+      await fetchBookings();
     } catch (err: any) {
       alert("Error: " + (err.response?.data?.detail || "Failed to confirm booking"));
+      await fetchBookings(); // always refresh so stale cards are corrected
+    } finally {
+      setActionLoading(null);
     }
   };
 
   const handleCancel = async (bookingId: number) => {
     if (!confirm("Are you sure you want to cancel this booking?")) return;
+    if (actionLoading) return;
+    setActionLoading(bookingId);
     try {
       await api.patch(`/bookings/${bookingId}/cancel`);
-      alert("Booking cancelled.");
-      fetchBookings();
+      await fetchBookings();
     } catch (err: any) {
       alert("Error: " + (err.response?.data?.detail || "Failed to cancel booking"));
+      await fetchBookings(); // always refresh so stale cards are corrected
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -145,33 +174,45 @@ export default function BookingsBoardPage() {
 
                     {/* Workflow Action Buttons */}
                     <div className="mt-3 pt-3 border-t flex flex-col gap-2">
+                      {/* KYC Status Indicator */}
+                      <div className="mt-2">
+                        {booking.has_verified_kyc ? (
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded font-bold">✓ KYC Verified</span>
+                        ) : (
+                          <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded font-bold">⚠ KYC Pending</span>
+                        )}
+                      </div>
+
                       {/* PENDING → Verify Documents (Manager/Admin only) */}
                       {booking.status === "PENDING" && isManagerOrAdmin && (
                         <button
-                          onClick={() => handleVerifyDocs(booking.id)}
-                          className="w-full text-xs bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1.5 rounded transition"
+                          onClick={() => handleVerifyDocs(booking)}
+                          disabled={actionLoading === booking.id}
+                          className="w-full text-xs bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          ✓ Verify Documents
+                          {actionLoading === booking.id ? "Processing..." : "✓ Verify Documents"}
                         </button>
                       )}
 
                       {/* DOCS_VERIFIED → Approve (Manager/Admin only) */}
                       {booking.status === "DOCS_VERIFIED" && isManagerOrAdmin && (
                         <button
-                          onClick={() => handleApprove(booking.id)}
-                          className="w-full text-xs bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 rounded transition"
+                          onClick={() => handleApprove(booking)}
+                          disabled={actionLoading === booking.id}
+                          className="w-full text-xs bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          ✓ Approve Booking
+                          {actionLoading === booking.id ? "Processing..." : "✓ Approve Booking"}
                         </button>
                       )}
 
                       {/* APPROVED → Confirm (Manager/Admin only) */}
                       {booking.status === "APPROVED" && isManagerOrAdmin && (
                         <button
-                          onClick={() => handleConfirm(booking.id)}
-                          className="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 rounded transition"
+                          onClick={() => handleConfirm(booking)}
+                          disabled={actionLoading === booking.id}
+                          className="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          ✓ Confirm Booking
+                          {actionLoading === booking.id ? "Processing..." : "✓ Confirm Booking"}
                         </button>
                       )}
 
@@ -179,9 +220,10 @@ export default function BookingsBoardPage() {
                       {isSuperAdmin && !["CONFIRMED", "CANCELLED"].includes(booking.status) && (
                         <button
                           onClick={() => handleCancel(booking.id)}
-                          className="w-full text-xs bg-red-100 hover:bg-red-200 text-red-700 font-bold py-1.5 rounded transition"
+                          disabled={actionLoading === booking.id}
+                          className="w-full text-xs bg-red-100 hover:bg-red-200 text-red-700 font-bold py-1.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          ✕ Cancel
+                          {actionLoading === booking.id ? "Processing..." : "✕ Cancel"}
                         </button>
                       )}
                     </div>

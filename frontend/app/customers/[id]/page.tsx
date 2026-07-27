@@ -64,7 +64,12 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
     try {
       await api.patch(`/customers/documents/${docId}/verify`, { status });
       alert(`Document marked as ${status}`);
-      fetchCustomerData();
+      
+      if (status === 'VERIFIED') {
+        window.location.href = '/customers'; // Use standard window navigation to force a full refresh, bypassing Next.js client router cache
+      } else {
+        fetchCustomerData();
+      }
     } catch (err) {
       alert("Error verifying document. You might lack permissions.");
     }
