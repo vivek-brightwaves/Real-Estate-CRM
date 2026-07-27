@@ -353,6 +353,18 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, [accessToken, router]);
 
   useEffect(() => {
+    if (!user) return;
+
+    const adminOnly = pathname.startsWith("/admin/");
+    const managerOnly = pathname === "/reports" || pathname.startsWith("/reports/");
+    if (adminOnly && user.role !== "SUPER_ADMIN") {
+      router.replace("/");
+    } else if (managerOnly && !["SUPER_ADMIN", "MANAGER"].includes(user.role)) {
+      router.replace("/");
+    }
+  }, [pathname, router, user]);
+
+  useEffect(() => {
     if (mainRef.current) {
       mainRef.current.scrollTop = 0;
     }

@@ -43,7 +43,7 @@ export default function BookingsBoardPage() {
       return;
     }
     try {
-      await api.post("/bookings", {
+      const res = await api.post("/bookings", {
         unit_id: Number(newUnitId),
         customer_id: Number(newCustId)
       });
@@ -51,7 +51,7 @@ export default function BookingsBoardPage() {
       setShowNew(false);
       setNewUnitId("");
       setNewCustId("");
-      fetchBookings();
+      router.replace(`/bookings/${res.data.id}`);
     } catch (err: any) {
       alert("Error: " + (err.response?.data?.detail || "Failed to create booking"));
     }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import api from "../../lib/axios";
 import { useAuthStore } from "../../store/authStore";
+import { useSearchParams } from "next/navigation";
 
 export default function CollectionsPage() {
   const [payments, setPayments] = useState([]);
@@ -10,6 +11,8 @@ export default function CollectionsPage() {
   const [activeTab, setActiveTab] = useState("PENDING"); // PENDING, OVERDUE, RECEIVED
   
   const { user } = useAuthStore();
+  const searchParams = useSearchParams();
+  const selectedBookingId = searchParams.get("booking");
 
   // Modals state
   const [showNew, setShowNew] = useState(false);
@@ -23,12 +26,21 @@ export default function CollectionsPage() {
 
   useEffect(() => {
     fetchPayments();
-  }, [activeTab]);
+  }, [activeTab, selectedBookingId]);
+
+  useEffect(() => {
+    if (selectedBookingId) {
+      setNewBookingId(selectedBookingId);
+      setShowNew(true);
+    }
+  }, [selectedBookingId]);
 
   const fetchPayments = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/payments`);
+      const res = await api.get(
+        selectedBookingId ? `/payments?booking_id=${selectedBookingId}` : "/payments"
+      );
       // We will filter client side for tabs (or could pass ?status_filter)
       setPayments(res.data);
     } catch (err) {
@@ -114,9 +126,11 @@ export default function CollectionsPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-gray-800">Collections Dashboard</h2>
-          <button onClick={() => setShowNew(true)} className="bg-primary text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition font-bold">
-            + Record Scheduled Payment
-          </button>
+          {selectedBookingId && (
+            <button onClick={() => setShowNew(true)} className="bg-primary text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition font-bold">
+              + Schedule Payment for Booking #{selectedBookingId}
+            </button>
+          )}
         </div>
 
         {/* Tabs */}
@@ -198,8 +212,10 @@ export default function CollectionsPage() {
             <div className="bg-white p-6 rounded-xl w-full max-w-sm shadow-xl">
               <h3 className="text-xl font-bold mb-4 text-gray-800">Record Scheduled Payment</h3>
               <form onSubmit={handleRecordPayment}>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Booking ID</label>
-                <input type="number" required value={newBookingId} onChange={(e) => setNewBookingId(e.target.value)} className="w-full mb-4 border p-2 rounded" />
+                <input type="hidden" value={newBookingId} readOnly />
+                <p className="mb-4 rounded bg-blue-50 p-3 text-sm font-semibold text-blue-800">
+                  Booking #{newBookingId}
+                </p>
                 
                 <label className="block text-sm font-bold text-gray-700 mb-1">Amount (₹)</label>
                 <input type="number" required value={newAmount} onChange={(e) => setNewAmount(e.target.value)} className="w-full mb-4 border p-2 rounded" />

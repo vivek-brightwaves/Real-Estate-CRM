@@ -41,6 +41,10 @@ export default function BookingDetailPage({ params }: { params: { id: string } }
     setActionLoading(true);
     try {
       await api.patch(`/bookings/${params.id}/${action}`);
+      if (action === "confirm") {
+        router.replace(`/collections?booking=${params.id}`);
+        return;
+      }
       await fetchBooking();
     } catch (err: any) {
       alert("Error: " + (err.response?.data?.detail || "Action failed"));
@@ -158,6 +162,14 @@ export default function BookingDetailPage({ params }: { params: { id: string } }
 
           {/* Workflow Action Buttons based on Role & Status */}
           <div className="flex gap-4 border-t pt-6">
+            {booking.status === "CONFIRMED" && (
+              <button
+                onClick={() => router.replace(`/collections?booking=${booking.id}`)}
+                className="flex-1 bg-primary text-white py-3 rounded-lg font-bold shadow hover:bg-blue-600"
+              >
+                Continue to Payments
+              </button>
+            )}
             {(user?.role === "MANAGER" || user?.role === "SUPER_ADMIN") && (
               <>
                 {booking.status === "PENDING" && (

@@ -131,12 +131,12 @@ export default function VisitsPage() {
 
                     <div className="mt-auto flex gap-3 border-t pt-4">
                       {/* Employee Actions */}
-                      {(!visit.check_in_time && user?.role === "EMPLOYEE") && (
+                      {(!visit.check_in_time && ["SCHEDULED", "RESCHEDULED"].includes(visit.status) && user?.role === "EMPLOYEE") && (
                         <button onClick={() => setShowCheckIn(visit.id)} className="flex-1 bg-primary text-white py-2 rounded hover:bg-blue-600 transition">
                           Check In
                         </button>
                       )}
-                      {(visit.check_in_time && !visit.feedback && user?.role === "EMPLOYEE") && (
+                      {(visit.check_in_time && !visit.feedback && visit.status !== "COMPLETED" && user?.role === "EMPLOYEE") && (
                         <button onClick={() => setShowFeedback(visit.id)} className="flex-1 bg-green-500 text-white py-2 rounded hover:bg-green-600 transition">
                           Leave Feedback
                         </button>

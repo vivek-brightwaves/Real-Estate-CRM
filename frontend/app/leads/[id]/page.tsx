@@ -52,7 +52,7 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
     try {
       await api.patch(`/leads/${lead.id}`, { status: 'CONTACTED' });
       alert("Lead marked as Contacted successfully.");
-      router.push("/leads");
+      router.replace(`/leads/${lead.id}`);
     } catch (err: any) {
       alert("Error updating status: " + (err.response?.data?.detail || err.message));
     }
@@ -81,13 +81,15 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
       alert("Site visit scheduled successfully.");
       // Redirect to Leads Board — it will refetch and show the lead
       // in the VISIT_SCHEDULED column without a manual page refresh.
-      router.push("/leads");
+      router.replace("/visits");
     } catch (err: any) {
       alert("Error scheduling visit: " + (err.response?.data?.detail || err.message));
     }
   };
 
-  const hasCompletedVisit = lead?.site_visits?.some((v: any) => v.status === 'COMPLETED');
+  const hasApprovedVisit = lead?.site_visits?.some(
+    (v: any) => v.status === 'COMPLETED' && v.is_approved
+  );
 
   const handleSubmitVisitResult = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,13 +178,15 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
 
             {lead.status === 'VISIT_SCHEDULED' && (
               <>
-                <button 
-                  onClick={() => setShowVisitModal(true)}
-                  className="flex-1 bg-gray-500 text-white py-3 rounded-lg shadow hover:bg-gray-600 transition font-bold"
-                >
-                  Update Visit Result
-                </button>
-                {hasCompletedVisit && (
+                {!hasApprovedVisit && (
+                  <button
+                    onClick={() => router.replace("/visits")}
+                    className="flex-1 bg-gray-600 text-white py-3 rounded-lg shadow hover:bg-gray-700 transition font-bold"
+                  >
+                    Continue Site Visit
+                  </button>
+                )}
+                {hasApprovedVisit && (
                   <button 
                     onClick={() => handleUpdateStatus('NEGOTIATION')}
                     className="flex-1 bg-yellow-500 text-white py-3 rounded-lg shadow hover:bg-yellow-600 transition font-bold"
