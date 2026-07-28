@@ -240,28 +240,8 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Restored Search Box - 300x52px, Radius 16px */}
-            <div className="relative hidden sm:block w-[200px] lg:w-[300px] h-[52px]">
-              <input
-                type="text"
-                placeholder="Search dashboard..."
-                className="h-[52px] w-full pl-11 pr-4 bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#1E293B] rounded-[16px] text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-650/10 dark:focus:ring-blue-500/20 shadow-sm transition-all duration-300"
-              />
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94A3B8] text-lg pointer-events-none">
-                🔍
-              </span>
-            </div>
-
-            {/* Mobile Search Icon Trigger */}
-            <button 
-              onClick={() => alert("Mobile Search triggered")} 
-              className="sm:hidden w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#1E293B] rounded-full text-[#94A3B8] shadow-sm cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-            >
-              🔍
-            </button>
-
-            {/* Calendar/Date Picker Button - 210x52px */}
-            <div className="hidden lg:flex items-center justify-between w-[210px] h-[52px] px-4 bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#1E293B] rounded-[16px] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold transition-all shadow-sm cursor-pointer select-none">
+            {/* Calendar/Date Picker Button - 190x48px */}
+            <div className="hidden lg:flex items-center justify-between w-[190px] h-[48px] px-4 bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] rounded-[16px] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold transition-all shadow-sm hover:border-blue-500 dark:hover:border-blue-500 cursor-pointer select-none">
               <div className="flex items-center gap-2">
                 <span className="text-sm">📅</span>
                 <span>July 27, 2026</span>
@@ -275,7 +255,7 @@ export default function DashboardLayout({
                 onClick={() => setIsNotifOpen(!isNotifOpen)} 
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#1E293B] rounded-full text-blue-600 dark:text-blue-400 shadow-sm hover:shadow transition-all focus:outline-none cursor-pointer relative"
+                className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] rounded-full text-blue-600 dark:text-blue-400 shadow-sm hover:shadow transition-all focus:outline-none cursor-pointer relative"
               >
                 <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -297,7 +277,7 @@ export default function DashboardLayout({
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 15, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-3 w-80 bg-white dark:bg-[#1E293B] rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E5E7EB] dark:border-[#1E293B] z-50 overflow-hidden"
+                    className="absolute right-0 mt-3 w-80 bg-white dark:bg-[#1E293B] rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E5E7EB] dark:border-[#334155] z-50 overflow-hidden"
                   >
                     <div className="p-4 border-b border-[#E5E7EB] dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/40">
                       <span className="text-xs font-extrabold text-slate-800 dark:text-[#F8FAFC]">System Notifications</span>
@@ -337,7 +317,7 @@ export default function DashboardLayout({
               onClick={() => alert("Opening messages inbox panel")}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#1E293B] rounded-full text-indigo-650 dark:text-indigo-400 shadow-sm hover:shadow transition-all focus:outline-none cursor-pointer relative"
+              className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] rounded-full text-indigo-650 dark:text-indigo-400 shadow-sm hover:shadow transition-all focus:outline-none cursor-pointer relative"
             >
               <svg className="w-5 h-5 text-blue-650 dark:text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -350,7 +330,7 @@ export default function DashboardLayout({
               onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#1E293B] rounded-full text-[#94A3B8] dark:text-[#F8FAFC] shadow-sm hover:shadow transition-all focus:outline-none cursor-pointer"
+              className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] rounded-full text-[#94A3B8] dark:text-[#F8FAFC] shadow-sm hover:shadow transition-all focus:outline-none cursor-pointer"
               title={resolvedTheme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               <AnimatePresence mode="wait">
@@ -381,7 +361,7 @@ export default function DashboardLayout({
               onClick={() => alert("Opening settings dashboard")}
               whileHover={{ rotate: 90, scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#1E293B] rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all shadow-sm focus:outline-none cursor-pointer"
+              className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all shadow-sm focus:outline-none cursor-pointer"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -393,7 +373,7 @@ export default function DashboardLayout({
             <div className="relative">
               <button 
                 onClick={() => setIsProfileOpen(!isProfileOpen)} 
-                className="flex items-center gap-3 pl-4 border-l border-[#E5E7EB] dark:border-[#1E293B] focus:outline-none group text-left cursor-pointer"
+                className="flex items-center gap-3 pl-4 border-l border-[#E5E7EB] dark:border-[#334155] focus:outline-none group text-left cursor-pointer"
               >
                 <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-650 text-white flex items-center justify-center font-extrabold text-lg border border-white dark:border-[#0F172A] shadow-md shrink-0 relative z-10">
                   S
@@ -417,7 +397,7 @@ export default function DashboardLayout({
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 15, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-3 w-52 bg-white dark:bg-[#1E293B] rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E5E7EB] dark:border-[#1E293B] z-50 py-1.5 overflow-hidden"
+                    className="absolute right-0 mt-3 w-52 bg-white dark:bg-[#1E293B] rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E5E7EB] dark:border-[#334155] z-50 py-1.5 overflow-hidden"
                   >
                     <div className="px-4 py-2.5 border-b border-[#E5E7EB] dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-left">
                       <p className="text-xs font-extrabold text-[#0F172A] dark:text-[#F8FAFC]">{user.name}</p>
