@@ -124,7 +124,7 @@ export default function DashboardLayout({
                 key={item.name}
                 onClick={() => handleNavClick(item.href)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 group ${isActive
-                    ? "bg-gradient-to-r from-blue-600 to-indigo-650 text-white shadow-md shadow-blue-600/10"
+                    ? "bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white shadow-md shadow-blue-600/10"
                     : "text-slate-400 hover:bg-slate-850 hover:text-white dark:hover:bg-slate-800/60"
                   }`}
                 title={item.name}
@@ -220,7 +220,7 @@ export default function DashboardLayout({
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="sticky top-0 z-50 w-full h-[72px] bg-white dark:bg-[#0F172A] border-b border-[#E5E7EB] dark:border-[#1E293B] px-6 py-4 flex items-center justify-between shadow-[0_8px_30px_rgba(15,23,42,0.06)] dark:shadow-none transition-colors duration-300"
+          className="sticky top-0 z-50 w-full h-[72px] bg-white dark:bg-[#111827] border-b border-[#E5E7EB] dark:border-[#334155] px-6 py-4 flex items-center justify-between shadow-[0_8px_30px_rgba(15,23,42,0.06)] dark:shadow-none transition-colors duration-300"
         >
           <div className="flex items-center gap-4">
             <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 md:hidden rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">

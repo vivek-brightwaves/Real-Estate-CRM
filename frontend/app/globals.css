@@ -569,13 +569,13 @@ rect,
 }
 
 .dark tbody tr:nth-child(even) {
-  background-color: #111827 !important;
+  background-color: #0F172A !important;
 }
 
 .dark .hover\:bg-slate-50:hover,
 .dark tr:hover,
 .dark tbody tr:hover {
-  background-color: #273449 !important;
+  background-color: #172554 !important;
 }
 
 /* Inputs and forms */
