@@ -11,16 +11,16 @@ export default function BookingChart() {
   ];
 
   return (
-    <div className="bg-gradient-to-br from-white via-white to-emerald-50/15 p-5 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 backdrop-blur-md bg-white/95">
-      <div className="flex items-center justify-between pb-5 mb-5 border-b border-[#E8EDF7]">
+    <div className="bg-gradient-to-br from-white via-white to-emerald-50/15 dark:from-[#1E293B] dark:to-emerald-950/5 p-5 rounded-[20px] border border-[#E8EDF7] dark:border-[#334155] shadow-sm hover:shadow-lg transition-all duration-300 backdrop-blur-md bg-white/95 dark:bg-[#1E293B]/95">
+      <div className="flex items-center justify-between pb-5 mb-5 border-b border-[#E8EDF7] dark:border-[#334155]">
         <div>
-          <h3 className="text-lg font-bold text-slate-900">Booking Status</h3>
-          <p className="text-xs text-slate-500 mt-0.5">Distribution of bookings by state</p>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-[#F8FAFC]">Booking Status</h3>
+          <p className="text-xs text-slate-500 dark:text-[#94A3B8] mt-0.5">Distribution of bookings by state</p>
         </div>
         <div className="flex items-center gap-2">
           <button 
             onClick={() => alert("Opening Bookings Breakdown Details")}
-            className="px-3 py-1.5 border border-[#E8EDF7] hover:border-slate-350 rounded-lg text-slate-700 hover:text-slate-900 text-xs font-bold transition-all bg-slate-50/50 hover:bg-slate-100 shadow-sm"
+            className="px-3 py-1.5 border border-[#E8EDF7] dark:border-slate-700 hover:border-slate-350 dark:hover:border-slate-500 rounded-lg text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all bg-slate-50/50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 shadow-sm cursor-pointer"
           >
             Details
           </button>
@@ -58,7 +58,7 @@ export default function BookingChart() {
               iconSize={8}
               formatter={(value: any, entry: any) => {
                 const item = data.find(d => d.name === value);
-                return <span className="text-xs font-semibold text-slate-600 ml-1">{value} ({item?.value})</span>;
+                return <span className="text-xs font-semibold text-slate-600 dark:text-[#CBD5E1] ml-1">{value} ({item?.value})</span>;
               }}
             />
           </PieChart>

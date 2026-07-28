@@ -478,6 +478,158 @@ button[class*="bg-gradient-to-r"]:active {
   animation: tabChangeFade 220ms ease-in-out forwards;
 }
 
+/* Smooth theme transition settings */
+* {
+  transition: background-color 350ms ease, color 350ms ease, border-color 350ms ease, box-shadow 350ms ease;
+}
+
+/* Ensure Recharts SVGs, sparklines, and transforms do not inherit transitions to prevent rendering lag */
+.recharts-wrapper, 
+.recharts-wrapper *, 
+.recharts-surface, 
+.recharts-surface *, 
+svg, 
+path, 
+circle, 
+rect,
+.animate-sweep-dot,
+.animate-float-glow,
+.animate-bell-shake {
+  transition: none !important;
+}
+
+:root {
+  --welcome-bg-start: rgba(255, 255, 255, 0.95);
+  --welcome-bg-mid: rgba(239, 246, 255, 0.07);
+  --welcome-bg-end: rgba(250, 245, 255, 0.07);
+}
+
+.dark {
+  --welcome-bg-start: rgba(30, 41, 59, 0.95);
+  --welcome-bg-mid: rgba(30, 41, 59, 0.4);
+  --welcome-bg-end: rgba(15, 23, 42, 0.1);
+}
+
+/* Premium Dark Theme Global Utilities */
+.dark body {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+}
+
+.dark .bg-white {
+  background-color: #1E293B !important;
+}
+
+/* Text color overrides */
+.dark .text-slate-900, 
+.dark .text-slate-850,
+.dark .text-slate-800 {
+  color: #F8FAFC !important;
+}
+
+.dark .text-slate-700, 
+.dark .text-slate-600,
+.dark .text-slate-655 {
+  color: #CBD5E1 !important;
+}
+
+.dark .text-slate-500, 
+.dark .text-slate-400, 
+.dark .text-slate-450 {
+  color: #94A3B8 !important;
+}
+
+/* Borders */
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-200\/80,
+.dark .border-\[\#E8EDF7\],
+.dark .border-white\/60,
+.dark .border-white\/80 {
+  border-color: #334155 !important;
+}
+
+/* Table styling */
+.dark th {
+  background-color: #1E293B !important;
+  color: #CBD5E1 !important;
+  border-color: #334155 !important;
+}
+
+.dark td {
+  border-color: #334155 !important;
+}
+
+.dark tr {
+  background-color: #1E293B;
+}
+
+.dark tbody tr {
+  background-color: #0F172A !important;
+}
+
+.dark tbody tr:nth-child(even) {
+  background-color: #111827 !important;
+}
+
+.dark .hover\:bg-slate-50:hover,
+.dark tr:hover,
+.dark tbody tr:hover {
+  background-color: #273449 !important;
+}
+
+/* Inputs and forms */
+.dark input, 
+.dark select, 
+.dark textarea {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+  color: #F8FAFC !important;
+}
+
+.dark input::placeholder, 
+.dark textarea::placeholder {
+  color: #64748B !important;
+}
+
+.dark select option {
+  background-color: #1E293B !important;
+  color: #F8FAFC !important;
+}
+
+/* Modals Overlay & Card */
+.dark .bg-slate-950\/40,
+.dark .bg-black\/40 {
+  background-color: rgba(0, 0, 0, 0.65) !important;
+}
+
+.dark .bg-slate-900 {
+  background-color: #0F172A !important;
+}
+
+/* Custom tabs & status background cards */
+.dark .bg-slate-50,
+.dark .bg-slate-50\/50,
+.dark .bg-slate-50\/40 {
+  background-color: #1E293B !important;
+}
+
+.dark .bg-slate-100 {
+  background-color: #273449 !important;
+}
+
+/* Scrollbar override */
+.dark ::-webkit-scrollbar-track {
+  background: #0F172A !important;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155 !important;
+  border-color: #0F172A !important;
+}
+
+
+
 
 
 

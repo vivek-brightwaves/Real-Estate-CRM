@@ -19,23 +19,23 @@ const formatNumber = (num: number, prefix: string = ""): string => {
   const isIndian = prefix.includes("₹") || prefix.toLowerCase().includes("inr");
   if (isIndian) {
     if (num >= 10000000) {
-      return `${(num / 10000000).toFixed(1).replace(/\.0$/, '')}Cr`;
+      return `${(num / 10000000).toFixed(2).replace(/\.?0+$/, '')} Cr`;
     }
     if (num >= 100000) {
-      return `${(num / 100000).toFixed(1).replace(/\.0$/, '')}L`;
+      return `${(num / 100000).toFixed(2).replace(/\.?0+$/, '')} L`;
     }
     if (num >= 1000) {
-      return `${(num / 1000).toFixed(1).replace(/\.0$/, '')}K`;
+      return `${(num / 1000).toFixed(2).replace(/\.?0+$/, '')}K`;
     }
   } else {
     if (num >= 1000000000) {
-      return `${(num / 1000000000).toFixed(1).replace(/\.0$/, '')}B`;
+      return `${(num / 1000000000).toFixed(2).replace(/\.?0+$/, '')}B`;
     }
     if (num >= 1000000) {
-      return `${(num / 1000000).toFixed(1).replace(/\.0$/, '')}M`;
+      return `${(num / 1000000).toFixed(2).replace(/\.?0+$/, '')}M`;
     }
     if (num >= 1000) {
-      return `${(num / 1000).toFixed(1).replace(/\.0$/, '')}K`;
+      return `${(num / 1000).toFixed(2).replace(/\.?0+$/, '')}K`;
     }
   }
   return num.toLocaleString('en-US');
@@ -76,49 +76,49 @@ const formatLargeValue = (val: string | number, label: string): string => {
 export default function StatsCard({ label, value, growth, isPositive, color, sparklineData, icon, delay = 0 }: StatsCardProps) {
   const themes = {
     blue: {
-      gradient: "from-blue-50/40 via-white to-blue-50/15",
-      accent: "text-blue-600",
-      bgLight: "bg-blue-50/60 text-blue-600 border border-blue-100/50",
+      gradient: "from-blue-50/40 via-white to-blue-50/15 dark:from-blue-955/10 dark:via-[#1E293B] dark:to-blue-955/5",
+      accent: "text-blue-600 dark:text-blue-450",
+      bgLight: "bg-blue-50/60 text-blue-600 border border-blue-100/50 dark:bg-blue-950/50 dark:text-blue-400 dark:border-blue-800/40",
       glow: "shadow-blue-500/5",
       sparkColor: "#3b82f6",
       glowColor: "rgba(59, 130, 246, 0.16)",
     },
     green: {
-      gradient: "from-emerald-50/40 via-white to-emerald-50/15",
-      accent: "text-emerald-600",
-      bgLight: "bg-emerald-50/60 text-emerald-600 border border-emerald-100/50",
+      gradient: "from-emerald-50/40 via-white to-emerald-50/15 dark:from-emerald-955/10 dark:via-[#1E293B] dark:to-emerald-955/5",
+      accent: "text-emerald-600 dark:text-emerald-450",
+      bgLight: "bg-emerald-50/60 text-emerald-600 border border-emerald-100/50 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-800/40",
       glow: "shadow-emerald-500/5",
       sparkColor: "#10b981",
       glowColor: "rgba(16, 185, 129, 0.16)",
     },
     purple: {
-      gradient: "from-purple-50/40 via-white to-purple-50/15",
-      accent: "text-purple-600",
-      bgLight: "bg-purple-50/60 text-purple-600 border border-purple-100/50",
+      gradient: "from-purple-50/40 via-white to-purple-50/15 dark:from-purple-955/10 dark:via-[#1E293B] dark:to-purple-955/5",
+      accent: "text-purple-600 dark:text-purple-450",
+      bgLight: "bg-purple-50/60 text-purple-600 border border-purple-100/50 dark:bg-purple-950/50 dark:text-purple-400 dark:border-purple-800/40",
       glow: "shadow-purple-500/5",
       sparkColor: "#8b5cf6",
       glowColor: "rgba(139, 92, 246, 0.16)",
     },
     orange: {
-      gradient: "from-orange-50/40 via-white to-orange-50/15",
-      accent: "text-orange-600",
-      bgLight: "bg-orange-50/60 text-orange-600 border border-orange-100/50",
+      gradient: "from-orange-50/40 via-white to-orange-50/15 dark:from-orange-955/10 dark:via-[#1E293B] dark:to-orange-955/5",
+      accent: "text-orange-600 dark:text-orange-450",
+      bgLight: "bg-orange-50/60 text-orange-600 border border-orange-100/50 dark:bg-orange-950/50 dark:text-orange-400 dark:border-orange-800/40",
       glow: "shadow-orange-500/5",
       sparkColor: "#f97316",
       glowColor: "rgba(249, 115, 22, 0.16)",
     },
     pink: {
-      gradient: "from-pink-50/40 via-white to-pink-50/15",
-      accent: "text-pink-600",
-      bgLight: "bg-pink-50/60 text-pink-600 border border-pink-100/50",
+      gradient: "from-pink-50/40 via-white to-pink-50/15 dark:from-pink-955/10 dark:via-[#1E293B] dark:to-pink-955/5",
+      accent: "text-pink-600 dark:text-pink-450",
+      bgLight: "bg-pink-50/60 text-pink-600 border border-pink-100/50 dark:bg-pink-950/50 dark:text-pink-400 dark:border-pink-800/40",
       glow: "shadow-pink-500/5",
       sparkColor: "#ec4899",
       glowColor: "rgba(236, 72, 153, 0.16)",
     },
     cyan: {
-      gradient: "from-cyan-50/40 via-white to-cyan-50/15",
-      accent: "text-cyan-600",
-      bgLight: "bg-cyan-50/60 text-cyan-600 border border-cyan-100/50",
+      gradient: "from-cyan-50/40 via-white to-cyan-50/15 dark:from-cyan-955/10 dark:via-[#1E293B] dark:to-cyan-955/5",
+      accent: "text-cyan-600 dark:text-cyan-450",
+      bgLight: "bg-cyan-50/60 text-cyan-600 border border-cyan-100/50 dark:bg-cyan-950/50 dark:text-cyan-400 dark:border-cyan-800/40",
       glow: "shadow-cyan-500/5",
       sparkColor: "#06b6d4",
       glowColor: "rgba(6, 182, 212, 0.16)",
@@ -216,6 +216,17 @@ export default function StatsCard({ label, value, growth, isPositive, color, spa
     setTimeout(() => setIsClicked(false), 180);
   };
 
+  // Determine dynamic font size based on length of displayValue to prevent overflows
+  let fontSize = "clamp(1.8rem, 3.2vw, 2.25rem)";
+  const valLength = String(displayValue).length;
+  if (valLength >= 12) {
+    fontSize = "clamp(1.3rem, 2.2vw, 1.6rem)";
+  } else if (valLength >= 10) {
+    fontSize = "clamp(1.5rem, 2.6vw, 1.85rem)";
+  } else if (valLength >= 8) {
+    fontSize = "clamp(1.7rem, 2.8vw, 2rem)";
+  }
+
   return (
     <div 
       ref={cardRef}
@@ -223,7 +234,7 @@ export default function StatsCard({ label, value, growth, isPositive, color, spa
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
-      className={`relative overflow-hidden bg-gradient-to-br ${currentTheme.gradient} rounded-2xl p-5 border border-[#E8EDF7] hover:border-slate-355/65 flex flex-col justify-between backdrop-blur-md bg-white/95 cursor-pointer select-none group w-full h-full min-h-[148px]`}
+      className={`relative overflow-hidden bg-gradient-to-br ${currentTheme.gradient} rounded-2xl p-5 border border-[#E8EDF7] dark:border-[#334155] hover:border-slate-355/65 dark:hover:border-slate-600/70 flex flex-col justify-between backdrop-blur-md bg-white/95 dark:bg-[#1E293B]/95 cursor-pointer select-none group w-full h-full min-h-[148px]`}
       style={{
         animation: loaded ? "none" : "statsCardLoad 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards",
         animationDelay: `${delay}ms`,
@@ -265,11 +276,11 @@ export default function StatsCard({ label, value, growth, isPositive, color, spa
             transform: isHovered ? `translate(${coords.x * 2}px, ${coords.y * 2}px)` : "none"
           }}
         >
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block truncate">{label}</span>
+          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block truncate">{label}</span>
           <h3 
-            className="font-bold text-slate-900 tracking-tight mt-0.5"
+            className="font-bold text-slate-900 dark:text-[#F8FAFC] tracking-tight mt-0.5"
             style={{ 
-              fontSize: 'clamp(1.75rem, 3.2vw, 2.25rem)', 
+              fontSize, 
               whiteSpace: 'nowrap',
             }}
             title={`Full value: ${value}`}
@@ -305,14 +316,14 @@ export default function StatsCard({ label, value, growth, isPositive, color, spa
           <span 
             className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold border transition-all duration-500 shrink-0 ${
               isPositive 
-                ? "bg-emerald-50 text-emerald-700 border-emerald-100/60" 
-                : "bg-rose-50 text-rose-700 border-rose-100/60"
+                ? "bg-emerald-50 text-emerald-700 border-emerald-100/60 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/30" 
+                : "bg-rose-50 text-rose-700 border-rose-100/60 dark:bg-rose-950/30 dark:text-rose-450 dark:border-rose-900/30"
             } ${displayValue !== "0" ? "scale-100 opacity-100" : "scale-80 opacity-0"}`}
           >
             <span>{isPositive ? "↑" : "↓"}</span>
             {growth}%
           </span>
-          <span className="text-[9px] text-slate-450 font-bold uppercase tracking-wider truncate">MoM Change</span>
+          <span className="text-[9px] text-slate-450 dark:text-slate-500 font-bold uppercase tracking-wider truncate">MoM Change</span>
         </div>
       </div>
 

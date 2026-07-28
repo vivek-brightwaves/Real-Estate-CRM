@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import ThemeToggle from "../ThemeToggle";
 
 interface UserType {
   name: string;
@@ -78,18 +79,18 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="h-screen overflow-hidden w-full flex bg-[#F5F8FF] font-sans selection:bg-blue-600 selection:text-white">
+    <div className="h-screen overflow-hidden w-full flex bg-[#F5F8FF] dark:bg-[#0F172A] font-sans selection:bg-blue-600 selection:text-white">
       
       {/* ============================================================ */}
       {/* LEFT FIXED SIDEBAR                                           */}
       {/* ============================================================ */}
       <aside 
-        className={`fixed left-0 top-0 h-screen hidden md:flex flex-col bg-gradient-to-b from-[#0F172A] to-[#1E293B] text-white shrink-0 border-r border-slate-800 transition-all duration-300 z-30 overflow-hidden ${
+        className={`fixed left-0 top-0 h-screen hidden md:flex flex-col bg-slate-900 dark:bg-[#111827] text-white shrink-0 border-r border-slate-850 dark:border-slate-800 transition-all duration-300 z-30 overflow-hidden ${
           isSidebarCollapsed ? "w-20" : "w-[250px]"
         }`}
       >
         {/* Brand Logo Header */}
-        <div className="h-16 px-6 flex items-center justify-between border-b border-slate-800/85">
+        <div className="h-16 px-6 flex items-center justify-between border-b border-slate-850 dark:border-slate-800/60">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-500 to-indigo-650 flex items-center justify-center shrink-0 shadow-md">
               <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -124,7 +125,7 @@ export default function DashboardLayout({
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 group ${
                   isActive 
                     ? "bg-gradient-to-r from-blue-600 to-indigo-650 text-white shadow-md shadow-blue-600/10" 
-                    : "text-slate-400 hover:bg-slate-800/40 hover:text-white"
+                    : "text-slate-400 hover:bg-slate-850 hover:text-white dark:hover:bg-slate-800/60"
                 }`}
                 title={item.name}
               >
@@ -138,9 +139,9 @@ export default function DashboardLayout({
         </div>
 
         {/* User Profile Section at the bottom */}
-        <div className="p-4 border-t border-slate-800 bg-slate-950/20">
+        <div className="p-4 border-t border-slate-850 dark:border-slate-800 bg-slate-950/20">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-extrabold text-sm shrink-0 border border-slate-700/50 shadow-inner">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-extrabold text-sm shrink-0 border border-slate-850 dark:border-slate-800/50 shadow-inner">
               {user.name.charAt(0)}
             </div>
             {!isSidebarCollapsed && (
@@ -181,10 +182,10 @@ export default function DashboardLayout({
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
           <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
-          <aside className="relative flex flex-col w-72 max-w-[80vw] bg-slate-900 text-white p-6 shadow-2xl z-10">
+          <aside className="relative flex flex-col w-72 max-w-[80vw] bg-slate-900 dark:bg-[#111827] text-white p-6 shadow-2xl z-10">
             <div className="flex items-center justify-between mb-8">
               <span className="text-lg font-extrabold tracking-tight text-white">CRM <span className="text-blue-500">Dashboard</span></span>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="p-1 rounded bg-slate-850 hover:bg-slate-800">
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-1 rounded bg-slate-850 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-750">
                 <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -195,7 +196,7 @@ export default function DashboardLayout({
                 <button
                   key={item.name}
                   onClick={() => handleNavClick(item.href)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-850"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-850 dark:hover:bg-slate-800"
                 >
                   <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={item.icon} />
@@ -216,9 +217,9 @@ export default function DashboardLayout({
       }`}>
         
         {/* Top Header */}
-        <header className="sticky top-0 z-50 w-full h-[76px] bg-white/75 backdrop-blur-[18px] border-b border-white/60 px-6 flex items-center justify-between shadow-[0_10px_30px_rgba(15,23,42,0.08)]">
+        <header className="sticky top-0 z-50 w-full h-[76px] bg-white/75 dark:bg-[#0B1220]/80 backdrop-blur-[18px] border-b border-[#E8EDF7] dark:border-slate-700/50 px-6 flex items-center justify-between shadow-[0_10px_30px_rgba(15,23,42,0.08)] dark:shadow-none">
           <div className="flex items-center gap-4">
-            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 md:hidden rounded-lg hover:bg-slate-100 text-slate-600">
+            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 md:hidden rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
               </svg>
@@ -238,7 +239,7 @@ export default function DashboardLayout({
               <input
                 type="text"
                 placeholder="Search dashboard..."
-                className="h-[48px] w-60 pl-10 pr-4 bg-slate-50/40 border border-[#E8EDF7] rounded-[16px] text-slate-800 placeholder:text-slate-450 text-xs font-semibold focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-650/10 focus:border-blue-600 shadow-sm transition-all"
+                className="h-[48px] w-60 pl-10 pr-4 bg-slate-50/40 dark:bg-slate-800 border border-[#E8EDF7] dark:border-slate-705 rounded-[16px] text-slate-800 dark:text-[#F8FAFC] placeholder:text-slate-450 dark:placeholder:text-slate-500 text-xs font-semibold focus:bg-white dark:focus:bg-slate-800/90 focus:outline-none focus:ring-4 focus:ring-blue-650/10 dark:focus:ring-blue-500/20 focus:border-blue-600 dark:focus:border-blue-500 shadow-sm transition-all"
               />
               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
                 🔍
@@ -246,46 +247,49 @@ export default function DashboardLayout({
             </div>
 
             {/* Calendar/Date Picker Button */}
-            <div className="hidden lg:flex items-center gap-2 h-[48px] px-4 bg-white border border-[#E8EDF7] hover:border-blue-300 hover:bg-blue-50/30 rounded-[16px] text-slate-700 text-xs font-bold transition-all shadow-sm cursor-pointer select-none">
+            <div className="hidden lg:flex items-center gap-2 h-[48px] px-4 bg-white dark:bg-slate-800 border border-[#E8EDF7] dark:border-slate-705 hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50/30 dark:hover:bg-blue-500/10 rounded-[16px] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold transition-all shadow-sm cursor-pointer select-none">
               <span className="text-sm">📅</span>
               <span>July 27, 2026</span>
             </div>
+
+            {/* Professional Theme Switch Toggle */}
+            <ThemeToggle />
 
             {/* Notification trigger */}
             <div className="relative">
               <button 
                 onClick={() => setIsNotifOpen(!isNotifOpen)} 
-                className="w-12 h-12 flex items-center justify-center bg-white border border-[#E8EDF7] rounded-full text-blue-600 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-300 shadow-sm hover:shadow-[0_10px_20px_rgba(37,99,235,0.2)] hover:-translate-y-[3px] hover:scale-[1.05] relative group"
+                className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-800 border border-[#E8EDF7] dark:border-slate-705 rounded-full text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white hover:border-blue-600 dark:hover:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-[0_10px_20px_rgba(37,99,235,0.2)] hover:-translate-y-[3px] hover:scale-[1.05] relative group"
               >
                 <svg className={`w-5 h-5 ${unreadCount > 0 ? "animate-bell-shake" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[9px] font-black w-4.5 h-4.5 flex items-center justify-center rounded-full border-2 border-white px-1 leading-none">
+                  <span className="absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[9px] font-black w-4.5 h-4.5 flex items-center justify-center rounded-full border-2 border-white dark:border-[#0B1220] px-1 leading-none">
                     {unreadCount}
                   </span>
                 )}
               </button>
               {isNotifOpen && (
-                <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E8EDF7] z-50 overflow-hidden animate-header-load">
-                  <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                    <span className="text-xs font-extrabold text-slate-800">System Notifications</span>
+                <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E8EDF7] dark:border-slate-800 z-50 overflow-hidden animate-header-load">
+                  <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-850">
+                    <span className="text-xs font-extrabold text-slate-800 dark:text-[#F8FAFC]">System Notifications</span>
                     {unreadCount > 0 && (
                       <span className="px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-[10px] font-bold text-blue-700">
                         {unreadCount} New
                       </span>
                     )}
                   </div>
-                  <div className="max-h-72 overflow-y-auto divide-y divide-slate-100">
+                  <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
                     {notifications && notifications.length > 0 ? (
                       notifications.map(n => (
-                        <div key={n.id} className="p-3.5 hover:bg-slate-50 transition-colors flex flex-col gap-1 text-[11px] relative">
-                          <p className={`font-semibold text-slate-700 ${!n.is_read ? 'text-slate-900 font-bold' : ''}`}>{n.message}</p>
-                          <span className="text-[9px] text-slate-400 font-semibold">{new Date(n.created_at).toLocaleTimeString()}</span>
+                        <div key={n.id} className="p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex flex-col gap-1 text-[11px] relative">
+                          <p className={`font-semibold text-slate-700 dark:text-slate-300 ${!n.is_read ? 'text-slate-900 dark:text-white font-bold' : ''}`}>{n.message}</p>
+                          <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold">{new Date(n.created_at).toLocaleTimeString()}</span>
                           {!n.is_read && (
                             <button 
                               onClick={() => onMarkRead(n.id)}
-                              className="absolute right-3.5 top-3.5 px-2 py-0.5 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-100 text-[9px] font-bold text-blue-700 transition-all"
+                              className="absolute right-3.5 top-3.5 px-2 py-0.5 bg-blue-50 dark:bg-slate-800 hover:bg-blue-600 dark:hover:bg-blue-500 hover:text-white dark:hover:text-white rounded border border-blue-100 dark:border-slate-700 text-[9px] font-bold text-blue-700 dark:text-blue-400 transition-all"
                             >
                               Read
                             </button>
@@ -293,7 +297,7 @@ export default function DashboardLayout({
                         </div>
                       ))
                     ) : (
-                      <div className="py-8 text-center text-slate-400 text-xs font-semibold">No recent alerts found</div>
+                      <div className="py-8 text-center text-slate-400 dark:text-slate-500 text-xs font-semibold">No recent alerts found</div>
                     )}
                   </div>
                 </div>
@@ -303,18 +307,18 @@ export default function DashboardLayout({
             {/* Messages Button (Circular 48px with red dot in top right) */}
             <button 
               onClick={() => alert("Opening messages inbox panel")}
-              className="w-12 h-12 flex items-center justify-center bg-white border border-[#E8EDF7] rounded-full text-indigo-600 hover:bg-indigo-650 hover:text-white hover:border-indigo-650 transition-all duration-300 shadow-sm hover:shadow-[0_10px_20px_rgba(79,70,229,0.2)] hover:-translate-y-[3px] hover:scale-[1.05] relative"
+              className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-800 border border-[#E8EDF7] dark:border-slate-705 rounded-full text-indigo-600 dark:text-indigo-400 hover:bg-indigo-650 hover:text-white hover:border-indigo-650 dark:hover:border-indigo-500 transition-all duration-300 shadow-sm hover:shadow-[0_10px_20px_rgba(79,70,229,0.2)] hover:-translate-y-[3px] hover:scale-[1.05] relative"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white animate-pulse" />
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white dark:border-[#0B1220] animate-pulse" />
             </button>
 
             {/* Settings Button (Glass circle, rotate on hover) */}
             <button 
               onClick={() => alert("Opening settings dashboard")}
-              className="w-12 h-12 flex items-center justify-center bg-white/80 backdrop-blur-md border border-[#E8EDF7] rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-50/50 transition-all duration-300 shadow-sm hover:-translate-y-[3px] hover:scale-[1.05] group"
+              className="w-12 h-12 flex items-center justify-center bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-[#E8EDF7] dark:border-slate-705 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-205 hover:bg-slate-50/50 dark:hover:bg-[#273449]/50 transition-all duration-300 shadow-sm hover:-translate-y-[3px] hover:scale-[1.05] group"
             >
               <svg className="w-5 h-5 transition-transform duration-300 group-hover:rotate-[15deg]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -326,32 +330,32 @@ export default function DashboardLayout({
             <div className="relative">
               <button 
                 onClick={() => setIsProfileOpen(!isProfileOpen)} 
-                className="flex items-center gap-3 pl-3 border-l border-slate-200 focus:outline-none group text-left"
+                className="flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 focus:outline-none group text-left"
               >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-purple-650 text-white flex items-center justify-center font-extrabold text-sm border border-white/80 shadow-md shrink-0 animate-avatar-pulse relative z-10">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-purple-650 text-white flex items-center justify-center font-extrabold text-sm border border-white/80 dark:border-[#0B1220]/80 shadow-md shrink-0 animate-avatar-pulse relative z-10">
                   {user.name.charAt(0)}
                 </div>
                 <div className="hidden md:flex flex-col">
-                  <span className="text-xs font-bold text-slate-800 tracking-tight leading-none group-hover:text-blue-600 transition-colors">
+                  <span className="text-xs font-bold text-slate-800 dark:text-[#F8FAFC] tracking-tight leading-none group-hover:text-blue-600 transition-colors">
                     {user.name}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-semibold mt-1">
+                  <span className="text-[10px] text-slate-400 dark:text-[#94A3B8] font-semibold mt-1">
                     {getRoleLabel(user.role)}
                   </span>
                 </div>
-                <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-slate-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
               {isProfileOpen && (
-                <div className="absolute right-0 mt-3 w-52 bg-white rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E8EDF7] z-50 py-1.5 overflow-hidden animate-header-load">
-                  <div className="px-4 py-2.5 border-b border-slate-100 bg-slate-50/50">
-                    <p className="text-xs font-extrabold text-slate-900">{user.name}</p>
-                    <p className="text-[10px] text-slate-450 font-semibold mt-0.5">{user.role}</p>
+                <div className="absolute right-0 mt-3 w-52 bg-white dark:bg-slate-900 rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E8EDF7] dark:border-slate-800 z-50 py-1.5 overflow-hidden animate-header-load">
+                  <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40">
+                    <p className="text-xs font-extrabold text-slate-900 dark:text-[#F8FAFC]">{user.name}</p>
+                    <p className="text-[10px] text-slate-450 dark:text-[#94A3B8] font-semibold mt-0.5">{user.role}</p>
                   </div>
                   <button 
                     onClick={onLogout} 
-                    className="w-full text-left px-4 py-2.5 text-xs text-rose-600 hover:bg-rose-50 font-bold border-t border-slate-100/60 transition-all"
+                    className="w-full text-left px-4 py-2.5 text-xs text-rose-600 dark:text-rose-450 hover:bg-rose-50 dark:hover:bg-rose-950/20 font-bold border-t border-slate-100/60 dark:border-slate-800/60 transition-all cursor-pointer"
                   >
                     Logout Session
                   </button>
@@ -363,22 +367,22 @@ export default function DashboardLayout({
 
         {/* Master Content Area */}
         <div className="flex-1 flex flex-col min-h-0 relative">
-          <main className="flex-1 overflow-y-auto p-8 bg-[#F5F8FF] relative overflow-x-hidden">
+          <main className="flex-1 overflow-y-auto p-8 bg-[#F5F8FF] dark:bg-[#0F172A] relative overflow-x-hidden">
             
             {/* Background Layer 2: Soft Gradient Overlays */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#F5F8FF] via-blue-50/30 to-indigo-50/20 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#F5F8FF] via-blue-50/30 to-indigo-50/20 dark:from-[#0F172A] dark:via-blue-950/10 dark:to-indigo-950/10 pointer-events-none" />
 
             {/* Background Layer 3: Top Right Blurred Blue Glow */}
-            <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-blue-400/8 rounded-full blur-[140px] pointer-events-none" />
+            <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-blue-400/8 dark:bg-blue-500/3 rounded-full blur-[140px] pointer-events-none" />
 
             {/* Background Layer 4: Bottom Left Blurred Indigo Glow */}
-            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-500/6 rounded-full blur-[180px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-500/6 dark:bg-indigo-600/3 rounded-full blur-[180px] pointer-events-none" />
 
             {/* Background Layer 4.5: Center Cyan Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-cyan-400/8 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-cyan-400/8 dark:bg-cyan-500/3 rounded-full blur-[120px] pointer-events-none" />
 
             {/* Background Layer 5: Subtle grid texture (3-5% opacity) */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#e8edf7_1px,transparent_1px),linear-gradient(to_bottom,#e8edf7_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-[0.05] pointer-events-none" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#e8edf7_1px,transparent_1px),linear-gradient(to_bottom,#e8edf7_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-[0.05] dark:opacity-[0.02] pointer-events-none" />
 
             {/* Content Container */}
             <div className="relative z-10">

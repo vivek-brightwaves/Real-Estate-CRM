@@ -2,12 +2,16 @@
 
 import React from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { useTheme } from "next-themes";
 
 interface RevenueChartProps {
   data: Array<{ month: string; amount: number }>;
 }
 
 export default function RevenueChart({ data }: RevenueChartProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
   // If data is empty, use realistic mock data
   const chartData = data && data.length > 0 ? data : [
     { month: "Jan", amount: 1200000 },
@@ -22,22 +26,25 @@ export default function RevenueChart({ data }: RevenueChartProps) {
     return `₹${(value / 100000).toFixed(1)}L`;
   };
 
+  const gridColor = isDark ? "#334155" : "#f1f5f9";
+  const tickColor = isDark ? "#94a3b8" : "#64748b";
+
   return (
-    <div className="bg-gradient-to-br from-white via-white to-blue-50/15 p-5 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 backdrop-blur-md bg-white/95">
-      <div className="flex items-center justify-between pb-5 mb-5 border-b border-[#E8EDF7]">
+    <div className="bg-gradient-to-br from-white via-white to-blue-50/15 dark:from-[#1E293B] dark:to-blue-950/5 p-5 rounded-[20px] border border-[#E8EDF7] dark:border-[#334155] shadow-sm hover:shadow-lg transition-all duration-300 backdrop-blur-md bg-white/95 dark:bg-[#1E293B]/95">
+      <div className="flex items-center justify-between pb-5 mb-5 border-b border-[#E8EDF7] dark:border-[#334155]">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-bold text-slate-900">Revenue Trends</h3>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-105 text-[10px] font-bold">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-[#F8FAFC]">Revenue Trends</h3>
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-105 dark:border-emerald-900/35 text-[10px] font-bold">
               +18.4%
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">Gross revenue collections over the last 6 months</p>
+          <p className="text-xs text-slate-500 dark:text-[#94A3B8] mt-0.5">Gross revenue collections over the last 6 months</p>
         </div>
         <div className="flex items-center gap-2">
           <button 
             onClick={() => alert("Opening Revenue Breakdown Details")}
-            className="px-3 py-1.5 border border-[#E8EDF7] hover:border-slate-350 rounded-lg text-slate-700 hover:text-slate-900 text-xs font-bold transition-all bg-slate-50/50 hover:bg-slate-100 shadow-sm"
+            className="px-3 py-1.5 border border-[#E8EDF7] dark:border-slate-700 hover:border-slate-350 dark:hover:border-slate-500 rounded-lg text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-all bg-slate-50/50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 shadow-sm cursor-pointer"
           >
             Details
           </button>
@@ -53,18 +60,18 @@ export default function RevenueChart({ data }: RevenueChartProps) {
                 <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
             <XAxis 
               dataKey="month" 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fill: '#64748b', fontSize: 12 }} 
+              tick={{ fill: tickColor, fontSize: 12 }} 
             />
             <YAxis 
               axisLine={false} 
               tickLine={false} 
               tickFormatter={formatCurrency}
-              tick={{ fill: '#64748b', fontSize: 12 }}
+              tick={{ fill: tickColor, fontSize: 12 }}
             />
             <Tooltip 
               contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px', padding: '10px 14px' }}
@@ -82,7 +89,7 @@ export default function RevenueChart({ data }: RevenueChartProps) {
               isAnimationActive={true}
               animationDuration={2000}
               animationEasing="ease-out"
-              dot={{ stroke: '#4f46e5', strokeWidth: 2, r: 4, fill: '#fff' }}
+              dot={{ stroke: '#4f46e5', strokeWidth: 2, r: 4, fill: isDark ? '#1e293b' : '#fff' }}
             />
           </AreaChart>
         </ResponsiveContainer>
