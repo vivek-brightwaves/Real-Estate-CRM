@@ -447,6 +447,7 @@ export default function BookingsBoardPage() {
                                 <div className="absolute right-0 mt-1.5 w-40 bg-white rounded-xl shadow-xl border border-[#E8EDF7] z-50 py-1 font-semibold text-xs">
                                   <button onClick={() => router.push(`/bookings/${b.id}`)} className="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700">View Details</button>
                                   <button onClick={() => router.push(`/customers/${b.customer_id}`)} className="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700">View Client</button>
+                                  <button onClick={() => router.push(`/collections?booking=${b.id}`)} className="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700">Schedule Payment</button>
                                 </div>
                               )}
                             </div>

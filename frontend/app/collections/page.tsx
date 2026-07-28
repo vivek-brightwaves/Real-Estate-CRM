@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import api from "../../lib/axios";
 import { useAuthStore } from "../../store/authStore";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import StatsCard from "../../components/dashboard/StatsCard";
 
@@ -18,13 +18,15 @@ interface Payment {
   receipt_number?: string;
 }
 
-export default function CollectionsPage() {
+function CollectionsDashboard() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"PENDING" | "OVERDUE" | "RECEIVED">("PENDING");
   
   const { user, accessToken, clearAuth } = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedBookingId = searchParams.get("booking");
 
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -54,12 +56,21 @@ export default function CollectionsPage() {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
-  }, [accessToken, router]);
+  }, [accessToken, router, selectedBookingId]);
+
+  useEffect(() => {
+    if (selectedBookingId) {
+      setNewBookingId(selectedBookingId);
+      setShowNew(true);
+    }
+  }, [selectedBookingId]);
 
   const fetchPayments = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/payments`);
+      const res = await api.get(
+        selectedBookingId ? `/payments?booking_id=${selectedBookingId}` : "/payments"
+      );
       setPayments(res.data || []);
     } catch (err) {
       console.error(err);
@@ -133,10 +144,25 @@ export default function CollectionsPage() {
 
   const generateReceipt = async (paymentId: number) => {
     try {
-      const res = await api.post(`/payments/${paymentId}/generate-receipt`);
-      window.open(`http://localhost:8000${res.data.receipt_url}`, "_blank");
+      const res = await api.post(
+        `/payments/${paymentId}/generate-receipt`,
+        {},
+        { responseType: "blob" }
+      );
+
+      const blob = new Blob([res.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const newTab = window.open(url, "_blank");
+      if (!newTab) {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `receipt_${paymentId}.pdf`;
+        a.click();
+      }
+      setTimeout(() => window.URL.revokeObjectURL(url), 10000);
     } catch (err: any) {
-      alert("Error generating receipt: " + (err.response?.data?.detail || "Error"));
+      const detail = err.response?.data?.detail;
+      alert("Error generating receipt: " + (detail || err.message || "Unknown error"));
     }
   };
 
@@ -600,5 +626,19 @@ export default function CollectionsPage() {
 
       </div>
     </DashboardLayout>
+  );
+}
+
+import { Suspense } from "react";
+
+export default function CollectionsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <CollectionsDashboard />
+    </Suspense>
   );
 }
