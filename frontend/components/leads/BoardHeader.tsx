@@ -32,7 +32,7 @@ export default function BoardHeader({ onSearch, onAdd }: { onSearch?: (q: string
             <button className="rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">Filter</button>
             <button className="rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">Sort</button>
             <button className="rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">Export</button>
-            <button onClick={onAdd} className="rounded-3xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">+ Add Lead</button>
+            <button onClick={onAdd} className="btn-premium-action btn-add-lead">+ Add Lead</button>
           </div>
         </div>
       </div>

@@ -5,6 +5,216 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "../../../store/authStore";
 import api from "../../../lib/axios";
 
+// ============================================================
+// COMPACT SUB-COMPONENTS (OPTIMIZED FOR SaaS DENSITY)
+// ============================================================
+
+// 1. Compact Premium Input Field with Floating Label and Focus Shadow
+interface PremiumInputProps {
+  label: string;
+  type?: string;
+  value: any;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  icon: React.ReactNode;
+  id: string;
+}
+
+const PremiumInput = ({
+  label,
+  type = "text",
+  value,
+  onChange,
+  icon,
+  id
+}: PremiumInputProps) => {
+  return (
+    <div className="relative w-full group/input h-12">
+      {/* Icon (18px) */}
+      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-blue-500 transition-all duration-300 z-10">
+        {icon}
+      </span>
+      <input
+        id={id}
+        type={type}
+        value={value ?? ""}
+        onChange={onChange}
+        placeholder=" "
+        className="peer w-full h-full pl-11 pr-3.5 pt-4 pb-1 bg-white/40 border border-slate-200/85 rounded-[14px] text-[14px] font-semibold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300 shadow-sm focus:bg-white placeholder-transparent"
+      />
+      <label
+        htmlFor={id}
+        className="absolute left-11 top-[22px] -translate-y-1/2 text-[14px] font-semibold text-slate-400 pointer-events-none transition-all duration-300 origin-left
+        peer-placeholder-shown:text-[14px] peer-placeholder-shown:top-1/2
+        peer-focus:text-[12px] peer-focus:top-2.5 peer-focus:text-blue-500
+        peer-[:not(:placeholder-shown)]:text-[12px] peer-[:not(:placeholder-shown)]:top-2.5"
+      >
+        {label}
+      </label>
+    </div>
+  );
+};
+
+// 2. Compact iOS-style Toggle Switch
+interface ToggleSwitchProps {
+  id: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  label: string;
+}
+
+const ToggleSwitch = ({
+  id,
+  checked,
+  onChange,
+  label
+}: ToggleSwitchProps) => {
+  return (
+    <div className="flex items-center justify-between px-3.5 h-14 bg-white/40 border border-slate-200/50 rounded-[14px] shadow-sm hover:bg-white/60 transition-all duration-200">
+      <span className="text-[14px] font-bold text-slate-700">{label}</span>
+      <button
+        type="button"
+        id={id}
+        onClick={() => onChange(!checked)}
+        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-blue-500/10 ${
+          checked ? 'bg-gradient-to-r from-blue-600 to-blue-500' : 'bg-slate-200'
+        }`}
+      >
+        <span
+          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-300 ease-in-out ${
+            checked ? 'translate-x-5' : 'translate-x-0'
+          }`}
+        />
+      </button>
+    </div>
+  );
+};
+
+// 3. Compact Custom Searchable Dropdown Selector
+interface DropdownOption {
+  label: string;
+  value: string;
+}
+
+interface CustomDropdownProps {
+  id: string;
+  label: string;
+  value: string;
+  options: DropdownOption[];
+  onChange: (value: string) => void;
+  icon: React.ReactNode;
+}
+
+const CustomDropdown = ({
+  id,
+  label,
+  value,
+  options,
+  onChange,
+  icon
+}: CustomDropdownProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(`#dropdown-${id}`)) {
+        setIsOpen(false);
+        setSearchQuery("");
+      }
+    };
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
+  }, [isOpen, id]);
+
+  const selectedOption = options.find(opt => opt.value === value);
+  const filteredOptions = options.filter(opt =>
+    opt.label.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div id={`dropdown-${id}`} className="relative w-full group/dropdown h-12">
+      {/* Icon (18px) */}
+      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/dropdown:text-blue-500 transition-colors duration-200 z-10">
+        {icon}
+      </span>
+      
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full h-full text-left pl-11 pr-10 pt-4 pb-1 bg-white/40 border border-slate-200/80 rounded-[14px] text-[14px] font-semibold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300 shadow-sm hover:bg-white/60 flex justify-between items-center"
+      >
+        <span className="truncate">{selectedOption?.label || value}</span>
+        <svg 
+          className={`w-[18px] h-[18px] text-slate-400 transition-transform duration-300 ${isOpen ? "rotate-180 text-blue-500" : ""}`} 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      
+      <span className="absolute left-11 top-2.5 text-[12px] font-bold text-slate-400 pointer-events-none">
+        {label}
+      </span>
+
+      {isOpen && (
+        <div className="absolute left-0 right-0 mt-1.5 bg-white/95 backdrop-blur-xl border border-slate-200/80 rounded-[14px] shadow-xl z-50 p-2 overflow-hidden animate-settings-tab-fade">
+          <div className="relative mb-1.5">
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200/60 rounded-lg text-slate-700 text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all duration-200"
+            />
+          </div>
+
+          <div className="max-h-40 overflow-y-auto space-y-0.5 pr-1">
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(opt.value);
+                    setIsOpen(false);
+                    setSearchQuery("");
+                  }}
+                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-between ${
+                    opt.value === value
+                      ? "bg-blue-500 text-white"
+                      : "text-slate-650 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
+                >
+                  <span>{opt.label}</span>
+                  {opt.value === value && (
+                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
+              ))
+            ) : (
+              <div className="text-center py-2 text-slate-400 text-xs">No options found</div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================================
+// MAIN PAGE COMPONENT
+// ============================================================
 export default function SettingsPage() {
   const router = useRouter();
   const { user, accessToken } = useAuthStore();
@@ -31,7 +241,6 @@ export default function SettingsPage() {
   const fetchSettings = async () => {
     try {
       const res = await api.get("/settings");
-      // Merge with default state
       setSettings((prev) => ({
         ...prev,
         ...res.data
@@ -65,179 +274,414 @@ export default function SettingsPage() {
     }));
   };
 
+  // Tab Details & Metadata (using optimized 18px icons)
+  const tabMetadata: Record<string, { label: string; cardTitle: string; icon: React.ReactNode }> = {
+    email: {
+      label: "Email",
+      cardTitle: "SMTP Email Settings",
+      icon: (
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      )
+    },
+    messaging: {
+      label: "Messaging",
+      cardTitle: "SMS / WhatsApp Provider",
+      icon: (
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      )
+    },
+    security: {
+      label: "Security",
+      cardTitle: "Platform Security",
+      icon: (
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      )
+    },
+    storage: {
+      label: "Storage",
+      cardTitle: "Document Storage",
+      icon: (
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+        </svg>
+      )
+    },
+    backup: {
+      label: "Backup",
+      cardTitle: "Database Backup",
+      icon: (
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4-3 3m0 0-3-3m3 3V4" />
+        </svg>
+      )
+    }
+  };
+
+  const messagingOptions = [
+    { label: "Twilio", value: "Twilio" },
+    { label: "Gupshup", value: "Gupshup" },
+    { label: "AWS SNS", value: "AWS_SNS" }
+  ];
+
+  const storageOptions = [
+    { label: "Amazon S3", value: "S3" },
+    { label: "Google Cloud Storage", value: "GCS" },
+    { label: "Local Disk", value: "Local" }
+  ];
+
+  const backupOptions = [
+    { label: "Hourly", value: "hourly" },
+    { label: "Daily", value: "daily" },
+    { label: "Weekly", value: "weekly" }
+  ];
+
   if (!user || user.role !== "SUPER_ADMIN") return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-slate-900 text-white p-6 hidden md:block">
-        <h1 className="text-2xl font-bold mb-8 text-primary">CRM Admin</h1>
-        <nav className="space-y-4">
-          <a href="/" className="block px-4 py-2 hover:bg-slate-800 rounded">Back to Dashboard</a>
-          <a href="/admin/users" className="block px-4 py-2 hover:bg-slate-800 rounded">User Management</a>
-          <a href="/admin/approvals" className="block px-4 py-2 hover:bg-slate-800 rounded">Approvals Inbox</a>
-          <a href="/admin/audit" className="block px-4 py-2 hover:bg-slate-800 rounded">Audit Logs</a>
-          <a href="/admin/settings" className="block px-4 py-2 bg-slate-800 rounded">Global Settings</a>
-        </nav>
-      </div>
+    <div className="space-y-6 animate-settings-entrance relative pb-8">
+      
+      {/* BACKGROUND DECORATIVE GRADIENTS */}
+      <div className="absolute top-10 right-10 w-64 h-64 rounded-full bg-blue-500/8 blur-[90px] pointer-events-none animate-pulse-glow" style={{ animationDelay: '0s' }} />
+      <div className="absolute bottom-20 left-10 w-72 h-72 rounded-full bg-purple-500/10 blur-[100px] pointer-events-none animate-pulse-glow" style={{ animationDelay: '1.5s' }} />
 
-      <div className="flex-1 p-8 overflow-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800">Global Settings</h2>
-          <button 
-            onClick={saveSettings}
-            disabled={saving || loading}
-            className="px-6 py-2 bg-primary text-white font-bold rounded shadow hover:bg-blue-600 transition disabled:opacity-50"
-          >
-            {saving ? "Saving..." : "Save All Changes"}
-          </button>
+      {/* HEADER SECTION */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 relative z-10">
+        <div>
+          {/* Breadcrumbs */}
+          <nav className="flex items-center gap-1.5 text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">
+            <span className="hover:text-blue-600 transition-colors cursor-pointer" onClick={() => router.push("/")}>Dashboard</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-slate-400">Administration</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-slate-600">Global Settings</span>
+          </nav>
+          
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-to-tr from-blue-600/10 to-purple-600/10 rounded-[14px] border border-blue-500/15 text-blue-600 shadow-sm flex items-center justify-center">
+              {/* Settings Gear Icon (optimized to 18px size) */}
+              <svg className="w-[18px] h-[18px] animate-[spin_10s_linear_infinite]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-lg md:text-xl font-black text-slate-900 tracking-tight">Global Settings</h2>
+              <p className="text-[11px] text-slate-500 mt-0.5 font-medium">Configure SMTP credentials, backup policies, messaging, and storage providers</p>
+            </div>
+          </div>
         </div>
 
-        {loading ? (
-          <p>Loading settings...</p>
-        ) : (
-          <div className="bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col md:flex-row min-h-[600px]">
-            {/* Tabs Sidebar */}
-            <div className="w-full md:w-64 bg-gray-50 border-r p-4 space-y-2">
-              {['email', 'messaging', 'security', 'storage', 'backup'].map((tab) => (
+        <button 
+          onClick={saveSettings}
+          disabled={saving || loading}
+          className="btn-premium-action btn-save-changes disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+        >
+          {/* Hover backdrop gradient layer */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          
+          <svg className="w-[18px] h-[18px] text-white relative z-10 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>
+          <span className="relative z-10">{saving ? "Saving Changes..." : "Save All Changes"}</span>
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="relative z-10 overflow-hidden bg-white/70 backdrop-blur-xl border border-white/40 rounded-[14px] shadow-sm p-10 text-center text-slate-550 font-bold text-xs">
+          <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          Loading system configurations...
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start relative z-10">
+          
+          {/* COMPACT LEFT SIDEBAR NAVIGATION */}
+          <div className="md:col-span-1 flex flex-row md:flex-col gap-1.5 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 scrollbar-hide shrink-0 bg-white/40 backdrop-blur-md p-1.5 rounded-[14px] border border-slate-200/50">
+            {['email', 'messaging', 'security', 'storage', 'backup'].map((tab) => {
+              const active = activeTab === tab;
+              const meta = tabMetadata[tab];
+              
+              return (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`w-full text-left px-4 py-3 rounded font-bold capitalize transition ${
-                    activeTab === tab ? "bg-primary text-white" : "text-gray-600 hover:bg-gray-200"
+                  className={`w-full relative flex items-center gap-2.5 px-3 py-2.5 rounded-full text-xs font-bold transition-all duration-300 shrink-0 select-none ${
+                    active 
+                      ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/15 translate-x-1" 
+                      : "text-slate-500 hover:bg-white/70 hover:text-slate-900 hover:translate-x-1 hover:shadow-sm"
                   }`}
                 >
-                  {tab} Configuration
+                  {/* Left glowing indicator */}
+                  {active && (
+                    <span className="absolute left-2 top-[30%] bottom-[30%] w-0.5 rounded-full bg-white shadow-[0_0_6px_#fff]" />
+                  )}
+                  
+                  <span className={`transition-transform duration-300 ${active ? "scale-110 ml-1.5" : "group-hover:scale-110"}`}>
+                    {meta.icon}
+                  </span>
+                  
+                  <span className="truncate whitespace-nowrap">{meta.label} Configuration</span>
                 </button>
-              ))}
-            </div>
+              );
+            })}
+          </div>
 
-            {/* Tab Content */}
-            <div className="flex-1 p-8">
+          {/* COMPACT MAIN CONFIGURATION CONTENT */}
+          <div className="md:col-span-3">
+            <div 
+              key={activeTab}
+              className="relative overflow-hidden bg-white/70 backdrop-blur-xl border border-white/40 rounded-[14px] shadow-[0_8px_24px_rgba(31,38,135,0.04)] p-6 transition-all duration-300 hover:shadow-[0_12px_32px_rgba(31,38,135,0.08)] animate-settings-tab-fade"
+            >
+              {/* Top Accent Gradient Border */}
+              <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-blue-500 via-purple-500 to-transparent" />
               
-              {/* Email Settings */}
-              {activeTab === "email" && (
-                <div className="max-w-2xl space-y-6">
-                  <h3 className="text-xl font-bold text-gray-800 border-b pb-2">SMTP Email Settings</h3>
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id="email_enabled" checked={settings.email.enabled} onChange={(e) => handleNestedChange('email', 'enabled', e.target.checked)} />
-                    <label htmlFor="email_enabled" className="font-bold text-gray-700">Enable Email Notifications</label>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-1">SMTP Host</label>
-                      <input type="text" className="w-full border p-2 rounded" value={settings.email.host} onChange={(e) => handleNestedChange('email', 'host', e.target.value)} />
+              {/* Card Header & Title */}
+              <div className="mb-4 flex items-center gap-2.5">
+                <span className="p-1.5 bg-blue-500/10 rounded-lg text-blue-600 flex items-center justify-center">
+                  {tabMetadata[activeTab].icon}
+                </span>
+                <h3 className="text-[15px] font-extrabold text-slate-900">{tabMetadata[activeTab].cardTitle}</h3>
+              </div>
+              
+              {/* Divider */}
+              <div className="h-[1px] bg-slate-200/50 mb-4" />
+
+              {/* Form Controls (Optimized Gaps to 16px = space-y-4) */}
+              <div className="max-w-2xl space-y-4">
+                
+                {/* Email Tab Content */}
+                {activeTab === "email" && (
+                  <>
+                    <ToggleSwitch 
+                      id="email_enabled" 
+                      label="Enable Email Notifications" 
+                      checked={settings.email.enabled} 
+                      onChange={(checked) => handleNestedChange('email', 'enabled', checked)} 
+                    />
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <PremiumInput 
+                        id="email_host" 
+                        label="SMTP Host" 
+                        value={settings.email.host} 
+                        onChange={(e) => handleNestedChange('email', 'host', e.target.value)} 
+                        icon={
+                          <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                          </svg>
+                        } 
+                      />
+                      <PremiumInput 
+                        id="email_port" 
+                        type="number"
+                        label="SMTP Port" 
+                        value={settings.email.port} 
+                        onChange={(e) => handleNestedChange('email', 'port', parseInt(e.target.value) || 0)} 
+                        icon={
+                          <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                          </svg>
+                        } 
+                      />
                     </div>
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-1">SMTP Port</label>
-                      <input type="number" className="w-full border p-2 rounded" value={settings.email.port} onChange={(e) => handleNestedChange('email', 'port', parseInt(e.target.value))} />
+
+                    <PremiumInput 
+                      id="email_sender" 
+                      type="email"
+                      label="Sender Email" 
+                      value={settings.email.sender_email} 
+                      onChange={(e) => handleNestedChange('email', 'sender_email', e.target.value)} 
+                      icon={
+                        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+                        </svg>
+                      } 
+                    />
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <PremiumInput 
+                        id="email_username" 
+                        label="Username" 
+                        value={settings.email.username} 
+                        onChange={(e) => handleNestedChange('email', 'username', e.target.value)} 
+                        icon={
+                          <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        } 
+                      />
+                      <PremiumInput 
+                        id="email_password" 
+                        type="password"
+                        label="Password" 
+                        value={settings.email.password} 
+                        onChange={(e) => handleNestedChange('email', 'password', e.target.value)} 
+                        icon={
+                          <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                        } 
+                      />
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Sender Email</label>
-                    <input type="email" className="w-full border p-2 rounded" value={settings.email.sender_email} onChange={(e) => handleNestedChange('email', 'sender_email', e.target.value)} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-1">Username</label>
-                      <input type="text" className="w-full border p-2 rounded" value={settings.email.username} onChange={(e) => handleNestedChange('email', 'username', e.target.value)} />
+
+                    <ToggleSwitch 
+                      id="use_tls" 
+                      label="Use TLS Encryption" 
+                      checked={settings.email.use_tls} 
+                      onChange={(checked) => handleNestedChange('email', 'use_tls', checked)} 
+                    />
+                  </>
+                )}
+
+                {/* Messaging Tab Content */}
+                {activeTab === "messaging" && (
+                  <>
+                    <ToggleSwitch 
+                      id="messaging_enabled" 
+                      label="Enable External Messaging API" 
+                      checked={settings.messaging.enabled} 
+                      onChange={(checked) => handleNestedChange('messaging', 'enabled', checked)} 
+                    />
+
+                    <CustomDropdown 
+                      id="messaging_provider" 
+                      label="Provider" 
+                      value={settings.messaging.provider} 
+                      options={messagingOptions} 
+                      onChange={(value) => handleNestedChange('messaging', 'provider', value)} 
+                      icon={
+                        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                      }
+                    />
+
+                    <PremiumInput 
+                      id="messaging_api_key" 
+                      type="password"
+                      label="API Key / Token" 
+                      value={settings.messaging.api_key} 
+                      onChange={(e) => handleNestedChange('messaging', 'api_key', e.target.value)} 
+                      icon={
+                        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m-5 4a5 5 0 01-1.89-4H5a2 2 0 00-2 2v3a2 2 0 002 2h1v1a1 1 0 001 1h1a1 1 0 001-1v-1h3a5 5 0 011.89-4z" />
+                        </svg>
+                      } 
+                    />
+                  </>
+                )}
+
+                {/* Security Tab Content */}
+                {activeTab === "security" && (
+                  <>
+                    <ToggleSwitch 
+                      id="require_2fa" 
+                      label="Enforce 2FA for all Super Admins" 
+                      checked={settings.security.require_2fa} 
+                      onChange={(checked) => handleNestedChange('security', 'require_2fa', checked)} 
+                    />
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <PremiumInput 
+                        id="security_timeout" 
+                        type="number"
+                        label="Session Timeout (minutes)" 
+                        value={settings.security.session_timeout} 
+                        onChange={(e) => handleNestedChange('security', 'session_timeout', parseInt(e.target.value) || 0)} 
+                        icon={
+                          <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        } 
+                      />
+                      <PremiumInput 
+                        id="security_expiry" 
+                        type="number"
+                        label="Password Expiry (Days)" 
+                        value={settings.security.password_expiry_days} 
+                        onChange={(e) => handleNestedChange('security', 'password_expiry_days', parseInt(e.target.value) || 0)} 
+                        icon={
+                          <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        } 
+                      />
                     </div>
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-1">Password</label>
-                      <input type="password" className="w-full border p-2 rounded" value={settings.email.password} onChange={(e) => handleNestedChange('email', 'password', e.target.value)} />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id="use_tls" checked={settings.email.use_tls} onChange={(e) => handleNestedChange('email', 'use_tls', e.target.checked)} />
-                    <label htmlFor="use_tls" className="font-bold text-gray-700">Use TLS Encryption</label>
-                  </div>
-                </div>
-              )}
+                  </>
+                )}
 
-              {/* Messaging Settings */}
-              {activeTab === "messaging" && (
-                <div className="max-w-2xl space-y-6">
-                  <h3 className="text-xl font-bold text-gray-800 border-b pb-2">SMS/WhatsApp Provider</h3>
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id="msg_enabled" checked={settings.messaging.enabled} onChange={(e) => handleNestedChange('messaging', 'enabled', e.target.checked)} />
-                    <label htmlFor="msg_enabled" className="font-bold text-gray-700">Enable External Messaging API</label>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Provider</label>
-                    <select className="w-full border p-2 rounded" value={settings.messaging.provider} onChange={(e) => handleNestedChange('messaging', 'provider', e.target.value)}>
-                      <option value="Twilio">Twilio</option>
-                      <option value="Gupshup">Gupshup</option>
-                      <option value="AWS_SNS">AWS SNS</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">API Key / Token</label>
-                    <input type="password" className="w-full border p-2 rounded" value={settings.messaging.api_key} onChange={(e) => handleNestedChange('messaging', 'api_key', e.target.value)} />
-                  </div>
-                </div>
-              )}
+                {/* Storage Tab Content */}
+                {activeTab === "storage" && (
+                  <>
+                    <CustomDropdown 
+                      id="storage_provider" 
+                      label="Storage Provider" 
+                      value={settings.storage.provider} 
+                      options={storageOptions} 
+                      onChange={(value) => handleNestedChange('storage', 'provider', value)} 
+                      icon={
+                        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                        </svg>
+                      }
+                    />
 
-              {/* Security Settings */}
-              {activeTab === "security" && (
-                <div className="max-w-2xl space-y-6">
-                  <h3 className="text-xl font-bold text-gray-800 border-b pb-2">Platform Security</h3>
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id="req_2fa" checked={settings.security.require_2fa} onChange={(e) => handleNestedChange('security', 'require_2fa', e.target.checked)} />
-                    <label htmlFor="req_2fa" className="font-bold text-gray-700">Enforce 2FA for all Super Admins</label>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Session Timeout (minutes)</label>
-                    <input type="number" className="w-full border p-2 rounded" value={settings.security.session_timeout} onChange={(e) => handleNestedChange('security', 'session_timeout', parseInt(e.target.value))} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Password Expiry (Days)</label>
-                    <input type="number" className="w-full border p-2 rounded" value={settings.security.password_expiry_days} onChange={(e) => handleNestedChange('security', 'password_expiry_days', parseInt(e.target.value))} />
-                  </div>
-                </div>
-              )}
+                    <PremiumInput 
+                      id="storage_bucket" 
+                      label="Bucket Name" 
+                      value={settings.storage.bucket_name} 
+                      onChange={(e) => handleNestedChange('storage', 'bucket_name', e.target.value)} 
+                      icon={
+                        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                      } 
+                    />
+                  </>
+                )}
 
-              {/* Storage Settings */}
-              {activeTab === "storage" && (
-                <div className="max-w-2xl space-y-6">
-                  <h3 className="text-xl font-bold text-gray-800 border-b pb-2">Document Storage Configuration</h3>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Storage Provider</label>
-                    <select className="w-full border p-2 rounded" value={settings.storage.provider} onChange={(e) => handleNestedChange('storage', 'provider', e.target.value)}>
-                      <option value="S3">Amazon S3</option>
-                      <option value="GCS">Google Cloud Storage</option>
-                      <option value="Local">Local Disk</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Bucket Name</label>
-                    <input type="text" className="w-full border p-2 rounded" value={settings.storage.bucket_name} onChange={(e) => handleNestedChange('storage', 'bucket_name', e.target.value)} />
-                  </div>
-                </div>
-              )}
+                {/* Backup Tab Content */}
+                {activeTab === "backup" && (
+                  <>
+                    <CustomDropdown 
+                      id="backup_frequency" 
+                      label="Frequency" 
+                      value={settings.backup.frequency} 
+                      options={backupOptions} 
+                      onChange={(value) => handleNestedChange('backup', 'frequency', value)} 
+                      icon={
+                        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
+                        </svg>
+                      }
+                    />
 
-              {/* Backup Settings */}
-              {activeTab === "backup" && (
-                <div className="max-w-2xl space-y-6">
-                  <h3 className="text-xl font-bold text-gray-800 border-b pb-2">Database Backup Schedule</h3>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Frequency</label>
-                    <select className="w-full border p-2 rounded" value={settings.backup.frequency} onChange={(e) => handleNestedChange('backup', 'frequency', e.target.value)}>
-                      <option value="hourly">Hourly</option>
-                      <option value="daily">Daily</option>
-                      <option value="weekly">Weekly</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Retention Period (Days)</label>
-                    <input type="number" className="w-full border p-2 rounded" value={settings.backup.retention_days} onChange={(e) => handleNestedChange('backup', 'retention_days', parseInt(e.target.value))} />
-                  </div>
-                </div>
-              )}
+                    <PremiumInput 
+                      id="backup_retention" 
+                      type="number"
+                      label="Retention Period (Days)" 
+                      value={settings.backup.retention_days} 
+                      onChange={(e) => handleNestedChange('backup', 'retention_days', parseInt(e.target.value) || 0)} 
+                      icon={
+                        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      } 
+                    />
+                  </>
+                )}
 
+              </div>
             </div>
           </div>
-        )}
-      </div>
+
+        </div>
+      )}
     </div>
   );
 }

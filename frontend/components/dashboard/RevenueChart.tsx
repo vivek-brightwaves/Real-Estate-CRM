@@ -23,16 +23,24 @@ export default function RevenueChart({ data }: RevenueChartProps) {
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-gradient-to-br from-white via-white to-blue-50/15 p-5 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 backdrop-blur-md bg-white/95">
+      <div className="flex items-center justify-between pb-5 mb-5 border-b border-[#E8EDF7]">
         <div>
-          <h3 className="text-lg font-bold text-slate-900">Revenue Trends</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-900">Revenue Trends</h3>
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-105 text-[10px] font-bold">
+              +18.4%
+            </span>
+          </div>
           <p className="text-xs text-slate-500 mt-0.5">Gross revenue collections over the last 6 months</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-semibold">
-            +18.4% growth
-          </span>
+          <button 
+            onClick={() => alert("Opening Revenue Breakdown Details")}
+            className="px-3 py-1.5 border border-[#E8EDF7] hover:border-slate-350 rounded-lg text-slate-700 hover:text-slate-900 text-xs font-bold transition-all bg-slate-50/50 hover:bg-slate-100 shadow-sm"
+          >
+            Details
+          </button>
         </div>
       </div>
 
@@ -71,6 +79,10 @@ export default function RevenueChart({ data }: RevenueChartProps) {
               strokeWidth={3} 
               fillOpacity={1} 
               fill="url(#colorAmount)" 
+              isAnimationActive={true}
+              animationDuration={2000}
+              animationEasing="ease-out"
+              dot={{ stroke: '#4f46e5', strokeWidth: 2, r: 4, fill: '#fff' }}
             />
           </AreaChart>
         </ResponsiveContainer>

@@ -194,6 +194,7 @@ export default function DashboardPage() {
                 color="blue" 
                 sparklineData={sparkData.leads}
                 icon={icons.leads} 
+                delay={100}
               />
               <StatsCard 
                 label="Active Properties" 
@@ -203,6 +204,7 @@ export default function DashboardPage() {
                 color="green" 
                 sparklineData={sparkData.properties}
                 icon={icons.properties} 
+                delay={150}
               />
               <StatsCard 
                 label="Bookings" 
@@ -212,6 +214,7 @@ export default function DashboardPage() {
                 color="purple" 
                 sparklineData={sparkData.bookings}
                 icon={icons.bookings} 
+                delay={200}
               />
               <StatsCard 
                 label="Revenue" 
@@ -221,61 +224,77 @@ export default function DashboardPage() {
                 color="orange" 
                 sparklineData={sparkData.revenue}
                 icon={icons.revenue} 
+                delay={250}
               />
               <StatsCard 
                 label="Customers" 
                 value={1280} 
                 growth="14.1" 
                 isPositive={true} 
-                color="indigo" 
+                color="pink" 
                 sparklineData={sparkData.customers}
                 icon={icons.customers} 
+                delay={300}
               />
               <StatsCard 
                 label="Site Visits" 
                 value={visitsCount} 
                 growth="20.0" 
                 isPositive={true} 
-                color="teal" 
+                color="cyan" 
                 sparklineData={sparkData.visits}
                 icon={icons.visits} 
+                delay={350}
               />
             </div>
 
             {/* Quick Actions Panel */}
-            <QuickActions />
+            <div className="animate-dashboard-fade-in" style={{ animationDelay: '400ms' }}>
+              <QuickActions />
+            </div>
 
-            {/* Charts Section Row 1: Large Area Chart & Conversion Funnel */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Analytics Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+              {/* Row 1: Revenue Trends & Lead Funnel */}
               <div className="lg:col-span-2">
-                <RevenueChart data={trendData} />
+                <div className="animate-dashboard-fade-in h-full" style={{ animationDelay: '450ms' }}>
+                  <RevenueChart data={trendData} />
+                </div>
               </div>
               <div className="lg:col-span-1">
-                <LeadPipelineChart data={funnelData} />
+                <div className="animate-dashboard-fade-in h-full" style={{ animationDelay: '500ms' }}>
+                  <LeadPipelineChart data={funnelData} />
+                </div>
+              </div>
+
+              {/* Row 2: Booking Chart, Sales Volume & Property Trends */}
+              <div className="lg:col-span-1">
+                <div className="animate-dashboard-fade-in h-full" style={{ animationDelay: '550ms' }}>
+                  <BookingChart />
+                </div>
+              </div>
+              <div className="lg:col-span-1">
+                <div className="animate-dashboard-fade-in h-full" style={{ animationDelay: '600ms' }}>
+                  <MonthlySalesChart />
+                </div>
+              </div>
+              <div className="lg:col-span-1">
+                <div className="animate-dashboard-fade-in h-full" style={{ animationDelay: '650ms' }}>
+                  <PropertySalesTrendChart />
+                </div>
+              </div>
+
+              {/* Row 3: Activity Timeline spanning full width */}
+              <div className="lg:col-span-3">
+                <div className="animate-dashboard-fade-in w-full" style={{ animationDelay: '700ms' }}>
+                  <ActivityTimeline />
+                </div>
               </div>
             </div>
 
-            {/* Charts Section Row 2: Secondary Visualizations */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-1">
-                <BookingChart />
-              </div>
-              <div className="lg:col-span-1">
-                <MonthlySalesChart />
-              </div>
-              <div className="lg:col-span-1">
-                <PropertySalesTrendChart />
-              </div>
-            </div>
-
-            {/* Table & Timeline Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <RecentLeadsTable leads={leadsData} />
-              </div>
-              <div className="lg:col-span-1">
-                <ActivityTimeline />
-              </div>
+            {/* Premium Recent Leads Table */}
+            <div className="w-full animate-dashboard-fade-in" style={{ animationDelay: '750ms' }}>
+              <RecentLeadsTable leads={leadsData} />
             </div>
 
           </>

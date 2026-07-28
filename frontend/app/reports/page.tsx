@@ -4,20 +4,31 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../../store/authStore";
 import api from "../../lib/axios";
+import DashboardLayout from "../../components/dashboard/DashboardLayout";
 
 export default function ReportsPage() {
   const router = useRouter();
-  const { user, accessToken } = useAuthStore();
+  const { user, accessToken, clearAuth } = useAuthStore();
   const [reportType, setReportType] = useState("sales");
   const [preview, setPreview] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState<any[]>([]);
+
   useEffect(() => {
-    if (!accessToken || user?.role === "EMPLOYEE") {
-      router.push("/");
-    } else {
-      fetchPreview();
+    if (!accessToken) {
+      router.push("/login");
+      return;
     }
+    if (user?.role === "EMPLOYEE") {
+      router.push("/");
+      return;
+    }
+    fetchPreview();
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
   }, [accessToken, user, router, reportType]);
 
   const fetchPreview = async () => {
@@ -33,6 +44,33 @@ export default function ReportsPage() {
     }
   };
 
+  const fetchNotifications = async () => {
+    try {
+      const [countRes, listRes] = await Promise.all([
+        api.get("/notifications/unread-count"),
+        api.get("/notifications"),
+      ]);
+      setUnreadCount(countRes.data.count ?? 0);
+      setNotifications(listRes.data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const markRead = async (id: number) => {
+    try {
+      await api.patch(`/notifications/${id}/mark-read`);
+      fetchNotifications();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleLogout = () => {
+    clearAuth();
+    router.push("/login");
+  };
+
   const downloadReport = (format: "excel" | "pdf") => {
     window.open(`http://localhost:8000/reports/${reportType}/export?format=${format}`, "_blank");
   };
@@ -40,41 +78,28 @@ export default function ReportsPage() {
   if (!user || user.role === "EMPLOYEE") return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-slate-900 text-white p-6 hidden md:block">
-        <h1 className="text-2xl font-bold mb-8 text-primary">CRM</h1>
-        <nav className="space-y-4">
-          <a href="/" className="block px-4 py-2 hover:bg-slate-800 rounded">Dashboard</a>
-          
-          {(user.role === 'SUPER_ADMIN') && (
-            <>
-              <a href="/admin/users" className="block px-4 py-2 hover:bg-slate-800 rounded">User Management</a>
-              <a href="/admin/approvals" className="block px-4 py-2 hover:bg-slate-800 rounded">Approvals Inbox</a>
-              <a href="/admin/audit" className="block px-4 py-2 hover:bg-slate-800 rounded">Audit Logs</a>
-            </>
-          )}
-          
-          <a href="/inventory" className="block px-4 py-2 hover:bg-slate-800 rounded">Inventory</a>
-          <a href="/leads" className="block px-4 py-2 hover:bg-slate-800 rounded">Leads</a>
-          <a href="/visits" className="block px-4 py-2 hover:bg-slate-800 rounded">Site Visits</a>
-          <a href="/customers" className="block px-4 py-2 hover:bg-slate-800 rounded">Customers</a>
-          <a href="/bookings" className="block px-4 py-2 hover:bg-slate-800 rounded">Bookings</a>
-          <a href="/collections" className="block px-4 py-2 hover:bg-slate-800 rounded">Collections</a>
-          <a href="/reports" className="block px-4 py-2 bg-slate-800 rounded">Reports Center</a>
-        </nav>
-      </div>
+    <DashboardLayout
+      user={user}
+      unreadCount={unreadCount}
+      notifications={notifications}
+      onMarkRead={markRead}
+      onLogout={handleLogout}
+    >
+      <div className="space-y-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Reports Center</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Generate, filter, preview and export business performance and sales sheets</p>
+          </div>
+        </div>
 
-      <div className="flex-1 p-8 overflow-auto">
-        <h2 className="text-3xl font-bold text-gray-800 mb-8">Reports Center</h2>
-
-        <div className="bg-white p-6 rounded-xl shadow-sm border mb-8 flex flex-col md:flex-row gap-6 items-end">
-          <div className="flex-1">
-            <label className="block text-sm font-bold text-gray-700 mb-2">Select Report Type</label>
+        <div className="bg-gradient-to-br from-white via-white to-slate-50/30 p-6 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-md transition-all duration-300 mb-8 flex flex-col md:flex-row gap-6 items-end">
+          <div className="flex-1 w-full">
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Select Report Type</label>
             <select 
               value={reportType}
               onChange={(e) => setReportType(e.target.value)}
-              className="w-full border p-3 rounded"
+              className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
             >
               <option value="sales">Sales & Bookings</option>
               <option value="finance">Finance & Collections</option>
@@ -82,60 +107,62 @@ export default function ReportsPage() {
             </select>
           </div>
           
-          <div className="flex gap-4">
+          <div className="flex gap-3 w-full md:w-auto shrink-0 justify-end">
             <button 
               onClick={() => downloadReport("excel")}
-              className="px-6 py-3 bg-green-600 text-white font-bold rounded shadow hover:bg-green-700 transition flex items-center gap-2"
+              className="btn-premium-action btn-export-excel flex items-center gap-1.5"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
               Export Excel
             </button>
             <button 
               onClick={() => downloadReport("pdf")}
-              className="px-6 py-3 bg-red-600 text-white font-bold rounded shadow hover:bg-red-700 transition flex items-center gap-2"
+              className="btn-premium-action btn-export-pdf flex items-center gap-1.5"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
               Export PDF
             </button>
           </div>
         </div>
 
         {loading ? (
-          <p>Loading preview...</p>
+          <div className="p-8 text-center text-slate-500 font-semibold text-xs bg-white rounded-[20px] border border-[#E8EDF7] shadow-sm">Loading report preview...</div>
         ) : preview ? (
-          <div className="bg-white rounded-xl shadow-sm border overflow-x-auto">
-            <div className="p-4 border-b bg-gray-50 flex justify-between">
-              <h3 className="font-bold text-gray-700">Data Preview (Max 50 rows)</h3>
-              <span className="text-sm text-gray-500">Total Rows Available: {preview.total_rows}</span>
+          <div className="bg-gradient-to-br from-white via-white to-slate-50/30 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden backdrop-blur-md bg-white/95">
+            <div className="p-4 border-b border-[#E8EDF7] bg-slate-50/60 flex justify-between items-center px-6">
+              <h3 className="font-bold text-slate-800 text-xs uppercase tracking-wide">Data Preview (Max 50 rows)</h3>
+              <span className="text-xs text-slate-450 font-bold">Total Rows Available: {preview.total_rows}</span>
             </div>
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-100">
-                <tr>
-                  {preview.headers.map((h: string, i: number) => (
-                    <th key={i} className="p-3 font-bold text-gray-600">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {preview.rows.map((row: any[], i: number) => (
-                  <tr key={i} className="border-b hover:bg-gray-50">
-                    {row.map((cell: any, j: number) => (
-                      <td key={j} className="p-3 text-gray-700">{cell}</td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="sticky top-0 bg-slate-50/60 border-b border-[#E8EDF7] text-xs font-bold text-slate-500 uppercase tracking-wider z-10">
+                    {preview.headers.map((h: string, i: number) => (
+                      <th key={i} className="px-6 py-4">{h}</th>
                     ))}
                   </tr>
-                ))}
-                {preview.rows.length === 0 && (
-                  <tr>
-                    <td colSpan={preview.headers.length} className="p-8 text-center text-gray-500">No data found for this report.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-[#E8EDF7] text-sm">
+                  {preview.rows.map((row: any[], i: number) => (
+                    <tr key={i} className="hover:bg-slate-50/60 transition-colors">
+                      {row.map((cell: any, j: number) => (
+                        <td key={j} className="px-6 py-4 font-semibold text-slate-700">{cell}</td>
+                      ))}
+                    </tr>
+                  ))}
+                  {preview.rows.length === 0 && (
+                    <tr>
+                      <td colSpan={preview.headers.length} className="px-6 py-12 text-center text-slate-500">No data found for this report.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         ) : (
-          <p className="text-red-500">Failed to load preview.</p>
+          <p className="text-xs font-bold text-rose-500 text-center py-8">Failed to load preview data.</p>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

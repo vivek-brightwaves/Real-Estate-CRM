@@ -87,9 +87,9 @@ export default function LeadsPage() {
       onMarkRead={markRead}
       onLogout={handleLogout}
     >
-      <div className="min-h-full flex flex-col bg-[linear-gradient(180deg,_#F8FAFC_0%,_#F1F5F9_100%)]">
-        <div className="mx-auto max-w-7xl px-8 py-10">
-          <div className="rounded-[32px] border border-[#E2E8F0] bg-white p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+      <div className="min-h-full flex flex-col">
+        <div className="mx-auto w-full py-2">
+          <div className="bg-gradient-to-br from-white via-white to-slate-50/30 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 p-6 md:p-8 backdrop-blur-md bg-white/95">
             <LeadsBoard
               leads={leads}
               loading={loading}

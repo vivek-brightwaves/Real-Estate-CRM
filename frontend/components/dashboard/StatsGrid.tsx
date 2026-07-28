@@ -101,7 +101,7 @@ export default function StatsGrid({ dashboardData }: StatsGridProps) {
         value={1280} 
         growth="14.1" 
         isPositive={true} 
-        color="indigo" 
+        color="pink" 
         sparklineData={sparkData.customers}
         icon={icons.customers} 
       />
@@ -110,7 +110,7 @@ export default function StatsGrid({ dashboardData }: StatsGridProps) {
         value={visitsCount} 
         growth="20.0" 
         isPositive={true} 
-        color="teal" 
+        color="cyan" 
         sparklineData={sparkData.visits}
         icon={icons.visits} 
       />

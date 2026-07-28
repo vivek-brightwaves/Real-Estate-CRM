@@ -27,8 +27,8 @@ export default function LeadSection({
   onViewAll,
 }: LeadSectionProps) {
   return (
-    <section className="flex h-[680px] min-h-[520px] flex-col overflow-hidden rounded-[24px] border-2 border-[#CBD5E1] bg-white shadow-[0_8px_25px_rgba(15,23,42,0.05)] transition-all duration-300 hover:border-[#2563EB] hover:shadow-[0_15px_40px_rgba(37,99,235,0.12)]">
-      <div className="sticky top-0 z-30 bg-white border-b border-[#E2E8F0] shadow-[0_2px_8px_rgba(0,0,0,0.05)] px-5 py-4">
+    <section className="flex h-[680px] min-h-[520px] flex-col overflow-hidden rounded-[20px] border border-[#E8EDF7] bg-white shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-md">
+      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#E8EDF7] px-5 py-4">
         <LeadSectionHeader title={title} count={leads.length} icon={icon} badgeClass={badgeClass} />
       </div>
 
@@ -46,13 +46,13 @@ export default function LeadSection({
         )}
       </div>
 
-      <div className="border-t border-[#E2E8F0] bg-slate-50 px-5 py-4">
+      <div className="border-t border-[#E8EDF7] bg-slate-50/40 px-5 py-3">
         <button
           type="button"
           onClick={onViewAll}
-          className="text-sm font-semibold text-slate-700 transition hover:text-slate-900"
+          className="text-xs font-bold text-slate-550 transition hover:text-blue-600 cursor-pointer"
         >
-          View All Leads →
+          View All Leads &rarr;
         </button>
       </div>
     </section>

@@ -25,7 +25,7 @@ export default function EmptyState({ title, subtitle, onAdd }: EmptyStateProps) 
         <button
           type="button"
           onClick={onAdd}
-          className="rounded-3xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+          className="btn-premium-action btn-add-lead"
         >
           Add Lead
         </button>

@@ -36,8 +36,26 @@ export default function SiteVisitChart() {
               labelStyle={{ color: '#94a3b8', fontSize: '11px', fontWeight: 'bold' }}
               itemStyle={{ fontSize: '12px' }}
             />
-            <Bar dataKey="visits" name="Total Visits" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={16} />
-            <Bar dataKey="sales" name="Sales Closed" fill="#10b981" radius={[4, 4, 0, 0]} barSize={16} />
+            <Bar 
+              dataKey="visits" 
+              name="Total Visits" 
+              fill="#3b82f6" 
+              radius={[4, 4, 0, 0]} 
+              barSize={16} 
+              isAnimationActive={true}
+              animationDuration={900}
+              animationEasing="ease-out"
+            />
+            <Bar 
+              dataKey="sales" 
+              name="Sales Closed" 
+              fill="#10b981" 
+              radius={[4, 4, 0, 0]} 
+              barSize={16} 
+              isAnimationActive={true}
+              animationDuration={900}
+              animationEasing="ease-out"
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

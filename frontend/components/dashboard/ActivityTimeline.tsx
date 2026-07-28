@@ -67,8 +67,8 @@ export default function ActivityTimeline() {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-gradient-to-br from-white via-white to-slate-50/30 p-5 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 backdrop-blur-md bg-white/95">
+      <div className="flex items-center justify-between mb-6 pb-5 border-b border-[#E8EDF7]">
         <div>
           <h3 className="text-lg font-bold text-slate-900">Activity Timeline</h3>
           <p className="text-xs text-slate-500 mt-0.5">Audit log of corporate transactions</p>
@@ -81,7 +81,7 @@ export default function ActivityTimeline() {
         </button>
       </div>
 
-      <div className="relative border-l border-slate-100 ml-4 pl-6 space-y-6">
+      <div className="relative border-l border-[#E8EDF7] ml-4 pl-6 space-y-6">
         {activities.map((act, index) => (
           <div key={index} className="relative">
             {/* Dot Indicator */}

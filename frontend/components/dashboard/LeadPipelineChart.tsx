@@ -21,15 +21,25 @@ export default function LeadPipelineChart({ data }: LeadPipelineChartProps) {
   const COLORS = ["#3b82f6", "#6366f1", "#a855f7", "#ec4899", "#10b981"];
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-gradient-to-br from-white via-white to-indigo-50/15 p-5 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 backdrop-blur-md bg-white/95">
+      <div className="flex items-center justify-between pb-5 mb-5 border-b border-[#E8EDF7]">
         <div>
-          <h3 className="text-lg font-bold text-slate-900">Lead Pipeline Funnel</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-900">Lead Pipeline Funnel</h3>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-105 text-[10px] font-bold">
+              Active
+            </span>
+          </div>
           <p className="text-xs text-slate-500 mt-0.5">Total counts across different deal stages</p>
         </div>
-        <span className="text-xs font-semibold px-2 py-1 bg-blue-50 text-blue-700 rounded-lg">
-          Active Deals
-        </span>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => alert("Opening Lead Pipeline Details")}
+            className="px-3 py-1.5 border border-[#E8EDF7] hover:border-slate-350 rounded-lg text-slate-700 hover:text-slate-900 text-xs font-bold transition-all bg-slate-50/50 hover:bg-slate-100 shadow-sm"
+          >
+            Details
+          </button>
+        </div>
       </div>
 
       <div className="h-72 w-full">
@@ -54,7 +64,14 @@ export default function LeadPipelineChart({ data }: LeadPipelineChartProps) {
               itemStyle={{ color: '#fff', fontSize: '13px' }}
               formatter={(value: any) => [value, "Leads"]}
             />
-            <Bar dataKey="count" radius={[6, 6, 0, 0]} barSize={40}>
+            <Bar 
+              dataKey="count" 
+              radius={[6, 6, 0, 0]} 
+              barSize={40}
+              isAnimationActive={true}
+              animationDuration={900}
+              animationEasing="ease-out"
+            >
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}

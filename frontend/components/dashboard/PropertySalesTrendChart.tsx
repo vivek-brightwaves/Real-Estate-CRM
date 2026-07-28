@@ -14,15 +14,25 @@ export default function PropertySalesTrendChart() {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-lg hover:shadow-xl transition-all duration-300">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-gradient-to-br from-white via-white to-teal-50/15 p-5 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 backdrop-blur-md bg-white/95">
+      <div className="flex items-center justify-between pb-5 mb-5 border-b border-[#E8EDF7]">
         <div>
-          <h3 className="text-base font-bold text-slate-900">Property Sales Trend</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-base font-bold text-slate-900">Property Sales Trend</h3>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-105 text-[10px] font-bold">
+              Annually
+            </span>
+          </div>
           <p className="text-xs text-slate-500 mt-0.5">Commercial vs Residential unit sales trends</p>
         </div>
-        <span className="text-xs font-semibold px-2 py-1 bg-teal-50 text-teal-700 rounded-lg">
-          Annually
-        </span>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => alert("Opening Sales Trends Details")}
+            className="px-3 py-1.5 border border-[#E8EDF7] hover:border-slate-350 rounded-lg text-slate-700 hover:text-slate-900 text-xs font-bold transition-all bg-slate-50/50 hover:bg-slate-100 shadow-sm"
+          >
+            Details
+          </button>
+        </div>
       </div>
 
       <div className="h-64 w-full">
@@ -46,8 +56,32 @@ export default function PropertySalesTrendChart() {
               labelStyle={{ color: '#94a3b8', fontSize: '11px', fontWeight: 'bold' }}
               itemStyle={{ fontSize: '12px' }}
             />
-            <Area type="monotone" dataKey="commercial" name="Commercial" stroke="#3b82f6" strokeWidth={2.5} fillOpacity={1} fill="url(#colorCommercial)" />
-            <Area type="monotone" dataKey="residential" name="Residential" stroke="#14b8a6" strokeWidth={2.5} fillOpacity={1} fill="url(#colorResidential)" />
+            <Area 
+              type="monotone" 
+              dataKey="commercial" 
+              name="Commercial" 
+              stroke="#3b82f6" 
+              strokeWidth={2.5} 
+              fillOpacity={1} 
+              fill="url(#colorCommercial)" 
+              isAnimationActive={true}
+              animationDuration={1500}
+              animationEasing="ease-out"
+              animationBegin={0}
+            />
+            <Area 
+              type="monotone" 
+              dataKey="residential" 
+              name="Residential" 
+              stroke="#14b8a6" 
+              strokeWidth={2.5} 
+              fillOpacity={1} 
+              fill="url(#colorResidential)" 
+              isAnimationActive={true}
+              animationDuration={1500}
+              animationEasing="ease-out"
+              animationBegin={300}
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>

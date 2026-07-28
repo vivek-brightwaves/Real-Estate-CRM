@@ -3,23 +3,32 @@
 import { useState, useEffect } from "react";
 import api from "../../../lib/axios";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "../../../store/authStore";
+import DashboardLayout from "../../../components/dashboard/DashboardLayout";
 
 export default function LeadDetailPage({ params }: { params: { id: string } }) {
   const [lead, setLead] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [newNote, setNewNote] = useState("");
   const router = useRouter();
+  const { user, accessToken, clearAuth } = useAuthStore();
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
+    if (!accessToken) {
+      router.push("/login");
+      return;
+    }
     fetchLead();
-  }, [params.id]);
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [accessToken, params.id, router]);
 
   const fetchLead = async () => {
     setLoading(true);
     try {
-      // Assuming a GET /leads/{id} endpoint exists (might need to add it to router if missing)
-      // I didn't explicitly add GET /leads/{id} in the backend scaffold, let's mock the detail for now
-      // using the list endpoint and filtering
       const res = await api.get("/leads");
       const found = res.data.find((l: any) => l.id === Number(params.id));
       if (found) setLead(found);
@@ -30,13 +39,40 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
     }
   };
 
+  const fetchNotifications = async () => {
+    try {
+      const [countRes, listRes] = await Promise.all([
+        api.get("/notifications/unread-count"),
+        api.get("/notifications"),
+      ]);
+      setUnreadCount(countRes.data.count ?? 0);
+      setNotifications(listRes.data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const markRead = async (id: number) => {
+    try {
+      await api.patch(`/notifications/${id}/mark-read`);
+      fetchNotifications();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleLogout = () => {
+    clearAuth();
+    router.push("/login");
+  };
+
   const handleAddNote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNote) return;
     try {
       await api.post(`/leads/${params.id}/notes`, { note: newNote });
       setNewNote("");
-      fetchLead(); // Refetch to show new note
+      fetchLead();
     } catch (err) {
       alert("Error adding note");
     }
@@ -44,7 +80,6 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
 
   const handleScheduleVisit = async () => {
     try {
-      // Defaulting to tomorrow for scaffold
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       
@@ -58,102 +93,123 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
     }
   };
 
-  if (loading) return <div className="p-8">Loading...</div>;
-  if (!lead) return <div className="p-8">Lead not found.</div>;
+  if (loading) return <div className="p-8 text-center text-slate-500 font-semibold text-xs">Loading lead details...</div>;
+  if (!lead) return <div className="p-8 text-center text-slate-500 font-semibold text-xs">Lead not found.</div>;
+  if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 flex justify-center">
-      <div className="max-w-4xl w-full flex gap-8">
-        
-        {/* Left Col: Lead Info */}
-        <div className="flex-1 bg-white p-6 rounded-xl shadow border">
-          <button onClick={() => router.back()} className="text-gray-500 mb-6 hover:text-gray-800">← Back</button>
-          
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-800">{lead.name}</h2>
-              <p className="text-gray-500">{lead.phone} • {lead.email || "No email"}</p>
-            </div>
-            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded font-bold text-sm">
-              {lead.status.replace('_', ' ')}
-            </span>
+    <DashboardLayout
+      user={user}
+      unreadCount={unreadCount}
+      notifications={notifications}
+      onMarkRead={markRead}
+      onLogout={handleLogout}
+    >
+      <div className="space-y-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Lead Profiles</h2>
+            <p className="text-xs text-slate-500 mt-0.5">View and update detailed pipeline status for {lead.name}</p>
           </div>
-          
-          <div className="space-y-4 mb-8">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-50 p-4 rounded border">
-                <span className="text-sm text-gray-500">Source</span>
-                <p className="font-medium">{lead.source || "Unknown"}</p>
-              </div>
-              <div className="bg-gray-50 p-4 rounded border">
-                <span className="text-sm text-gray-500">Assigned To</span>
-                <p className="font-medium">User ID {lead.assigned_to_id}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-4">
-            <button 
-              onClick={handleScheduleVisit}
-              className="flex-1 bg-green-500 text-white py-3 rounded-lg shadow hover:bg-green-600 transition font-bold"
-            >
-              Schedule Site Visit
-            </button>
-            {lead.status !== 'CONVERTED' && (
-              <button 
-                onClick={async () => {
-                  try {
-                    const res = await api.post("/customers", { lead_id: lead.id, name: lead.name, phone: lead.phone, email: lead.email });
-                    alert("Lead converted successfully!");
-                    router.push(`/customers/${res.data.id}`);
-                  } catch (err) {
-                    alert("Error converting lead");
-                  }
-                }}
-                className="flex-1 bg-purple-600 text-white py-3 rounded-lg shadow hover:bg-purple-700 transition font-bold"
-              >
-                Convert to Customer
-              </button>
-            )}
-          </div>
+          <button 
+            onClick={() => router.back()}
+            className="px-3.5 py-2 bg-slate-50/50 border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-100 transition shadow-sm"
+          >
+            &larr; Back
+          </button>
         </div>
 
-        {/* Right Col: Notes Timeline */}
-        <div className="flex-1 bg-white p-6 rounded-xl shadow border flex flex-col">
-          <h3 className="text-xl font-bold mb-6 border-b pb-2">Timeline & Notes</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           
-          <div className="flex-1 overflow-y-auto space-y-4 mb-6">
-            {lead.notes?.length > 0 ? lead.notes.map((note: any) => (
-              <div key={note.id} className="bg-gray-50 p-4 rounded border-l-4 border-primary">
-                <p className="text-sm text-gray-800">{note.note}</p>
-                <p className="text-xs text-gray-400 mt-2">{new Date(note.created_at).toLocaleString()}</p>
+          {/* Left Col: Lead Info */}
+          <div className="bg-gradient-to-br from-white via-white to-slate-50/30 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 p-6 flex flex-col backdrop-blur-md bg-white/95 space-y-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-lg font-black text-slate-900 tracking-tight leading-none mb-1.5">{lead.name}</h3>
+                <p className="text-xs text-slate-450 font-semibold">{lead.phone} &bull; {lead.email || "No email"}</p>
               </div>
-            )) : (
-              <p className="text-gray-500 text-center py-8">No notes yet.</p>
-            )}
+              <span className="px-3 py-1 bg-blue-50 border border-blue-100 text-blue-700 rounded-full font-bold text-xs uppercase tracking-wider">
+                {lead.status.replace('_', ' ')}
+              </span>
+            </div>
             
-            {lead.site_visits?.length > 0 && lead.site_visits.map((visit: any) => (
-              <div key={visit.id} className="bg-green-50 p-4 rounded border-l-4 border-green-500">
-                <p className="text-sm text-green-900 font-bold">Site Visit Scheduled</p>
-                <p className="text-xs text-green-700 mt-1">{new Date(visit.scheduled_at).toLocaleString()}</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-slate-50/50 p-4 rounded-xl border border-[#E8EDF7] shadow-inner">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Source</span>
+                  <p className="font-bold text-slate-800 text-xs">{lead.source || "Unknown"}</p>
+                </div>
+                <div className="bg-slate-50/50 p-4 rounded-xl border border-[#E8EDF7] shadow-inner">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Assigned To</span>
+                  <p className="font-bold text-slate-800 text-xs">User ID #{lead.assigned_to_id}</p>
+                </div>
               </div>
-            ))}
+            </div>
+
+            <div className="flex flex-wrap gap-4 pt-4 border-t border-slate-100">
+              <button 
+                onClick={handleScheduleVisit}
+                className="flex-1 py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-650 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-500/10 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+              >
+                Schedule Site Visit
+              </button>
+              {lead.status !== 'CONVERTED' && (
+                <button 
+                  onClick={async () => {
+                    try {
+                      const res = await api.post("/customers", { lead_id: lead.id, name: lead.name, phone: lead.phone, email: lead.email });
+                      alert("Lead converted successfully!");
+                      router.push(`/customers/${res.data.id}`);
+                    } catch (err) {
+                      alert("Error converting lead");
+                    }
+                  }}
+                  className="flex-1 py-3 px-4 bg-gradient-to-r from-purple-500 to-violet-650 text-white rounded-xl text-xs font-bold shadow-md shadow-purple-500/10 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                >
+                  Convert to Customer
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Right Col: Notes Timeline */}
+          <div className="bg-gradient-to-br from-white via-white to-slate-50/30 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 p-6 flex flex-col backdrop-blur-md bg-white/95 space-y-6">
+            <h3 className="text-base font-bold text-slate-900 border-b border-[#E8EDF7] pb-2">Timeline & Notes</h3>
+            
+            <div className="max-h-[300px] overflow-y-auto space-y-4 pr-1">
+              {lead.notes?.length > 0 ? lead.notes.map((note: any) => (
+                <div key={note.id} className="bg-slate-50/60 p-4 rounded-xl border border-[#E8EDF7] border-l-4 border-l-blue-600 shadow-inner">
+                  <p className="text-xs text-slate-700 font-medium leading-relaxed">{note.note}</p>
+                  <p className="text-[10px] text-slate-400 font-bold mt-2">{new Date(note.created_at).toLocaleString()}</p>
+                </div>
+              )) : (
+                <p className="text-slate-400 text-center py-8 text-xs font-semibold">No timeline notes yet.</p>
+              )}
+              
+              {lead.site_visits?.length > 0 && lead.site_visits.map((visit: any) => (
+                <div key={visit.id} className="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100 border-l-4 border-l-emerald-600 shadow-inner">
+                  <p className="text-xs text-emerald-800 font-bold">Site Visit Scheduled</p>
+                  <p className="text-[10px] text-emerald-650 font-bold mt-1">{new Date(visit.scheduled_at).toLocaleString()}</p>
+                </div>
+              ))}
+            </div>
+            
+            <form onSubmit={handleAddNote} className="pt-4 border-t border-slate-100 space-y-3">
+              <textarea 
+                className="w-full border border-[#E8EDF7] rounded-xl p-3.5 outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all text-xs font-semibold text-slate-700 shadow-sm bg-white resize-none"
+                placeholder="Add a new timeline note..."
+                rows={3}
+                value={newNote}
+                onChange={e => setNewNote(e.target.value)}
+              />
+              <button type="submit" className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition-all duration-200 cursor-pointer">
+                Add Note
+              </button>
+            </form>
           </div>
           
-          <form onSubmit={handleAddNote} className="mt-auto">
-            <textarea 
-              className="w-full border rounded-lg p-3 outline-none focus:border-primary mb-2"
-              placeholder="Add a new note..."
-              value={newNote}
-              onChange={e => setNewNote(e.target.value)}
-            />
-            <button type="submit" className="w-full bg-primary text-white py-2 rounded shadow hover:bg-blue-600 transition">
-              Add Note
-            </button>
-          </form>
         </div>
-        
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

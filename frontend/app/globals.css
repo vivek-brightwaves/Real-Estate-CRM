@@ -3,11 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --background: #f8fafc; /* slate-50 */
-  --foreground: #0f172a; /* slate-900 */
+  --background: #f8fafc;
+  /* slate-50 */
+  --foreground: #0f172a;
+  /* slate-900 */
 }
 
-html, body {
+html,
+body {
   overflow: hidden;
   height: 100vh;
 }
@@ -25,3 +28,457 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Premium Dashboard Card Overrides (Linear/Stripe Style) */
+.bg-slate-50 .bg-white.rounded-2xl,
+.bg-slate-50 .bg-white.rounded-\[20px\] {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(4px) !important;
+  border-color: rgba(226, 232, 240, 0.7) !important;
+  border-radius: 1rem !important;
+  /* rounded-2xl */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  /* shadow-sm */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.bg-slate-50 .bg-white.rounded-2xl:hover,
+.bg-slate-50 .bg-white.rounded-\[20px\]:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  /* shadow-xl */
+  transform: translateY(-2px) !important;
+  /* -translate-y-0.5 */
+}
+
+/* Custom Animations and Glow Styles */
+@keyframes settingsFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes settingsPulseGlow {
+
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.45;
+    transform: scale(1.1);
+  }
+}
+
+.animate-settings-entrance {
+  animation: settingsFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-settings-tab-fade {
+  animation: settingsFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pulse-glow {
+  animation: settingsPulseGlow 3s ease-in-out infinite;
+}
+
+/* ============================================================ */
+/* SPECIFIC ACTION BUTTON GRADIENTS                            */
+/* ============================================================ */
+
+/* Base styling for premium action buttons */
+.btn-premium-action {
+  height: 46px !important;
+  border-radius: 14px !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important; /* text-xs */
+  line-height: 1rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding-left: 1.25rem !important; /* px-5 */
+  padding-right: 1.25rem !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(4px) !important;
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer;
+}
+
+.btn-premium-action:hover {
+  transform: translateY(-3px) scale(1.02) !important;
+}
+
+.btn-premium-action:active {
+  transform: scale(0.97) !important;
+}
+
+/* 1. Add Lead: Blue–Indigo */
+.btn-add-lead {
+  background: linear-gradient(135deg, #2563EB, #4F46E5) !important;
+  box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.25) !important;
+}
+.btn-add-lead:hover {
+  box-shadow: 0 8px 24px 0 rgba(37, 99, 235, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 2. New Project: Emerald–Teal */
+.btn-new-project {
+  background: linear-gradient(135deg, #059669, #0D9488) !important;
+  box-shadow: 0 4px 14px 0 rgba(5, 150, 105, 0.25) !important;
+}
+.btn-new-project:hover {
+  box-shadow: 0 8px 24px 0 rgba(5, 150, 105, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 3. New Booking: Violet–Purple */
+.btn-new-booking {
+  background: linear-gradient(135deg, #7C3AED, #9333EA) !important;
+  box-shadow: 0 4px 14px 0 rgba(124, 58, 237, 0.25) !important;
+}
+.btn-new-booking:hover {
+  box-shadow: 0 8px 24px 0 rgba(124, 58, 237, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 4. Add Customer: Cyan–Blue */
+.btn-add-customer {
+  background: linear-gradient(135deg, #0891B2, #2563EB) !important;
+  box-shadow: 0 4px 14px 0 rgba(8, 145, 178, 0.25) !important;
+}
+.btn-add-customer:hover {
+  box-shadow: 0 8px 24px 0 rgba(8, 145, 178, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 5. Record Payment: Orange–Amber */
+.btn-record-payment {
+  background: linear-gradient(135deg, #EA580C, #D97706) !important;
+  box-shadow: 0 4px 14px 0 rgba(234, 88, 12, 0.25) !important;
+}
+.btn-record-payment:hover {
+  box-shadow: 0 8px 24px 0 rgba(234, 88, 12, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 6. Export Excel: Green–Mint */
+.btn-export-excel {
+  background: linear-gradient(135deg, #16A34A, #10B981) !important;
+  box-shadow: 0 4px 14px 0 rgba(22, 163, 74, 0.25) !important;
+}
+.btn-export-excel:hover {
+  box-shadow: 0 8px 24px 0 rgba(22, 163, 74, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 7. Export PDF: Rose–Red */
+.btn-export-pdf {
+  background: linear-gradient(135deg, #E11D48, #DC2626) !important;
+  box-shadow: 0 4px 14px 0 rgba(225, 29, 72, 0.25) !important;
+}
+.btn-export-pdf:hover {
+  box-shadow: 0 8px 24px 0 rgba(225, 29, 72, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 8. Mark Received: Emerald–Lime */
+.btn-mark-received {
+  background: linear-gradient(135deg, #059669, #65A30D) !important;
+  box-shadow: 0 4px 14px 0 rgba(5, 150, 105, 0.25) !important;
+}
+.btn-mark-received:hover {
+  box-shadow: 0 8px 24px 0 rgba(5, 150, 105, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 9. Save All Changes: Indigo–Blue */
+.btn-save-changes {
+  background: linear-gradient(135deg, #4F46E5, #2563EB) !important;
+  box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.25) !important;
+}
+.btn-save-changes:hover {
+  box-shadow: 0 8px 24px 0 rgba(79, 70, 229, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ============================================================ */
+/* PREMIUM LOGIN SIGN-IN BUTTON                                 */
+/* ============================================================ */
+
+.btn-login-premium {
+  height: 52px !important;
+  border-radius: 16px !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: linear-gradient(135deg, #6366F1, #8B5CF6) !important;
+  box-shadow: 0 12px 35px rgba(99, 102, 241, 0.35) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-login-premium:hover {
+  transform: translateY(-3px) scale(1.02) !important;
+  filter: brightness(1.08) !important;
+  box-shadow: 0 16px 40px rgba(99, 102, 241, 0.5) !important;
+}
+
+.btn-login-premium:active {
+  transform: scale(0.98) !important;
+  filter: brightness(0.95) !important;
+}
+
+.btn-login-premium:focus {
+  outline: none !important;
+  box-shadow: 0 12px 35px rgba(99, 102, 241, 0.35), 0 0 0 4px rgba(99, 102, 241, 0.25) !important;
+}
+
+.btn-login-premium::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  animation: buttonShine 5s ease-in-out infinite;
+}
+
+/* ============================================================ */
+/* PREMIUM KPI STATS CARD & DASHBOARD ANIMATIONS                */
+/* ============================================================ */
+
+/* Staggered statistics card mounting */
+@keyframes statsCardLoad {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Staggered generic dashboard component fade-in */
+@keyframes dashboardFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-dashboard-fade-in {
+  opacity: 0;
+  animation: dashboardFadeIn 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Sweep dot animation along sparklines */
+@keyframes sweepDot {
+  0% {
+    left: 0%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+.animate-sweep-dot {
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  animation: sweepDot 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Floating background glow - Left -> Right -> Left over 8s infinite */
+@keyframes floatGlow {
+  0%, 100% {
+    transform: translate(-10%, -10%);
+  }
+  50% {
+    transform: translate(10%, 10%);
+  }
+}
+
+.animate-float-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 120%;
+  height: 120%;
+  opacity: 0.06;
+  pointer-events: none;
+  animation: floatGlow 8s ease-in-out infinite;
+  z-index: 1;
+}
+
+/* Table rows staggered fade-in load */
+@keyframes tableRowFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.table-row-anim {
+  opacity: 0;
+  animation: tableRowFadeIn 600ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Premium table row hover layout highlight */
+.premium-table-row {
+  position: relative;
+  transition: all 250ms ease !important;
+}
+
+.premium-table-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background-color: #3b82f6; /* Left blue highlight */
+  opacity: 0;
+  transition: opacity 250ms ease;
+}
+
+.premium-table-row:hover {
+  background-color: #fafbfd !important; /* Slightly brighter background */
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important; /* Subtle row shadow */
+}
+
+.premium-table-row:hover::before {
+  opacity: 1;
+}
+
+/* Global button action overrides: gradient shifts and press scales */
+button[class*="bg-gradient-to-r"] {
+  background-size: 200% auto !important;
+  transition: all 300ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+button[class*="bg-gradient-to-r"]:hover {
+  background-position: right center !important;
+  transform: translateY(-3px) scale(1.02) !important;
+}
+
+button[class*="bg-gradient-to-r"]:active {
+  transform: scale(0.96) !important;
+}
+
+/* Respect user prefers-reduced-motion options globally */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-delay: 0s !important;
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* Page load animation for header (Fade In + Move Up 20px over 700ms) */
+@keyframes headerLoad {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-header-load {
+  opacity: 0;
+  animation: headerLoad 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Unread notifications shake animation */
+@keyframes bellShake {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(8deg); }
+  30% { transform: rotate(-8deg); }
+  45% { transform: rotate(4deg); }
+  60% { transform: rotate(-4deg); }
+  75% { transform: rotate(2deg); }
+  90% { transform: rotate(-2deg); }
+}
+
+.animate-bell-shake {
+  animation: bellShake 1.5s ease infinite;
+  transform-origin: top center;
+}
+
+/* Avatar slow pulse animation every 6 seconds */
+@keyframes avatarPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(124, 58, 237, 0);
+  }
+}
+
+.animate-avatar-pulse {
+  animation: avatarPulse 6s infinite ease-in-out;
+}
+
+/* Collections Dashboard Tab Switching Animation (220ms ease-in-out) */
+@keyframes tabChangeFade {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-tab-change {
+  animation: tabChangeFade 220ms ease-in-out forwards;
+}
+
+
+
+
+

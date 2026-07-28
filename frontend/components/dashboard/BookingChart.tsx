@@ -11,10 +11,20 @@ export default function BookingChart() {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300">
-      <div>
-        <h3 className="text-lg font-bold text-slate-900">Booking Status</h3>
-        <p className="text-xs text-slate-500 mt-0.5">Distribution of bookings by state</p>
+    <div className="bg-gradient-to-br from-white via-white to-emerald-50/15 p-5 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 backdrop-blur-md bg-white/95">
+      <div className="flex items-center justify-between pb-5 mb-5 border-b border-[#E8EDF7]">
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">Booking Status</h3>
+          <p className="text-xs text-slate-500 mt-0.5">Distribution of bookings by state</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => alert("Opening Bookings Breakdown Details")}
+            className="px-3 py-1.5 border border-[#E8EDF7] hover:border-slate-350 rounded-lg text-slate-700 hover:text-slate-900 text-xs font-bold transition-all bg-slate-50/50 hover:bg-slate-100 shadow-sm"
+          >
+            Details
+          </button>
+        </div>
       </div>
 
       <div className="h-64 mt-4 w-full flex items-center justify-center">
@@ -28,6 +38,9 @@ export default function BookingChart() {
               outerRadius={80}
               paddingAngle={5}
               dataKey="value"
+              isAnimationActive={true}
+              animationDuration={1500}
+              animationEasing="ease-out"
             >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
