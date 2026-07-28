@@ -82,14 +82,13 @@ export default function DashboardLayout({
 
   return (
     <div className="h-screen overflow-hidden w-full flex bg-[#F5F8FF] dark:bg-[#0F172A] font-sans selection:bg-blue-600 selection:text-white">
-      
+
       {/* ============================================================ */}
       {/* LEFT FIXED SIDEBAR                                           */}
       {/* ============================================================ */}
-      <aside 
-        className={`fixed left-0 top-0 h-screen hidden md:flex flex-col bg-slate-900 dark:bg-[#111827] text-white shrink-0 border-r border-slate-850 dark:border-slate-800 transition-all duration-300 z-30 overflow-hidden ${
-          isSidebarCollapsed ? "w-20" : "w-[250px]"
-        }`}
+      <aside
+        className={`fixed left-0 top-0 h-screen hidden md:flex flex-col bg-slate-900 dark:bg-[#111827] text-white shrink-0 border-r border-slate-850 dark:border-slate-800 transition-all duration-300 z-30 overflow-hidden ${isSidebarCollapsed ? "w-20" : "w-[250px]"
+          }`}
       >
         {/* Brand Logo Header */}
         <div className="h-16 px-6 flex items-center justify-between border-b border-slate-850 dark:border-slate-800/60">
@@ -105,8 +104,8 @@ export default function DashboardLayout({
               </span>
             )}
           </div>
-          
-          <button 
+
+          <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             className="p-1 rounded-lg bg-slate-800/60 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
           >
@@ -124,11 +123,10 @@ export default function DashboardLayout({
               <button
                 key={item.name}
                 onClick={() => handleNavClick(item.href)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 group ${
-                  isActive 
-                    ? "bg-gradient-to-r from-blue-600 to-indigo-650 text-white shadow-md shadow-blue-600/10" 
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 group ${isActive
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-650 text-white shadow-md shadow-blue-600/10"
                     : "text-slate-400 hover:bg-slate-850 hover:text-white dark:hover:bg-slate-800/60"
-                }`}
+                  }`}
                 title={item.name}
               >
                 <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -153,7 +151,7 @@ export default function DashboardLayout({
               </div>
             )}
             {!isSidebarCollapsed && (
-              <button 
+              <button
                 onClick={onLogout}
                 className="p-1.5 rounded-lg hover:bg-slate-800 text-rose-400 hover:text-rose-350 transition-colors shrink-0"
                 title="Logout Session"
@@ -165,7 +163,7 @@ export default function DashboardLayout({
             )}
           </div>
           {isSidebarCollapsed && (
-            <button 
+            <button
               onClick={onLogout}
               className="mt-3 w-full flex justify-center p-2 rounded-lg hover:bg-rose-500/10 text-rose-450 transition-colors"
               title="Logout Session"
@@ -214,12 +212,11 @@ export default function DashboardLayout({
       {/* ============================================================ */}
       {/* CONTENT AREA WRAPPER                                         */}
       {/* ============================================================ */}
-      <div className={`flex-1 flex flex-col min-w-0 h-screen overflow-hidden transition-all duration-300 ${
-        isSidebarCollapsed ? "md:pl-20" : "md:pl-[250px]"
-      }`}>
-        
+      <div className={`flex-1 flex flex-col min-w-0 h-screen overflow-hidden transition-all duration-300 ${isSidebarCollapsed ? "md:pl-20" : "md:pl-[250px]"
+        }`}>
+
         {/* Top Header */}
-        <motion.header 
+        <motion.header
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -231,7 +228,7 @@ export default function DashboardLayout({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
               </svg>
             </button>
-            
+
             {/* Minimal workspace breadcrumb / label */}
             <div className="hidden sm:flex flex-col justify-center select-none">
               <span className="text-[12px] font-bold text-[#94A3B8] uppercase tracking-wider block">DASHBOARD OVERVIEW</span>
@@ -241,12 +238,12 @@ export default function DashboardLayout({
 
           <div className="flex items-center gap-4">
             {/* Calendar/Date Picker Button - 190x48px */}
-            <div className="hidden lg:flex items-center justify-between w-[190px] h-[48px] px-4 bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] rounded-[16px] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold transition-all shadow-sm hover:border-blue-500 dark:hover:border-blue-500 cursor-pointer select-none">
+            <div className="hidden lg:flex items-center justify-between w-[190px] h-[48px] px-4 bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] rounded-[16px] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold transition-all shadow-sm hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md cursor-pointer select-none">
               <div className="flex items-center gap-2">
                 <span className="text-sm">📅</span>
                 <span>July 27, 2026</span>
               </div>
-              <span className="text-[10px] text-slate-400 dark:text-slate-500">▼</span>
+              <span className="text-[10px] text-slate-450 dark:text-slate-500 font-bold">▼</span>
             </div>
 
             {/* Notification trigger - circular 48px */}
@@ -419,7 +416,7 @@ export default function DashboardLayout({
         {/* Master Content Area */}
         <div className="flex-1 flex flex-col min-h-0 relative">
           <main className="flex-1 overflow-y-auto p-8 bg-[#F5F8FF] dark:bg-[#0F172A] relative overflow-x-hidden">
-            
+
             {/* Background Layer 2: Soft Gradient Overlays */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#F5F8FF] via-blue-50/30 to-indigo-50/20 dark:from-[#0F172A] dark:via-blue-950/10 dark:to-indigo-950/10 pointer-events-none" />
 
