@@ -1,6 +1,13 @@
 from typing import Optional, List
+from datetime import datetime
 from pydantic import BaseModel
 from app.models.customers import DocStatusEnum
+
+class VerifiedByOut(BaseModel):
+    id: int
+    name: str
+    class Config:
+        from_attributes = True
 
 class CustomerDocumentBase(BaseModel):
     doc_type: str
@@ -13,6 +20,9 @@ class CustomerDocumentOut(CustomerDocumentBase):
     customer_id: int
     file_url: str
     status: DocStatusEnum
+    verified_by_id: Optional[int] = None
+    verified_at: Optional[datetime] = None
+    verified_by: Optional[VerifiedByOut] = None
 
     class Config:
         from_attributes = True
@@ -36,3 +46,4 @@ class CustomerOut(CustomerBase):
 
     class Config:
         from_attributes = True
+

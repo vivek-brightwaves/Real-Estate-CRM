@@ -61,12 +61,34 @@ def get_leads(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), cu
     query = db.query(Lead).filter(scope_query_to_branch(current_user, Lead))
     return query.offset(skip).limit(limit).all()
 
+@router.get("/{lead_id}", response_model=LeadOut)
+def get_lead(lead_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    lead = get_lead_or_404(db, lead_id)
+    verify_lead_access(lead, current_user)
+    return lead
+
 @router.patch("/{lead_id}", response_model=LeadOut)
 def update_lead(lead_id: int, lead_in: LeadUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     lead = get_lead_or_404(db, lead_id)
     verify_lead_access(lead, current_user)
     
     update_data = lead_in.model_dump(exclude_unset=True)
+    if "status" in update_data:
+        new_status = update_data["status"]
+        current_status = lead.status
+        
+        valid_transitions = {
+            LeadStatusEnum.NEW: [LeadStatusEnum.CONTACTED, LeadStatusEnum.LOST],
+            LeadStatusEnum.CONTACTED: [LeadStatusEnum.VISIT_SCHEDULED, LeadStatusEnum.LOST],
+            LeadStatusEnum.VISIT_SCHEDULED: [LeadStatusEnum.NEGOTIATION, LeadStatusEnum.LOST],
+            LeadStatusEnum.NEGOTIATION: [LeadStatusEnum.CONVERTED, LeadStatusEnum.LOST],
+            LeadStatusEnum.CONVERTED: [],
+            LeadStatusEnum.LOST: []
+        }
+        
+        if new_status != current_status and new_status not in valid_transitions.get(current_status, []):
+            raise HTTPException(status_code=400, detail=f"Invalid state transition from {current_status} to {new_status}")
+
     for field, value in update_data.items():
         setattr(lead, field, value)
         
@@ -123,7 +145,7 @@ def schedule_visit(lead_id: int, visit_in: SiteVisitCreate, db: Session = Depend
     visit = SiteVisit(
         lead_id=lead.id,
         scheduled_at=visit_in.scheduled_at,
-        employee_id=visit_in.employee_id or current_user.id
+        employee_id=visit_in.employee_id or lead.assigned_to_id or current_user.id
     )
     db.add(visit)
     db.commit()

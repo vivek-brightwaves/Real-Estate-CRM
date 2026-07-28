@@ -11,7 +11,7 @@ class LeadStatusEnum(str, enum.Enum):
     CONTACTED = "CONTACTED"
     VISIT_SCHEDULED = "VISIT_SCHEDULED"
     NEGOTIATION = "NEGOTIATION"
-    WON = "WON"
+    CONVERTED = "CONVERTED"
     LOST = "LOST"
 
 class Lead(Base):
@@ -50,6 +50,8 @@ class SiteVisit(Base):
     scheduled_at = Column(DateTime(timezone=True), nullable=False)
     status = Column(Enum(SiteVisitStatusEnum), default=SiteVisitStatusEnum.SCHEDULED, index=True)
     feedback = Column(Text, nullable=True)
+    sales_notes = Column(Text, nullable=True)
+    remarks = Column(Text, nullable=True)
     rating = Column(Integer, nullable=True)
     check_in_time = Column(DateTime, nullable=True)
     photo_url = Column(String(255), nullable=True)

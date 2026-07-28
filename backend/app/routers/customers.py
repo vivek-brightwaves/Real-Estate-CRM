@@ -39,7 +39,7 @@ def convert_lead_to_customer(customer_in: CustomerCreate, db: Session = Depends(
     if existing_customer:
         raise HTTPException(status_code=400, detail="Customer already exists for this lead")
         
-    lead.status = LeadStatusEnum.WON
+    lead.status = LeadStatusEnum.CONVERTED
     
     customer = Customer(
         name=customer_in.name,
@@ -55,9 +55,19 @@ def convert_lead_to_customer(customer_in: CustomerCreate, db: Session = Depends(
 
 @router.get("/", response_model=List[CustomerOut])
 def get_customers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    from sqlalchemy.orm import joinedload
     # Using the same scoping logic
-    query = db.query(Customer).filter(scope_query_to_branch(current_user, Customer))
+    query = db.query(Customer).filter(scope_query_to_branch(current_user, Customer)).options(joinedload(Customer.documents))
     return query.offset(skip).limit(limit).all()
+
+@router.get("/verified-documents", response_model=List[CustomerDocumentOut], dependencies=[Depends(require_roles([RoleEnum.SUPER_ADMIN, RoleEnum.MANAGER]))])
+def get_verified_documents(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    """Returns all KYC documents that have been VERIFIED, with verifier details."""
+    docs = db.query(CustomerDocument).filter(
+        CustomerDocument.status == DocStatusEnum.VERIFIED
+    ).all()
+    return docs
+
 
 @router.get("/{customer_id}", response_model=CustomerOut)
 def get_customer(customer_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -128,12 +138,22 @@ async def upload_document(
     return doc
 
 @router.patch("/documents/{doc_id}/verify", response_model=CustomerDocumentOut, dependencies=[Depends(require_roles([RoleEnum.SUPER_ADMIN, RoleEnum.MANAGER]))])
-def verify_document(doc_id: int, payload: CustomerVerifyDocument, db: Session = Depends(get_db)):
+def verify_document(doc_id: int, payload: CustomerVerifyDocument, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     doc = db.query(CustomerDocument).filter(CustomerDocument.id == doc_id).first()
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
-        
+
+    from datetime import datetime
     doc.status = payload.status
+    if payload.status == DocStatusEnum.VERIFIED:
+        doc.verified_by_id = current_user.id
+        doc.verified_at = datetime.utcnow()
+    else:
+        # If rejected/reverted, clear verification metadata
+        doc.verified_by_id = None
+        doc.verified_at = None
+
     db.commit()
     db.refresh(doc)
     return doc
+

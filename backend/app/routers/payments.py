@@ -2,7 +2,8 @@ import os
 from typing import List, Optional
 from datetime import date, datetime
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import or_, and_
 
 from app.db.session import get_db
@@ -12,9 +13,10 @@ from app.models.sales import Payment, Booking, PaymentStatusEnum
 from app.schemas.payments import PaymentCreate, PaymentMarkReceived, PaymentOut
 
 # Reportlab imports
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
+from reportlab.lib import colors
 
 router = APIRouter()
 
@@ -86,39 +88,118 @@ def get_payments(
     return payments
 
 @router.post("/{payment_id}/generate-receipt")
-def generate_receipt(payment_id: int, db: Session = Depends(get_db)):
-    payment = get_payment_or_404(db, payment_id)
+def generate_receipt(payment_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # Eagerly load booking -> customer and booking -> unit
+    payment = (
+        db.query(Payment)
+        .options(
+            joinedload(Payment.booking).joinedload(Booking.customer),
+            joinedload(Payment.booking).joinedload(Booking.unit),
+        )
+        .filter(Payment.id == payment_id)
+        .first()
+    )
+    if not payment:
+        raise HTTPException(status_code=404, detail="Payment not found")
     
     if payment.status != PaymentStatusEnum.RECEIVED:
         raise HTTPException(status_code=400, detail="Receipts can only be generated for RECEIVED payments")
-        
-    # Generate PDF
+    
+    # Ensure receipts directory exists
+    receipts_dir = os.path.join("uploads", "receipts")
+    os.makedirs(receipts_dir, exist_ok=True)
+    
     file_name = f"receipt_{payment.id}.pdf"
-    file_path = os.path.join("uploads", "receipts", file_name)
+    file_path = os.path.join(receipts_dir, file_name)
     
-    c = canvas.Canvas(file_path, pagesize=letter)
+    # Collect enriched data
+    booking = payment.booking
+    customer = booking.customer if booking else None
+    unit = booking.unit if booking else None
     
-    # Draw simple receipt
-    c.setFont("Helvetica-Bold", 24)
-    c.drawString(1 * inch, 10 * inch, "PAYMENT RECEIPT")
+    customer_name = customer.name if customer else "N/A"
+    customer_phone = customer.phone if customer else "N/A"
+    unit_number = unit.unit_number if unit else "N/A"
+    unit_type = unit.type if unit else "N/A"
     
-    c.setFont("Helvetica", 12)
-    c.drawString(1 * inch, 9 * inch, f"Receipt No: {payment.receipt_number or 'N/A'}")
-    c.drawString(1 * inch, 8.5 * inch, f"Date: {payment.received_date}")
+    # Generate PDF with A4 page
+    c = canvas.Canvas(file_path, pagesize=A4)
+    width, height = A4
     
-    c.drawString(1 * inch, 7.5 * inch, f"Booking ID: {payment.booking_id}")
-    c.drawString(1 * inch, 7 * inch, f"Customer ID: {payment.booking.customer_id if payment.booking else 'N/A'}")
+    # Header background
+    c.setFillColor(colors.HexColor("#1e3a5f"))
+    c.rect(0, height - 100, width, 100, fill=1, stroke=0)
     
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(1 * inch, 6 * inch, f"Amount Received: Rs. {payment.amount}")
+    # Title
+    c.setFillColor(colors.white)
+    c.setFont("Helvetica-Bold", 26)
+    c.drawString(1 * inch, height - 55, "PAYMENT RECEIPT")
     
-    c.setFont("Helvetica", 12)
-    c.drawString(1 * inch, 5.5 * inch, f"Payment Mode: {payment.mode.value if payment.mode else 'N/A'}")
+    c.setFont("Helvetica", 11)
+    c.drawRightString(width - 1 * inch, height - 40, f"Receipt No: {payment.receipt_number or f'PMT-{payment.id:05d}'}")
+    c.drawRightString(width - 1 * inch, height - 58, f"Date: {payment.received_date or date.today()}")
+
+    # Customer Details section
+    y = height - 130
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica-Bold", 13)
+    c.drawString(1 * inch, y, "Customer Details")
+    c.setStrokeColor(colors.HexColor("#1e3a5f"))
+    c.line(1 * inch, y - 4, width - 1 * inch, y - 4)
     
-    c.drawString(1 * inch, 4 * inch, "Thank you for your business.")
+    c.setFont("Helvetica", 11)
+    y -= 24
+    c.drawString(1 * inch, y, f"Name:  {customer_name}")
+    y -= 18
+    c.drawString(1 * inch, y, f"Phone: {customer_phone}")
+    
+    # Booking / Unit Details
+    y -= 36
+    c.setFont("Helvetica-Bold", 13)
+    c.drawString(1 * inch, y, "Booking & Unit Details")
+    c.line(1 * inch, y - 4, width - 1 * inch, y - 4)
+    
+    c.setFont("Helvetica", 11)
+    y -= 24
+    c.drawString(1 * inch, y, f"Booking ID:  #{booking.id if booking else 'N/A'}")
+    y -= 18
+    c.drawString(1 * inch, y, f"Unit:        {unit_number} ({unit_type})")
+    
+    # Payment Details
+    y -= 36
+    c.setFont("Helvetica-Bold", 13)
+    c.drawString(1 * inch, y, "Payment Details")
+    c.line(1 * inch, y - 4, width - 1 * inch, y - 4)
+    
+    c.setFont("Helvetica", 11)
+    y -= 24
+    c.drawString(1 * inch, y, f"Payment ID:  #{payment.id}")
+    y -= 18
+    c.drawString(1 * inch, y, f"Mode:        {payment.mode.value if payment.mode else 'N/A'}")
+    y -= 18
+    c.drawString(1 * inch, y, f"Status:      RECEIVED")
+    
+    # Amount box
+    y -= 44
+    c.setFillColor(colors.HexColor("#f0f4ff"))
+    c.roundRect(1 * inch, y - 10, width - 2 * inch, 44, 8, fill=1, stroke=0)
+    c.setFillColor(colors.HexColor("#1e3a5f"))
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(1.3 * inch, y + 12, f"Amount Received: ₹ {payment.amount:,.2f}")
+    
+    # Footer
+    c.setFillColor(colors.gray)
+    c.setFont("Helvetica", 9)
+    c.drawCentredString(width / 2, 0.5 * inch, "This is a computer-generated receipt. No signature required.")
+    
     c.save()
     
-    return {"receipt_url": f"/uploads/receipts/{file_name}"}
+    return FileResponse(
+        path=file_path,
+        media_type="application/pdf",
+        filename=file_name,
+        headers={"Content-Disposition": f"inline; filename={file_name}"}
+    )
 
 @router.post("/{payment_id}/reminder")
 def send_reminder(payment_id: int, db: Session = Depends(get_db)):

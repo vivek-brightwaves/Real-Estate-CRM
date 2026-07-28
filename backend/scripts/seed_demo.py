@@ -11,7 +11,7 @@ from app.db.session import SessionLocal, engine
 from app.db.base import Base
 from app.models.users import User, RoleEnum, Company, Branch
 from app.models.leads import Lead, LeadStatusEnum
-from app.models.customers import Customer
+from app.models.customers import Customer, CustomerDocument, DocStatusEnum
 from app.models.projects import Project, Tower, Block, Unit, UnitStatusEnum
 from app.models.sales import Booking, BookingStatusEnum, Payment, PaymentStatusEnum, PaymentModeEnum
 
@@ -83,7 +83,7 @@ def seed_db():
 
         print("Seeding Leads & Customers...")
         leads = []
-        statuses = [LeadStatusEnum.NEW, LeadStatusEnum.CONTACTED, LeadStatusEnum.VISIT_SCHEDULED, LeadStatusEnum.NEGOTIATION, LeadStatusEnum.WON, LeadStatusEnum.LOST]
+        statuses = [LeadStatusEnum.NEW, LeadStatusEnum.CONTACTED, LeadStatusEnum.VISIT_SCHEDULED, LeadStatusEnum.NEGOTIATION, LeadStatusEnum.CONVERTED, LeadStatusEnum.LOST]
         for l in range(1, 21):
             lead = Lead(
                 name=f"Lead {l}", 
@@ -101,12 +101,25 @@ def seed_db():
         # Convert some WON leads to Customers
         customers = []
         for lead in leads:
-            if lead.status == LeadStatusEnum.WON:
+            if lead.status == LeadStatusEnum.CONVERTED:
                 cust = Customer(
                     name=lead.name, phone=lead.phone, email=lead.email,
                     lead_id=lead.id, assigned_to_id=lead.created_by_id
                 )
                 db.add(cust)
+                db.flush() # flush to get cust.id
+                
+                # Create verified KYC docs for demo customers to comply with business rules
+                doc = CustomerDocument(
+                    customer_id=cust.id,
+                    doc_type="ID_PROOF",
+                    file_url="https://example.com/dummy_id.pdf",
+                    status=DocStatusEnum.VERIFIED,
+                    verified_by_id=super_admin.id,
+                    verified_at=date.today()
+                )
+                db.add(doc)
+                
                 customers.append(cust)
         db.commit()
 
