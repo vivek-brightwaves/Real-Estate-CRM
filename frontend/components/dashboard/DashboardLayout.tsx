@@ -124,8 +124,8 @@ export default function DashboardLayout({
                 key={item.name}
                 onClick={() => handleNavClick(item.href)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 group ${isActive
-                    ? "bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white shadow-md shadow-blue-600/10"
-                    : "text-slate-400 hover:bg-slate-850 hover:text-white dark:hover:bg-slate-800/60"
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-650 text-white shadow-md shadow-blue-600/10"
+                  : "text-slate-400 hover:bg-slate-850 hover:text-white dark:hover:bg-slate-800/60"
                   }`}
                 title={item.name}
               >
@@ -220,7 +220,7 @@ export default function DashboardLayout({
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="sticky top-0 z-50 w-full h-[72px] bg-white dark:bg-[#111827] border-b border-[#E5E7EB] dark:border-[#334155] px-6 py-4 flex items-center justify-between shadow-[0_8px_30px_rgba(15,23,42,0.06)] dark:shadow-none transition-colors duration-300"
+          className="sticky top-0 z-50 w-full h-[72px] bg-white dark:bg-[#0F172A] border-b border-[#E5E7EB] dark:border-[#1E293B] px-6 py-4 flex items-center justify-between shadow-[0_8px_30px_rgba(15,23,42,0.06)] dark:shadow-none transition-colors duration-300"
         >
           <div className="flex items-center gap-4">
             <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 md:hidden rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">
@@ -237,28 +237,28 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Calendar/Date Picker Button - 190x48px */}
-            <div className="hidden lg:flex items-center justify-between w-[190px] h-[48px] px-4 bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] rounded-[16px] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold transition-all shadow-sm hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md cursor-pointer select-none">
+            {/* Calendar/Date Picker Button - 210x52px */}
+            <div className="hidden lg:flex items-center justify-between w-[210px] h-[52px] px-4 bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#1E293B] rounded-[16px] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold transition-all shadow-sm cursor-pointer select-none">
               <div className="flex items-center gap-2">
                 <span className="text-sm">📅</span>
                 <span>July 27, 2026</span>
               </div>
-              <span className="text-[10px] text-slate-450 dark:text-slate-500 font-bold">▼</span>
+              <span className="text-[10px] text-slate-400 dark:text-slate-500">▼</span>
             </div>
 
             {/* Notification trigger - circular 48px */}
             <div className="relative">
-              <motion.button 
-                onClick={() => setIsNotifOpen(!isNotifOpen)} 
+              <motion.button
+                onClick={() => setIsNotifOpen(!isNotifOpen)}
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] rounded-full text-blue-600 dark:text-blue-400 shadow-sm hover:shadow transition-all focus:outline-none cursor-pointer relative"
+                className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#1E293B] rounded-full text-blue-600 dark:text-blue-400 shadow-sm hover:shadow transition-all focus:outline-none cursor-pointer relative"
               >
                 <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 {unreadCount > 0 && (
-                  <motion.span 
+                  <motion.span
                     animate={{ scale: [1, 1.25, 1] }}
                     transition={{ repeat: Infinity, repeatDelay: 5, duration: 0.8 }}
                     className="absolute top-1.5 right-1.5 bg-rose-500 text-white text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full border border-white dark:border-[#0F172A] px-1 leading-none"
@@ -269,12 +269,12 @@ export default function DashboardLayout({
               </motion.button>
               <AnimatePresence>
                 {isNotifOpen && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 15, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 15, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-3 w-80 bg-white dark:bg-[#1E293B] rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E5E7EB] dark:border-[#334155] z-50 overflow-hidden"
+                    className="absolute right-0 mt-3 w-80 bg-white dark:bg-[#1E293B] rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E5E7EB] dark:border-[#1E293B] z-50 overflow-hidden"
                   >
                     <div className="p-4 border-b border-[#E5E7EB] dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/40">
                       <span className="text-xs font-extrabold text-slate-800 dark:text-[#F8FAFC]">System Notifications</span>
@@ -291,7 +291,7 @@ export default function DashboardLayout({
                             <p className={`font-semibold text-slate-750 dark:text-slate-350 ${!n.is_read ? 'text-slate-900 dark:text-[#F8FAFC] font-bold' : ''}`}>{n.message}</p>
                             <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold">{new Date(n.created_at).toLocaleTimeString()}</span>
                             {!n.is_read && (
-                              <button 
+                              <button
                                 onClick={() => onMarkRead(n.id)}
                                 className="absolute right-3.5 top-3.5 px-2 py-0.5 bg-blue-50 dark:bg-slate-800 hover:bg-blue-600 dark:hover:bg-blue-500 hover:text-white dark:hover:text-white rounded border border-blue-100 dark:border-slate-700 text-[9px] font-bold text-blue-700 dark:text-blue-400 transition-all cursor-pointer"
                               >
@@ -310,11 +310,11 @@ export default function DashboardLayout({
             </div>
 
             {/* Messages Button (Circular 48px with red dot in top right) */}
-            <motion.button 
+            <motion.button
               onClick={() => alert("Opening messages inbox panel")}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] rounded-full text-indigo-650 dark:text-indigo-400 shadow-sm hover:shadow transition-all focus:outline-none cursor-pointer relative"
+              className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#1E293B] rounded-full text-indigo-650 dark:text-indigo-400 shadow-sm hover:shadow transition-all focus:outline-none cursor-pointer relative"
             >
               <svg className="w-5 h-5 text-blue-650 dark:text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -327,7 +327,7 @@ export default function DashboardLayout({
               onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] rounded-full text-[#94A3B8] dark:text-[#F8FAFC] shadow-sm hover:shadow transition-all focus:outline-none cursor-pointer"
+              className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#1E293B] rounded-full text-[#94A3B8] dark:text-[#F8FAFC] shadow-sm hover:shadow transition-all focus:outline-none cursor-pointer"
               title={resolvedTheme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               <AnimatePresence mode="wait">
@@ -354,11 +354,11 @@ export default function DashboardLayout({
             </motion.button>
 
             {/* Settings Button (Glass circle, rotate on hover) */}
-            <motion.button 
+            <motion.button
               onClick={() => alert("Opening settings dashboard")}
               whileHover={{ rotate: 90, scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#334155] rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all shadow-sm focus:outline-none cursor-pointer"
+              className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-[#1E293B] rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all shadow-sm focus:outline-none cursor-pointer"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -368,9 +368,9 @@ export default function DashboardLayout({
 
             {/* User Profile dropdown */}
             <div className="relative">
-              <button 
-                onClick={() => setIsProfileOpen(!isProfileOpen)} 
-                className="flex items-center gap-3 pl-4 border-l border-[#E5E7EB] dark:border-[#334155] focus:outline-none group text-left cursor-pointer"
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center gap-3 pl-4 border-l border-[#E5E7EB] dark:border-[#1E293B] focus:outline-none group text-left cursor-pointer"
               >
                 <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-650 text-white flex items-center justify-center font-extrabold text-lg border border-white dark:border-[#0F172A] shadow-md shrink-0 relative z-10">
                   S
@@ -389,19 +389,19 @@ export default function DashboardLayout({
               </button>
               <AnimatePresence>
                 {isProfileOpen && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 15, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 15, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-3 w-52 bg-white dark:bg-[#1E293B] rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E5E7EB] dark:border-[#334155] z-50 py-1.5 overflow-hidden"
+                    className="absolute right-0 mt-3 w-52 bg-white dark:bg-[#1E293B] rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E5E7EB] dark:border-[#1E293B] z-50 py-1.5 overflow-hidden"
                   >
                     <div className="px-4 py-2.5 border-b border-[#E5E7EB] dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-left">
                       <p className="text-xs font-extrabold text-[#0F172A] dark:text-[#F8FAFC]">{user.name}</p>
                       <p className="text-[10px] text-[#94A3B8] font-semibold mt-0.5">{getRoleLabel(user.role)}</p>
                     </div>
-                    <button 
-                      onClick={onLogout} 
+                    <button
+                      onClick={onLogout}
                       className="w-full text-left px-4 py-2.5 text-xs text-rose-600 dark:text-rose-455 hover:bg-rose-50 dark:hover:bg-rose-950/20 font-bold border-t border-[#E5E7EB] dark:border-slate-800/60 transition-all cursor-pointer"
                     >
                       Logout Session

@@ -7,6 +7,11 @@
   /* slate-50 */
   --foreground: #0f172a;
   /* slate-900 */
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --text-secondary: #64748b;
+  --hover: #f1f5f9;
 }
 
 html,
@@ -98,12 +103,14 @@ body {
   height: 46px !important;
   border-radius: 14px !important;
   font-weight: 700 !important;
-  font-size: 0.75rem !important; /* text-xs */
+  font-size: 0.75rem !important;
+  /* text-xs */
   line-height: 1rem !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding-left: 1.25rem !important; /* px-5 */
+  padding-left: 1.25rem !important;
+  /* px-5 */
   padding-right: 1.25rem !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
@@ -125,6 +132,7 @@ body {
   background: linear-gradient(135deg, #2563EB, #4F46E5) !important;
   box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.25) !important;
 }
+
 .btn-add-lead:hover {
   box-shadow: 0 8px 24px 0 rgba(37, 99, 235, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
 }
@@ -134,6 +142,7 @@ body {
   background: linear-gradient(135deg, #059669, #0D9488) !important;
   box-shadow: 0 4px 14px 0 rgba(5, 150, 105, 0.25) !important;
 }
+
 .btn-new-project:hover {
   box-shadow: 0 8px 24px 0 rgba(5, 150, 105, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
 }
@@ -143,6 +152,7 @@ body {
   background: linear-gradient(135deg, #7C3AED, #9333EA) !important;
   box-shadow: 0 4px 14px 0 rgba(124, 58, 237, 0.25) !important;
 }
+
 .btn-new-booking:hover {
   box-shadow: 0 8px 24px 0 rgba(124, 58, 237, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
 }
@@ -152,6 +162,7 @@ body {
   background: linear-gradient(135deg, #0891B2, #2563EB) !important;
   box-shadow: 0 4px 14px 0 rgba(8, 145, 178, 0.25) !important;
 }
+
 .btn-add-customer:hover {
   box-shadow: 0 8px 24px 0 rgba(8, 145, 178, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
 }
@@ -161,6 +172,7 @@ body {
   background: linear-gradient(135deg, #EA580C, #D97706) !important;
   box-shadow: 0 4px 14px 0 rgba(234, 88, 12, 0.25) !important;
 }
+
 .btn-record-payment:hover {
   box-shadow: 0 8px 24px 0 rgba(234, 88, 12, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
 }
@@ -170,6 +182,7 @@ body {
   background: linear-gradient(135deg, #16A34A, #10B981) !important;
   box-shadow: 0 4px 14px 0 rgba(22, 163, 74, 0.25) !important;
 }
+
 .btn-export-excel:hover {
   box-shadow: 0 8px 24px 0 rgba(22, 163, 74, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
 }
@@ -179,6 +192,7 @@ body {
   background: linear-gradient(135deg, #E11D48, #DC2626) !important;
   box-shadow: 0 4px 14px 0 rgba(225, 29, 72, 0.25) !important;
 }
+
 .btn-export-pdf:hover {
   box-shadow: 0 8px 24px 0 rgba(225, 29, 72, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
 }
@@ -188,6 +202,7 @@ body {
   background: linear-gradient(135deg, #059669, #65A30D) !important;
   box-shadow: 0 4px 14px 0 rgba(5, 150, 105, 0.25) !important;
 }
+
 .btn-mark-received:hover {
   box-shadow: 0 8px 24px 0 rgba(5, 150, 105, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
 }
@@ -197,6 +212,7 @@ body {
   background: linear-gradient(135deg, #4F46E5, #2563EB) !important;
   box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.25) !important;
 }
+
 .btn-save-changes:hover {
   box-shadow: 0 8px 24px 0 rgba(79, 70, 229, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
 }
@@ -246,12 +262,10 @@ body {
   left: -100%;
   width: 50%;
   height: 100%;
-  background: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.25) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: linear-gradient(to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.25) 50%,
+      rgba(255, 255, 255, 0) 100%);
   transform: skewX(-25deg);
   animation: buttonShine 5s ease-in-out infinite;
 }
@@ -266,6 +280,7 @@ body {
     opacity: 0;
     transform: translateY(20px) scale(0.98);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -278,6 +293,7 @@ body {
     opacity: 0;
     transform: translateY(30px) scale(0.98);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -295,12 +311,15 @@ body {
     left: 0%;
     opacity: 0;
   }
+
   15% {
     opacity: 1;
   }
+
   85% {
     opacity: 1;
   }
+
   100% {
     left: 100%;
     opacity: 0;
@@ -321,9 +340,12 @@ body {
 
 /* Floating background glow - Left -> Right -> Left over 8s infinite */
 @keyframes floatGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(-10%, -10%);
   }
+
   50% {
     transform: translate(10%, 10%);
   }
@@ -349,6 +371,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -373,14 +396,17 @@ body {
   left: 0;
   width: 3px;
   height: 100%;
-  background-color: #3b82f6; /* Left blue highlight */
+  background-color: #3b82f6;
+  /* Left blue highlight */
   opacity: 0;
   transition: opacity 250ms ease;
 }
 
 .premium-table-row:hover {
-  background-color: #fafbfd !important; /* Slightly brighter background */
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important; /* Subtle row shadow */
+  background-color: #fafbfd !important;
+  /* Slightly brighter background */
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
+  /* Subtle row shadow */
 }
 
 .premium-table-row:hover::before {
@@ -404,7 +430,10 @@ button[class*="bg-gradient-to-r"]:active {
 
 /* Respect user prefers-reduced-motion options globally */
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
+
+  *,
+  ::before,
+  ::after {
     animation-delay: 0s !important;
     animation-duration: 0s !important;
     animation-iteration-count: 1 !important;
@@ -421,6 +450,7 @@ button[class*="bg-gradient-to-r"]:active {
     opacity: 0;
     transform: translateY(20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -434,13 +464,35 @@ button[class*="bg-gradient-to-r"]:active {
 
 /* Unread notifications shake animation */
 @keyframes bellShake {
-  0%, 100% { transform: rotate(0deg); }
-  15% { transform: rotate(8deg); }
-  30% { transform: rotate(-8deg); }
-  45% { transform: rotate(4deg); }
-  60% { transform: rotate(-4deg); }
-  75% { transform: rotate(2deg); }
-  90% { transform: rotate(-2deg); }
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  15% {
+    transform: rotate(8deg);
+  }
+
+  30% {
+    transform: rotate(-8deg);
+  }
+
+  45% {
+    transform: rotate(4deg);
+  }
+
+  60% {
+    transform: rotate(-4deg);
+  }
+
+  75% {
+    transform: rotate(2deg);
+  }
+
+  90% {
+    transform: rotate(-2deg);
+  }
 }
 
 .animate-bell-shake {
@@ -450,9 +502,12 @@ button[class*="bg-gradient-to-r"]:active {
 
 /* Avatar slow pulse animation every 6 seconds */
 @keyframes avatarPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.25);
   }
+
   50% {
     box-shadow: 0 0 0 8px rgba(124, 58, 237, 0);
   }
@@ -468,6 +523,7 @@ button[class*="bg-gradient-to-r"]:active {
     opacity: 0;
     transform: translateY(8px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -484,13 +540,13 @@ button[class*="bg-gradient-to-r"]:active {
 }
 
 /* Ensure Recharts SVGs, sparklines, and transforms do not inherit transitions to prevent rendering lag */
-.recharts-wrapper, 
-.recharts-wrapper *, 
-.recharts-surface, 
-.recharts-surface *, 
-svg, 
-path, 
-circle, 
+.recharts-wrapper,
+.recharts-wrapper *,
+.recharts-surface,
+.recharts-surface *,
+svg,
+path,
+circle,
 rect,
 .animate-sweep-dot,
 .animate-float-glow,
@@ -508,6 +564,12 @@ rect,
   --welcome-bg-start: rgba(30, 41, 59, 0.95);
   --welcome-bg-mid: rgba(30, 41, 59, 0.4);
   --welcome-bg-end: rgba(15, 23, 42, 0.1);
+  --background: #0F172A;
+  --card: #111827;
+  --border: #1E293B;
+  --text: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --hover: #1E293B;
 }
 
 /* Premium Dark Theme Global Utilities */
@@ -521,20 +583,20 @@ rect,
 }
 
 /* Text color overrides */
-.dark .text-slate-900, 
+.dark .text-slate-900,
 .dark .text-slate-850,
 .dark .text-slate-800 {
   color: #F8FAFC !important;
 }
 
-.dark .text-slate-700, 
+.dark .text-slate-700,
 .dark .text-slate-600,
 .dark .text-slate-655 {
   color: #CBD5E1 !important;
 }
 
-.dark .text-slate-500, 
-.dark .text-slate-400, 
+.dark .text-slate-500,
+.dark .text-slate-400,
 .dark .text-slate-450 {
   color: #94A3B8 !important;
 }
@@ -569,25 +631,25 @@ rect,
 }
 
 .dark tbody tr:nth-child(even) {
-  background-color: #0F172A !important;
+  background-color: #111827 !important;
 }
 
 .dark .hover\:bg-slate-50:hover,
 .dark tr:hover,
 .dark tbody tr:hover {
-  background-color: #172554 !important;
+  background-color: #273449 !important;
 }
 
 /* Inputs and forms */
-.dark input, 
-.dark select, 
+.dark input,
+.dark select,
 .dark textarea {
   background-color: #1E293B !important;
   border-color: #334155 !important;
   color: #F8FAFC !important;
 }
 
-.dark input::placeholder, 
+.dark input::placeholder,
 .dark textarea::placeholder {
   color: #64748B !important;
 }
@@ -628,9 +690,71 @@ rect,
   border-color: #0F172A !important;
 }
 
+/* Input elements, Select tags & Option menus */
+input,
+select,
+textarea {
+  background-color: var(--card) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
 
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-secondary) !important;
+  opacity: 0.7;
+}
 
+select option {
+  background-color: var(--card) !important;
+  color: var(--text) !important;
+}
 
+/* Dropdown list boxes and notification drawers */
+.bg-white.rounded-2xl.shadow-\[0_15px_40px_rgba\(15\,23\,42\,0\.12\)\] {
+  background-color: var(--card) !important;
+  border-color: var(--border) !important;
+}
 
+/* Tables style formatting */
+th {
+  background-color: var(--card) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
 
-
+td {
+  border-color: var(--border) !important;
+}
+
+tr {
+  background-color: var(--card) !important;
+}
+
+tbody tr {
+  background-color: var(--background) !important;
+}
+
+/* Hover highlights */
+.hover\:bg-slate-50:hover,
+tr:hover,
+tbody tr:hover,
+.hover\:bg-slate-850:hover {
+  background-color: var(--hover) !important;
+}
+
+/* Modals Overlay */
+.bg-slate-950\/40,
+.bg-black\/40 {
+  background-color: rgba(0, 0, 0, 0.65) !important;
+}
+
+/* Scrollbars overrides */
+::-webkit-scrollbar-track {
+  background: var(--background) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--hover) !important;
+  border-color: var(--background) !important;
+}
