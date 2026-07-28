@@ -233,27 +233,12 @@ export default function DashboardLayout({
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* Large Rounded Search Input */}
-            <div className="relative hidden md:block">
-              <input
-                type="text"
-                placeholder="Search dashboard..."
-                className="h-[48px] w-60 pl-10 pr-4 bg-slate-50/40 dark:bg-slate-800 border border-[#E8EDF7] dark:border-slate-705 rounded-[16px] text-slate-800 dark:text-[#F8FAFC] placeholder:text-slate-450 dark:placeholder:text-slate-500 text-xs font-semibold focus:bg-white dark:focus:bg-slate-800/90 focus:outline-none focus:ring-4 focus:ring-blue-650/10 dark:focus:ring-blue-500/20 focus:border-blue-600 dark:focus:border-blue-500 shadow-sm transition-all"
-              />
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
-                🔍
-              </span>
-            </div>
-
+          <div className="flex items-center gap-3.5">
             {/* Calendar/Date Picker Button */}
             <div className="hidden lg:flex items-center gap-2 h-[48px] px-4 bg-white dark:bg-slate-800 border border-[#E8EDF7] dark:border-slate-705 hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50/30 dark:hover:bg-blue-500/10 rounded-[16px] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold transition-all shadow-sm cursor-pointer select-none">
               <span className="text-sm">📅</span>
               <span>July 27, 2026</span>
             </div>
-
-            {/* Professional Theme Switch Toggle */}
-            <ThemeToggle />
 
             {/* Notification trigger */}
             <div className="relative">
@@ -314,6 +299,9 @@ export default function DashboardLayout({
               </svg>
               <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white dark:border-[#0B1220] animate-pulse" />
             </button>
+
+            {/* Professional Theme Switch Toggle */}
+            <ThemeToggle />
 
             {/* Settings Button (Glass circle, rotate on hover) */}
             <button 
