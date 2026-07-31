@@ -14,7 +14,10 @@ import app.models  # noqa: F401 - registers every model with Base.metadata
 
 
 revision: str = "cb128008f970"
-down_revision: Union[str, Sequence[str], None] = None
+# Existing Docker volumes were stamped with this legacy revision before the
+# migration history was rebuilt.  Keeping it as the predecessor lets those
+# databases upgrade to the new baseline without manual alembic_version edits.
+down_revision: Union[str, Sequence[str], None] = "20260725_add_booking_created_at"
 branch_labels = None
 depends_on = None
 
