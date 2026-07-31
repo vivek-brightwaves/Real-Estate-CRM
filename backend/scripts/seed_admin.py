@@ -32,7 +32,10 @@ def seed() -> None:
     except ValidationError as exc:
         raise RuntimeError("INITIAL_ADMIN_EMAIL must be a valid email address") from exc
 
-    if not validate_password_strength(admin_password):
+    allow_weak_password = os.getenv(
+        "ALLOW_WEAK_INITIAL_ADMIN_PASSWORD", "false"
+    ).lower() == "true"
+    if not allow_weak_password and not validate_password_strength(admin_password):
         raise RuntimeError(
             "INITIAL_ADMIN_PASSWORD must contain at least 8 characters, "
             "uppercase, lowercase, number, and special character"
@@ -40,10 +43,6 @@ def seed() -> None:
 
     db = SessionLocal()
     try:
-        if db.query(User).count():
-            print("Admin bootstrap skipped: the database already has users.")
-            return
-
         company = db.query(Company).order_by(Company.id).first()
         if company is None:
             company = Company(name=company_name, settings_json="{}")
@@ -61,8 +60,9 @@ def seed() -> None:
             db.add(branch)
             db.flush()
 
-        db.add(
-            User(
+        admin = db.query(User).filter(User.email == admin_email).first()
+        if admin is None:
+            admin = User(
                 name=admin_name,
                 email=admin_email,
                 password_hash=get_password_hash(admin_password),
@@ -71,9 +71,20 @@ def seed() -> None:
                 is_active=True,
                 is_email_verified=True,
             )
-        )
+            db.add(admin)
+            print(f"Initial administrator created for {admin_email}.")
+        else:
+            admin.name = admin_name
+            admin.password_hash = get_password_hash(admin_password)
+            admin.role = RoleEnum.SUPER_ADMIN
+            admin.branch_id = branch.id
+            admin.is_active = True
+            admin.is_locked = False
+            admin.locked_until = None
+            admin.failed_login_attempts = 0
+            admin.is_email_verified = True
+            print(f"Existing administrator enabled for {admin_email}.")
         db.commit()
-        print(f"Initial administrator created for {admin_email}.")
     except Exception:
         db.rollback()
         raise
