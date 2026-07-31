@@ -6,6 +6,8 @@ import { useAuthStore } from "../../store/authStore";
 import { useRouter, useSearchParams } from "next/navigation";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import StatsCard from "../../components/dashboard/StatsCard";
+import { useFeedback } from "../../components/ui/FeedbackProvider";
+import { useSectionSearch } from "../../hooks/useSectionSearch";
 
 interface Payment {
   id: number;
@@ -19,6 +21,7 @@ interface Payment {
 }
 
 function CollectionsDashboard() {
+  const { notify } = useFeedback();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"PENDING" | "OVERDUE" | "RECEIVED">("PENDING");
@@ -33,6 +36,7 @@ function CollectionsDashboard() {
 
   // Search & Filters parameters
   const [searchTerm, setSearchTerm] = useState("");
+  useSectionSearch("payments", setSearchTerm);
   const [sortBy, setSortBy] = useState("id");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -46,6 +50,10 @@ function CollectionsDashboard() {
   const [showMarkReceived, setShowMarkReceived] = useState<number | null>(null);
   const [rcvMode, setRcvMode] = useState("BANK_TRANSFER");
   const [rcvRef, setRcvRef] = useState("");
+  const [paymentAction, setPaymentAction] = useState<{
+    id: number;
+    type: "reminder" | "received" | "receipt";
+  } | null>(null);
 
   useEffect(() => {
     if (!accessToken) {
@@ -114,35 +122,53 @@ function CollectionsDashboard() {
         amount: Number(newAmount),
         due_date: newDueDate || null
       });
-      alert("Payment record created!");
+      notify({
+        title: "Payment scheduled",
+        message: "The payment record was saved in MySQL.",
+      });
       setShowNew(false);
       setNewBookingId("");
       setNewAmount("");
       setNewDueDate("");
       fetchPayments();
     } catch (err: any) {
-      alert("Error: " + (err.response?.data?.detail || "Failed to create"));
+      notify({
+        title: "Unable to schedule payment",
+        message: err.response?.data?.detail || "Please check the booking and amount.",
+        tone: "error",
+      });
     }
   };
 
   const handleMarkReceived = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!showMarkReceived) return;
+    setPaymentAction({ id: showMarkReceived, type: "received" });
     try {
       await api.patch(`/payments/${showMarkReceived}/mark-received`, {
         mode: rcvMode,
         receipt_number: rcvRef || null
       });
-      alert("Payment marked as received!");
+      notify({
+        title: "Payment marked received",
+        message: "The status, payment mode, receipt reference, and received date were saved. The booking owner was notified.",
+      });
       setShowMarkReceived(null);
       setRcvRef("");
       fetchPayments();
     } catch (err: any) {
-      alert("Error: " + (err.response?.data?.detail || "Failed to update"));
+      notify({
+        title: "Unable to mark payment received",
+        message: err.response?.data?.detail || "Please try again.",
+        tone: "error",
+      });
+    } finally {
+      setPaymentAction(null);
     }
   };
 
   const generateReceipt = async (paymentId: number) => {
+    setPaymentAction({ id: paymentId, type: "receipt" });
     try {
       const res = await api.post(
         `/payments/${paymentId}/generate-receipt`,
@@ -162,43 +188,66 @@ function CollectionsDashboard() {
       setTimeout(() => window.URL.revokeObjectURL(url), 10000);
     } catch (err: any) {
       const detail = err.response?.data?.detail;
-      alert("Error generating receipt: " + (detail || err.message || "Unknown error"));
+      notify({
+        title: "Receipt generation failed",
+        message: detail || err.message || "Unknown error",
+        tone: "error",
+      });
+    } finally {
+      setPaymentAction(null);
     }
   };
 
   const sendReminder = async (paymentId: number) => {
+    setPaymentAction({ id: paymentId, type: "reminder" });
     try {
       const res = await api.post(`/payments/${paymentId}/reminder`);
-      alert(`Reminder Simulated:\n\n${res.data.message}`);
+      notify({
+        title: "Payment reminder created",
+        message: `${res.data.message} Contact: ${res.data.customer_contact || "not available"}. Delivery status: ${res.data.delivery_status}.`,
+      });
     } catch (err: any) {
-      alert("Error sending reminder: " + (err.response?.data?.detail || "Error"));
+      notify({
+        title: "Unable to create reminder",
+        message: err.response?.data?.detail || "Please try again.",
+        tone: "error",
+      });
+    } finally {
+      setPaymentAction(null);
     }
   };
 
-  // Sparkline data
+  const statusSeries = (status: Payment["status"]) => {
+    const values = payments
+      .filter((payment) => payment.status === status)
+      .slice(-6)
+      .map((payment) => ({ value: payment.amount }));
+    return values.length ? values : [{ value: 0 }];
+  };
+
   const sparkData = {
-    pending: [{ value: 120000 }, { value: 140000 }, { value: 135000 }, { value: 190000 }, { value: 210000 }, { value: 240000 }],
-    overdue: [{ value: 45000 }, { value: 62000 }, { value: 58000 }, { value: 74000 }, { value: 80000 }, { value: 85000 }],
-    received: [{ value: 1800000 }, { value: 2600000 }, { value: 2200000 }, { value: 3400000 }, { value: 4100000 }, { value: 4800000 }],
+    pending: statusSeries("PENDING"),
+    overdue: statusSeries("OVERDUE"),
+    received: statusSeries("RECEIVED"),
   };
 
   // Calculated Days Overdue & Due Countdown
   const getDaysOverdue = (dateStr?: string) => {
-    if (!dateStr) return 5; // default fallback
+    if (!dateStr) return 0;
     const due = new Date(dateStr);
     const today = new Date();
     const diffTime = today.getTime() - due.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 0 ? diffDays : 2;
+    return Math.max(diffDays, 0);
   };
 
   const getDaysRemaining = (dateStr?: string) => {
-    if (!dateStr) return 8; // default fallback
+    if (!dateStr) return 0;
     const due = new Date(dateStr);
     const today = new Date();
     const diffTime = due.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 0 ? diffDays : 4;
+    return Math.max(diffDays, 0);
   };
 
   // Summary statistics values
@@ -214,10 +263,10 @@ function CollectionsDashboard() {
     });
 
     return {
-      pending: pendingSum || 240000,
-      overdue: overdueSum || 85000,
-      received: receivedSum || 48000000,
-      count: payments.length || 18
+      pending: pendingSum,
+      overdue: overdueSum,
+      received: receivedSum,
+      count: payments.length
     };
   };
 
@@ -237,6 +286,30 @@ function CollectionsDashboard() {
     if (sortBy === "amount") return b.amount - a.amount;
     return b.id - a.id;
   });
+
+  const exportPayments = () => {
+    const escape = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
+    const rows = [
+      ["Payment ID", "Booking ID", "Amount", "Status", "Due Date", "Receipt"],
+      ...sortedPayments.map((payment) => [
+        payment.id,
+        payment.booking_id,
+        payment.amount,
+        payment.status,
+        payment.due_date,
+        payment.receipt_number,
+      ]),
+    ];
+    const blob = new Blob([rows.map((row) => row.map(escape).join(",")).join("\n")], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `payments-${activeTab.toLowerCase()}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   const totalPages = Math.ceil(sortedPayments.length / itemsPerPage) || 1;
   const paginatedPayments = sortedPayments.slice(
@@ -278,7 +351,7 @@ function CollectionsDashboard() {
               className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm w-full md:w-48"
             />
             <button 
-              onClick={() => alert("Exporter scheduling spreadsheets...")}
+              onClick={exportPayments}
               className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm cursor-pointer"
             >
               Export
@@ -436,7 +509,9 @@ function CollectionsDashboard() {
                               <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
-                              {activeTab === "RECEIVED" ? (p.received_date || "2026-07-27") : (p.due_date || "2026-08-04")}
+                              {activeTab === "RECEIVED"
+                                ? (p.received_date || "Not recorded")
+                                : (p.due_date || "Not set")}
                             </span>
                           </td>
 
@@ -475,9 +550,9 @@ function CollectionsDashboard() {
                           {activeTab === "RECEIVED" && (
                             <td className="px-6 py-4">
                               <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-50 text-slate-700 border border-slate-200 text-[10px] font-black uppercase">
-                                💼 {p.mode || "BANK TRANSFER"}
+                                💼 {p.mode || "Not recorded"}
                               </span>
-                              <span className="block text-[9px] text-slate-400 font-bold mt-1 uppercase tracking-wide">Ref: {p.receipt_number || "RCV-4001"}</span>
+                              <span className="block text-[9px] text-slate-400 font-bold mt-1 uppercase tracking-wide">Ref: {p.receipt_number || "Not recorded"}</span>
                             </td>
                           )}
 
@@ -487,15 +562,19 @@ function CollectionsDashboard() {
                               {activeTab !== "RECEIVED" && (
                                 <button 
                                   onClick={() => sendReminder(p.id)} 
+                                  disabled={paymentAction?.id === p.id}
                                   className="px-3 py-1.5 bg-orange-50 border border-orange-200 rounded-lg text-orange-700 text-xs font-bold hover:bg-orange-100 hover:scale-102 transition shadow-sm cursor-pointer"
                                 >
-                                  Send Reminder
+                                  {paymentAction?.id === p.id && paymentAction.type === "reminder"
+                                    ? "Recording..."
+                                    : "Send Reminder"}
                                 </button>
                               )}
                               
-                              {activeTab !== "RECEIVED" && (user?.role === "MANAGER" || user?.role === "SUPER_ADMIN") && (
+                              {activeTab !== "RECEIVED" && ["ADMIN", "MANAGER", "SUPER_ADMIN"].includes(user?.role ?? "") && (
                                 <button 
                                   onClick={() => setShowMarkReceived(p.id)} 
+                                  disabled={paymentAction?.id === p.id}
                                   className="btn-premium-action btn-mark-received animate-pulse"
                                 >
                                   Mark Received
@@ -505,6 +584,7 @@ function CollectionsDashboard() {
                               {activeTab === "RECEIVED" && (
                                 <button 
                                   onClick={() => generateReceipt(p.id)} 
+                                  disabled={paymentAction?.id === p.id}
                                   className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-lg text-xs font-bold shadow-md shadow-blue-500/10 hover:shadow-lg hover:scale-102 transition cursor-pointer"
                                 >
                                   📥 View Receipt
@@ -617,7 +697,13 @@ function CollectionsDashboard() {
                 
                 <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
                   <button type="button" onClick={() => setShowMarkReceived(null)} className="px-4 py-2 border border-[#E8EDF7] rounded-xl hover:bg-slate-50 transition text-slate-655 text-xs font-bold cursor-pointer font-bold">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Confirm Receipt</button>
+                  <button
+                    type="submit"
+                    disabled={paymentAction?.type === "received"}
+                    className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {paymentAction?.type === "received" ? "Saving..." : "Confirm Receipt"}
+                  </button>
                 </div>
               </form>
             </div>

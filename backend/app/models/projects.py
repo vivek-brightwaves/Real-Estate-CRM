@@ -1,5 +1,14 @@
 import enum
-from sqlalchemy import Column, Integer, String, ForeignKey, DECIMAL, Enum, DateTime
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    ForeignKey,
+    DECIMAL,
+    Enum,
+    DateTime,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 
@@ -40,11 +49,18 @@ class Block(Base):
 
 class Unit(Base):
     __tablename__ = "units"
+    __table_args__ = (
+        UniqueConstraint(
+            "block_id",
+            "unit_number",
+            name="uq_unit_block_number",
+        ),
+    )
     id = Column(Integer, primary_key=True, index=True)
     block_id = Column(Integer, ForeignKey("blocks.id"), nullable=False, index=True)
     unit_number = Column(String(50), nullable=False)
     type = Column(String(50), nullable=True)
-    area = Column(String(50), nullable=True)
+    area = Column(DECIMAL(12, 2), nullable=True)
     price = Column(DECIMAL(12, 2), nullable=True)
     status = Column(Enum(UnitStatusEnum), default=UnitStatusEnum.AVAILABLE, index=True)
     hold_expires_at = Column(DateTime, nullable=True)

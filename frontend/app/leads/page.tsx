@@ -6,15 +6,20 @@ import { useAuthStore } from "../../store/authStore";
 import api from "../../lib/axios";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import LeadsBoard from "../../components/leads/LeadsBoard";
+import { useFeedback } from "../../components/ui/FeedbackProvider";
+import { useSectionSearch } from "../../hooks/useSectionSearch";
 
 export default function LeadsPage() {
   const router = useRouter();
+  const { notify } = useFeedback();
   const { user, accessToken, clearAuth } = useAuthStore();
 
   const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  useSectionSearch("leads", setSearchQuery);
 
   useEffect(() => {
     if (!accessToken) {
@@ -25,7 +30,9 @@ export default function LeadsPage() {
     fetchLeads();
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [accessToken, router]);
 
   const fetchLeads = async () => {
@@ -56,10 +63,18 @@ export default function LeadsPage() {
   const updateStatus = async (leadId: number, status: string) => {
     try {
       await api.patch(`/leads/${leadId}`, { status });
+      notify({
+        title: "Lead status updated",
+        message: `The lead moved to ${status.replaceAll("_", " ").toLowerCase()}.`,
+      });
       fetchLeads();
     } catch (err) {
       console.error(err);
-      alert("Unable to update lead status. Please try again.");
+      notify({
+        title: "Status update failed",
+        message: "Unable to update lead status. Please try again.",
+        tone: "error",
+      });
     }
   };
 
@@ -79,6 +94,15 @@ export default function LeadsPage() {
 
   if (!user) return null;
 
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+  const visibleLeads = normalizedSearch
+    ? leads.filter((lead) =>
+        [lead.name, lead.phone, lead.email, lead.source].some((value) =>
+          String(value ?? "").toLowerCase().includes(normalizedSearch),
+        ),
+      )
+    : leads;
+
   return (
     <DashboardLayout
       user={user}
@@ -91,11 +115,13 @@ export default function LeadsPage() {
         <div className="mx-auto w-full py-2">
           <div className="bg-gradient-to-br from-white via-white to-slate-50/30 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 p-6 md:p-8 backdrop-blur-md bg-white/95">
             <LeadsBoard
-              leads={leads}
+              leads={visibleLeads}
               loading={loading}
-              onSearch={() => {}}
+              searchValue={searchQuery}
+              onSearch={setSearchQuery}
               onAdd={() => router.push("/leads/new")}
               onStatusChange={updateStatus}
+              onLeadClick={(leadId) => router.push(`/leads/${leadId}`)}
               onViewAll={() => router.push("/leads")}
             />
           </div>

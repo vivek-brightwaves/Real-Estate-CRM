@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "../../store/authStore";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { AreaChart, Area, ResponsiveContainer } from "recharts";
+import { useSectionSearch } from "../../hooks/useSectionSearch";
 
 interface Booking {
   id: number;
@@ -27,6 +28,7 @@ export default function BookingsBoardPage() {
 
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState("");
+  useSectionSearch("bookings", setSearchTerm);
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
   const bookingsPerPage = 6;
@@ -40,6 +42,9 @@ export default function BookingsBoardPage() {
   const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
 
   useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("action") === "new") {
+      setShowNew(true);
+    }
     if (!accessToken) {
       router.push("/login");
       return;
@@ -187,12 +192,7 @@ export default function BookingsBoardPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-3.5 py-2 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm w-full md:w-48"
             />
-            <button 
-              onClick={() => alert("Filter sidebar toggled")}
-              className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm cursor-pointer"
-            >
-              Filter
-            </button>
+
             <button 
               onClick={() => setShowNew(true)} 
               className="btn-premium-action btn-new-booking"
@@ -213,7 +213,7 @@ export default function BookingsBoardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <button className="text-slate-400 hover:text-slate-600">
+              <button type="button" aria-label="Show pending bookings" onClick={() => { setStatusFilter("PENDING"); setCurrentPage(1); }} className="text-slate-400 hover:text-slate-600">
                 <span className="text-base font-bold">&bull;&bull;&bull;</span>
               </button>
             </div>
@@ -241,7 +241,7 @@ export default function BookingsBoardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <button className="text-slate-400 hover:text-slate-600">
+              <button type="button" aria-label="Show document verified bookings" onClick={() => { setStatusFilter("DOCS_VERIFIED"); setCurrentPage(1); }} className="text-slate-400 hover:text-slate-600">
                 <span className="text-base font-bold">&bull;&bull;&bull;</span>
               </button>
             </div>
@@ -269,7 +269,7 @@ export default function BookingsBoardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <button className="text-slate-400 hover:text-slate-600">
+              <button type="button" aria-label="Show approved bookings" onClick={() => { setStatusFilter("APPROVED"); setCurrentPage(1); }} className="text-slate-400 hover:text-slate-600">
                 <span className="text-base font-bold">&bull;&bull;&bull;</span>
               </button>
             </div>
@@ -297,7 +297,7 @@ export default function BookingsBoardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <button className="text-slate-400 hover:text-slate-600">
+              <button type="button" aria-label="Show confirmed bookings" onClick={() => { setStatusFilter("CONFIRMED"); setCurrentPage(1); }} className="text-slate-400 hover:text-slate-600">
                 <span className="text-base font-bold">&bull;&bull;&bull;</span>
               </button>
             </div>
@@ -325,7 +325,7 @@ export default function BookingsBoardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <button className="text-slate-400 hover:text-slate-600">
+              <button type="button" aria-label="Show cancelled bookings" onClick={() => { setStatusFilter("CANCELLED"); setCurrentPage(1); }} className="text-slate-400 hover:text-slate-600">
                 <span className="text-base font-bold">&bull;&bull;&bull;</span>
               </button>
             </div>

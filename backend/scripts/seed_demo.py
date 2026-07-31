@@ -27,13 +27,13 @@ def seed_db():
     Base.metadata.create_all(bind=engine)
 
     db = SessionLocal()
-    
+
     try:
         print("Seeding Company & Branches...")
         company = Company(name="Empire Real Estate CRM", settings_json=json.dumps({"email": {"enabled": False}}))
         db.add(company)
         db.commit()
-        
+
         branch1 = Branch(name="Downtown HQ", company_id=company.id)
         branch2 = Branch(name="Uptown Office", company_id=company.id)
         db.add_all([branch1, branch2])
@@ -43,10 +43,10 @@ def seed_db():
         super_admin = User(name="Super Admin", email="admin@gmail.com", phone="1234567890", role=RoleEnum.SUPER_ADMIN, branch_id=branch1.id, password_hash=get_password_hash("admin123"))
         mgr1 = User(name="Bob Manager (DT)", email="mgr1@example.com", phone="1234567891", role=RoleEnum.MANAGER, branch_id=branch1.id, password_hash=get_password_hash("mgr123"))
         mgr2 = User(name="Charlie Manager (UT)", email="mgr2@example.com", phone="1234567892", role=RoleEnum.MANAGER, branch_id=branch2.id, password_hash=get_password_hash("mgr123"))
-        
+
         db.add_all([super_admin, mgr1, mgr2])
         db.commit()
-        
+
         employees = []
         for i in range(1, 7):
             b_id = branch1.id if i <= 3 else branch2.id
@@ -60,22 +60,22 @@ def seed_db():
             proj = Project(name=f"Project {p}", location="City Center", branch_id=branch1.id if p < 3 else branch2.id)
             db.add(proj)
             db.commit()
-            
-            tower = Tower(name=f"Tower A", project_id=proj.id)
+
+            tower = Tower(name="Tower A", project_id=proj.id)
             db.add(tower)
             db.commit()
-            
-            block = Block(name=f"Block 1", tower_id=tower.id)
+
+            block = Block(name="Block 1", tower_id=tower.id)
             db.add(block)
             db.commit()
-            
+
             for u in range(1, 11):
                 unit = Unit(
-                    block_id=block.id, 
+                    block_id=block.id,
                     unit_number=f"{block.name}-{u}",
-                    type="2BHK" if u <= 5 else "3BHK", 
-                    area=1200 if u <= 5 else 1800, 
-                    price=5000000 if u <= 5 else 8000000, 
+                    type="2BHK" if u <= 5 else "3BHK",
+                    area=1200 if u <= 5 else 1800,
+                    price=5000000 if u <= 5 else 8000000,
                     status=UnitStatusEnum.AVAILABLE
                 )
                 db.add(unit)
@@ -84,20 +84,21 @@ def seed_db():
         print("Seeding Leads & Customers...")
         leads = []
         statuses = [LeadStatusEnum.NEW, LeadStatusEnum.CONTACTED, LeadStatusEnum.VISIT_SCHEDULED, LeadStatusEnum.NEGOTIATION, LeadStatusEnum.CONVERTED, LeadStatusEnum.LOST]
-        for l in range(1, 21):
+        for lead_number in range(1, 21):
             lead = Lead(
-                name=f"Lead {l}", 
-                phone=f"999000{l}", 
-                email=f"lead{l}@test.com", 
-                source="Website" if l % 2 == 0 else "Referral", 
-                status=statuses[l % len(statuses)], 
-                assigned_to_id=employees[l % 6].id, 
-                created_by_id=employees[l % 6].id
+                company_id=company.id,
+                name=f"Lead {lead_number}",
+                phone=f"999000{lead_number}",
+                email=f"lead{lead_number}@test.com",
+                source="Website" if lead_number % 2 == 0 else "Referral",
+                status=statuses[lead_number % len(statuses)],
+                assigned_to_id=employees[lead_number % 6].id,
+                created_by_id=employees[lead_number % 6].id
             )
             db.add(lead)
             leads.append(lead)
         db.commit()
-        
+
         # Convert some WON leads to Customers
         customers = []
         for lead in leads:
@@ -108,7 +109,7 @@ def seed_db():
                 )
                 db.add(cust)
                 db.flush() # flush to get cust.id
-                
+
                 # Create verified KYC docs for demo customers to comply with business rules
                 doc = CustomerDocument(
                     customer_id=cust.id,
@@ -119,36 +120,37 @@ def seed_db():
                     verified_at=date.today()
                 )
                 db.add(doc)
-                
+
                 customers.append(cust)
         db.commit()
 
         print("Seeding Bookings & Payments...")
         available_units = db.query(Unit).filter(Unit.status == UnitStatusEnum.AVAILABLE).limit(5).all()
         for i, cust in enumerate(customers):
-            if i >= 5: break
+            if i >= 5:
+                break
             unit = available_units[i]
             booking = Booking(
-                unit_id=unit.id, customer_id=cust.id, 
-                created_by_id=cust.assigned_to_id, 
+                unit_id=unit.id, customer_id=cust.id,
+                created_by_id=cust.assigned_to_id,
                 status=BookingStatusEnum.CONFIRMED if i % 2 == 0 else BookingStatusEnum.APPROVED,
                 approved_by_id=mgr1.id
             )
             unit.status = UnitStatusEnum.SOLD if booking.status == BookingStatusEnum.CONFIRMED else UnitStatusEnum.BOOKED
             db.add(booking)
             db.commit()
-            
+
             # Add Payments
             price_decimal = unit.price if isinstance(unit.price, Decimal) else Decimal(str(unit.price))
             payment1 = Payment(
                 booking_id=booking.id, amount=price_decimal * Decimal('0.1'),
-                due_date=date.today(), status=PaymentStatusEnum.RECEIVED, 
+                due_date=date.today(), status=PaymentStatusEnum.RECEIVED,
                 mode=PaymentModeEnum.BANK_TRANSFER, received_date=date.today(),
                 recorded_by_id=cust.assigned_to_id
             )
             payment2 = Payment(
                 booking_id=booking.id, amount=price_decimal * Decimal('0.9'),
-                due_date=date.today() + timedelta(days=30), status=PaymentStatusEnum.PENDING, 
+                due_date=date.today() + timedelta(days=30), status=PaymentStatusEnum.PENDING,
                 mode=None, received_date=None,
                 recorded_by_id=cust.assigned_to_id
             )
@@ -156,7 +158,7 @@ def seed_db():
         db.commit()
 
         print("Database successfully seeded for demo!")
-        
+
     except Exception as e:
         db.rollback()
         print(f"Error seeding database: {e}")

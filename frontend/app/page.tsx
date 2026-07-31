@@ -79,16 +79,18 @@ export default function DashboardPage() {
     setLoading(true);
     try {
       let dataRes;
-      if (user?.role === "SUPER_ADMIN") {
+      if (user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") {
         dataRes = await api.get('/dashboard/super-admin');
       } else if (user?.role === "MANAGER") {
         dataRes = await api.get('/dashboard/manager');
       } else if (user?.role === "EMPLOYEE") {
         dataRes = await api.get('/dashboard/employee');
+      } else if (user?.role === "BROKER" || user?.role === "PARTNER") {
+        dataRes = await api.get('/dashboard/broker');
       }
       setDashboardData(dataRes?.data || null);
 
-      if (user?.role !== "EMPLOYEE") {
+      if (!["EMPLOYEE", "CUSTOMER"].includes(user?.role ?? "")) {
         const [funRes, trnRes] = await Promise.all([
           api.get('/analytics/lead-funnel'),
           api.get('/analytics/revenue-trends')
@@ -155,11 +157,34 @@ export default function DashboardPage() {
     visits: [{ value: 180 }, { value: 210 }, { value: 195 }, { value: 260 }, { value: 240 }, { value: 312 }],
   };
 
-  // Extract dynamic values with safe fallback mocks
-  const totalRevenue = dashboardData ? (dashboardData.revenue || dashboardData.branch_revenue || 4825000) : 4825000;
-  const leadsCount = dashboardData ? (dashboardData.todays_leads || dashboardData.my_leads || 198) : 198;
-  const bookingsCount = dashboardData ? (dashboardData.todays_bookings || dashboardData.my_sales || 28) : 28;
-  const visitsCount = dashboardData ? (dashboardData.todays_visits || dashboardData.my_todays_visits || 312) : 312;
+  // Preserve legitimate zeroes: every KPI reflects persisted backend data.
+  const totalRevenue =
+    dashboardData?.revenue ??
+    dashboardData?.branch_revenue ??
+    dashboardData?.my_revenue ??
+    0;
+  const leadsCount =
+    dashboardData?.total_leads ??
+    dashboardData?.todays_leads ??
+    dashboardData?.my_leads ??
+    0;
+  const bookingsCount =
+    dashboardData?.total_bookings ??
+    dashboardData?.todays_bookings ??
+    dashboardData?.my_sales ??
+    0;
+  const visitsCount =
+    dashboardData?.todays_visits ??
+    dashboardData?.my_todays_visits ??
+    0;
+  const propertiesCount =
+    dashboardData?.projects_count ??
+    dashboardData?.inventory_available ??
+    0;
+  const customersCount =
+    dashboardData?.total_customers ??
+    dashboardData?.my_customers ??
+    0;
 
   return (
     <DashboardLayout
@@ -189,8 +214,6 @@ export default function DashboardPage() {
               <StatsCard 
                 label="Total Leads" 
                 value={leadsCount} 
-                growth="12.4" 
-                isPositive={true} 
                 color="blue" 
                 sparklineData={sparkData.leads}
                 icon={icons.leads} 
@@ -198,9 +221,7 @@ export default function DashboardPage() {
               />
               <StatsCard 
                 label="Active Properties" 
-                value={142} 
-                growth="5.6" 
-                isPositive={true} 
+                value={propertiesCount}
                 color="green" 
                 sparklineData={sparkData.properties}
                 icon={icons.properties} 
@@ -209,8 +230,6 @@ export default function DashboardPage() {
               <StatsCard 
                 label="Bookings" 
                 value={bookingsCount} 
-                growth="18.5" 
-                isPositive={true} 
                 color="purple" 
                 sparklineData={sparkData.bookings}
                 icon={icons.bookings} 
@@ -218,9 +237,7 @@ export default function DashboardPage() {
               />
               <StatsCard 
                 label="Revenue" 
-                value={`₹${totalRevenue.toLocaleString()}`} 
-                growth="8.2" 
-                isPositive={true} 
+                value={`₹${Number(totalRevenue).toLocaleString("en-IN")}`}
                 color="orange" 
                 sparklineData={sparkData.revenue}
                 icon={icons.revenue} 
@@ -228,9 +245,7 @@ export default function DashboardPage() {
               />
               <StatsCard 
                 label="Customers" 
-                value={1280} 
-                growth="14.1" 
-                isPositive={true} 
+                value={customersCount}
                 color="pink" 
                 sparklineData={sparkData.customers}
                 icon={icons.customers} 
@@ -239,8 +254,6 @@ export default function DashboardPage() {
               <StatsCard 
                 label="Site Visits" 
                 value={visitsCount} 
-                growth="20.0" 
-                isPositive={true} 
                 color="cyan" 
                 sparklineData={sparkData.visits}
                 icon={icons.visits} 

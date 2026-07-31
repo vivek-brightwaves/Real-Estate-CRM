@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 interface RevenueChartProps {
@@ -8,6 +9,7 @@ interface RevenueChartProps {
 }
 
 export default function RevenueChart({ data }: RevenueChartProps) {
+  const router = useRouter();
   // If data is empty, use realistic mock data
   const chartData = data && data.length > 0 ? data : [
     { month: "Jan", amount: 1200000 },
@@ -36,7 +38,7 @@ export default function RevenueChart({ data }: RevenueChartProps) {
         </div>
         <div className="flex items-center gap-2">
           <button 
-            onClick={() => alert("Opening Revenue Breakdown Details")}
+            onClick={() => router.push("/reports")}
             className="px-3 py-1.5 border border-[#E8EDF7] hover:border-slate-350 rounded-lg text-slate-700 hover:text-slate-900 text-xs font-bold transition-all bg-slate-50/50 hover:bg-slate-100 shadow-sm"
           >
             Details

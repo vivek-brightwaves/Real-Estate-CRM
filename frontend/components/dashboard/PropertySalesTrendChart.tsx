@@ -1,9 +1,11 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 export default function PropertySalesTrendChart() {
+  const router = useRouter();
   const data = [
     { year: "2021", commercial: 400, residential: 240 },
     { year: "2022", commercial: 450, residential: 320 },
@@ -27,7 +29,7 @@ export default function PropertySalesTrendChart() {
         </div>
         <div className="flex items-center gap-2">
           <button 
-            onClick={() => alert("Opening Sales Trends Details")}
+            onClick={() => router.push("/inventory")}
             className="px-3 py-1.5 border border-[#E8EDF7] hover:border-slate-350 rounded-lg text-slate-700 hover:text-slate-900 text-xs font-bold transition-all bg-slate-50/50 hover:bg-slate-100 shadow-sm"
           >
             Details

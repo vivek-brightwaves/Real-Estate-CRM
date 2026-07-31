@@ -1,9 +1,11 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 export default function BookingChart() {
+  const router = useRouter();
   const data = [
     { name: "Approved", value: 34, color: "#10b981" },
     { name: "Pending Approval", value: 18, color: "#f59e0b" },
@@ -19,7 +21,7 @@ export default function BookingChart() {
         </div>
         <div className="flex items-center gap-2">
           <button 
-            onClick={() => alert("Opening Bookings Breakdown Details")}
+            onClick={() => router.push("/bookings")}
             className="px-3 py-1.5 border border-[#E8EDF7] hover:border-slate-350 rounded-lg text-slate-700 hover:text-slate-900 text-xs font-bold transition-all bg-slate-50/50 hover:bg-slate-100 shadow-sm"
           >
             Details

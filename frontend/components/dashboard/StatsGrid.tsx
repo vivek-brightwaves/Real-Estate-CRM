@@ -8,11 +8,33 @@ interface StatsGridProps {
 }
 
 export default function StatsGrid({ dashboardData }: StatsGridProps) {
-  // Extract values with sensible default fallbacks for high-end visualization
-  const totalRevenue = dashboardData ? (dashboardData.revenue || dashboardData.branch_revenue || 4825000) : 4825000;
-  const leadsCount = dashboardData ? (dashboardData.todays_leads || dashboardData.my_leads || 198) : 198;
-  const bookingsCount = dashboardData ? (dashboardData.todays_bookings || dashboardData.my_sales || 28) : 28;
-  const visitsCount = dashboardData ? (dashboardData.todays_visits || dashboardData.my_todays_visits || 312) : 312;
+  const totalRevenue =
+    dashboardData?.revenue ??
+    dashboardData?.branch_revenue ??
+    dashboardData?.my_revenue ??
+    0;
+  const leadsCount =
+    dashboardData?.total_leads ??
+    dashboardData?.todays_leads ??
+    dashboardData?.my_leads ??
+    0;
+  const bookingsCount =
+    dashboardData?.total_bookings ??
+    dashboardData?.todays_bookings ??
+    dashboardData?.my_sales ??
+    0;
+  const visitsCount =
+    dashboardData?.todays_visits ??
+    dashboardData?.my_todays_visits ??
+    0;
+  const propertiesCount =
+    dashboardData?.projects_count ??
+    dashboardData?.inventory_available ??
+    0;
+  const customersCount =
+    dashboardData?.total_customers ??
+    dashboardData?.my_customers ??
+    0;
 
   // Custom icons for the 6 stats cards
   const icons = {
@@ -71,7 +93,7 @@ export default function StatsGrid({ dashboardData }: StatsGridProps) {
       />
       <StatsCard 
         label="Active Properties" 
-        value={142} 
+        value={propertiesCount}
         growth="5.6" 
         isPositive={true} 
         color="green" 
@@ -89,7 +111,7 @@ export default function StatsGrid({ dashboardData }: StatsGridProps) {
       />
       <StatsCard 
         label="Revenue" 
-        value={`₹${totalRevenue.toLocaleString()}`} 
+        value={`₹${Number(totalRevenue).toLocaleString("en-IN")}`}
         growth="8.2" 
         isPositive={true} 
         color="orange" 
@@ -98,7 +120,7 @@ export default function StatsGrid({ dashboardData }: StatsGridProps) {
       />
       <StatsCard 
         label="Customers" 
-        value={1280} 
+        value={customersCount}
         growth="14.1" 
         isPositive={true} 
         color="pink" 

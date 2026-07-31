@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import api from "../../../lib/axios";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAuthStore } from "../../../store/authStore";
 import DashboardLayout from "../../../components/dashboard/DashboardLayout";
 
-export default function BookingDetailPage({ params }: { params: { id: string } }) {
+export default function BookingDetailPage() {
+  const params = useParams<{ id: string }>();
   const [booking, setBooking] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   

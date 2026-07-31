@@ -6,8 +6,12 @@ from app.db.base import Base
 
 class RoleEnum(str, enum.Enum):
     SUPER_ADMIN = "SUPER_ADMIN"
+    ADMIN = "ADMIN"
     MANAGER = "MANAGER"
     EMPLOYEE = "EMPLOYEE"
+    PARTNER = "PARTNER"
+    CUSTOMER = "CUSTOMER"
+    BROKER = "BROKER"
 
 class Company(Base):
     __tablename__ = "companies"
@@ -36,9 +40,18 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     role = Column(Enum(RoleEnum), nullable=False)
     branch_id = Column(Integer, ForeignKey("branches.id"), nullable=True, index=True)
-    manager_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    manager_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
     is_active = Column(Boolean, default=True)
+    failed_login_attempts = Column(Integer, default=0)
+    is_locked = Column(Boolean, default=False)
+    locked_until = Column(DateTime(timezone=True), nullable=True)
+    is_email_verified = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     branch = relationship("Branch", back_populates="users")
     manager = relationship("User", remote_side=[id], backref="subordinates")
+    role_profiles = relationship(
+        "Role",
+        secondary="user_roles",
+        backref="users",
+    )

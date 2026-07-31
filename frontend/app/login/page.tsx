@@ -321,13 +321,13 @@ export default function LoginPage() {
                     <span className="font-semibold text-slate-700">Remember me</span>
                   </label>
 
-                  <a
-                    href="#"
-                    onClick={(e) => { e.preventDefault(); alert("Please contact your CRM Administrator to reset your password."); }}
+                  <button
+                    type="button"
+                    onClick={() => router.push("/forgot-password")}
                     className="font-bold text-blue-650 text-blue-600 hover:underline transition-all"
                   >
                     Forgot password?
-                  </a>
+                  </button>
                 </div>
 
                 {/* Submit button (Height 48px, rounded-xl, gradient, hover shadow-2xl and lift translate-y-[-2px]) */}

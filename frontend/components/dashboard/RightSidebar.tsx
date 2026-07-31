@@ -1,6 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import api from "../../lib/axios";
 
 interface RightSidebarProps {
   notifications: Array<{ id: number; message: string; created_at: string; is_read: boolean }>;
@@ -8,14 +11,27 @@ interface RightSidebarProps {
 }
 
 export default function RightSidebar({ notifications, onMarkRead }: RightSidebarProps) {
-  const [tasks, setTasks] = useState([
-    { id: 1, text: "Follow up with Siddharth Malhotra", completed: false },
-    { id: 2, text: "Approve token payment receipt B-104", completed: true },
-    { id: 3, text: "Prepare contract draft for Palace Heights", completed: false },
-  ]);
+  const router = useRouter();
+  const [tasks, setTasks] = useState<Array<{ id: number; title: string; status: string }>>([]);
 
-  const toggleTask = (id: number) => {
-    setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  const loadTasks = async () => {
+    try {
+      const response = await api.get("/tasks?size=5&sort_by=due_date&sort_order=asc");
+      setTasks(response.data ?? []);
+    } catch {
+      setTasks([]);
+    }
+  };
+
+  useEffect(() => {
+    void loadTasks();
+  }, []);
+
+  const toggleTask = async (task: { id: number; status: string }) => {
+    await api.patch(`/tasks/${task.id}`, {
+      status: task.status === "COMPLETED" ? "PENDING" : "COMPLETED",
+    });
+    await loadTasks();
   };
 
   const visits = [
@@ -65,7 +81,7 @@ export default function RightSidebar({ notifications, onMarkRead }: RightSidebar
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Today's Tasks</span>
           <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full border border-blue-100">
-            {tasks.filter(t => !t.completed).length} Pending
+            {tasks.filter(t => t.status !== "COMPLETED").length} Pending
           </span>
         </div>
         <div className="space-y-2.5">
@@ -76,12 +92,12 @@ export default function RightSidebar({ notifications, onMarkRead }: RightSidebar
             >
               <input
                 type="checkbox"
-                checked={task.completed}
-                onChange={() => toggleTask(task.id)}
+                checked={task.status === "COMPLETED"}
+                onChange={() => void toggleTask(task)}
                 className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 focus:ring-offset-0 cursor-pointer"
               />
-              <span className={`text-xs font-semibold leading-relaxed ${task.completed ? "text-slate-400 line-through" : "text-slate-700"}`}>
-                {task.text}
+              <span className={`text-xs font-semibold leading-relaxed ${task.status === "COMPLETED" ? "text-slate-400 line-through" : "text-slate-700"}`}>
+                {task.title}
               </span>
             </label>
           ))}
@@ -121,17 +137,17 @@ export default function RightSidebar({ notifications, onMarkRead }: RightSidebar
                 <p className="text-[9px] text-slate-400 font-semibold mt-1">Request by Agent: {app.agent}</p>
               </div>
               <div className="flex gap-2">
-                <button 
-                  onClick={() => alert("Approved successfully!")}
+                <button
+                  onClick={() => router.push("/admin/approvals")}
                   className="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] rounded-lg shadow-sm transition-colors"
                 >
-                  Approve
+                  Review
                 </button>
-                <button 
-                  onClick={() => alert("Request rejected")}
+                <button
+                  onClick={() => router.push("/tasks")}
                   className="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[10px] rounded-lg transition-colors"
                 >
-                  Reject
+                  Tasks
                 </button>
               </div>
             </div>

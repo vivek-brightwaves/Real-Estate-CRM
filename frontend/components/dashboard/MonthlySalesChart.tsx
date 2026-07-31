@@ -1,9 +1,11 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from "recharts";
 
 export default function MonthlySalesChart() {
+  const router = useRouter();
   const data = [
     { month: "Jan", sales: 45 },
     { month: "Feb", sales: 58 },
@@ -27,7 +29,7 @@ export default function MonthlySalesChart() {
         </div>
         <div className="flex items-center gap-2">
           <button 
-            onClick={() => alert("Opening Sales Breakdown Details")}
+            onClick={() => router.push("/reports")}
             className="px-3 py-1.5 border border-[#E8EDF7] hover:border-slate-350 rounded-lg text-slate-700 hover:text-slate-900 text-xs font-bold transition-all bg-slate-50/50 hover:bg-slate-100 shadow-sm"
           >
             Details

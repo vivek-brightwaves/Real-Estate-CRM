@@ -1,12 +1,15 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 
 export default function QuickActions() {
+  const router = useRouter();
   const actions = [
     {
       title: "Add Lead",
       desc: "Register a new buyer prospect",
+      href: "/leads/new",
       color: "bg-blue-50/50 text-blue-600 border-blue-100 hover:bg-blue-100/60 hover:border-blue-200",
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -17,6 +20,7 @@ export default function QuickActions() {
     {
       title: "Add Property",
       desc: "List a new residential asset",
+      href: "/inventory?action=project",
       color: "bg-emerald-50/50 text-emerald-600 border-emerald-100 hover:bg-emerald-100/60 hover:border-emerald-200",
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -27,6 +31,7 @@ export default function QuickActions() {
     {
       title: "New Booking",
       desc: "Create unit reservation booking",
+      href: "/bookings?action=new",
       color: "bg-purple-50/50 text-purple-600 border-purple-100 hover:bg-purple-100/60 hover:border-purple-200",
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -37,6 +42,7 @@ export default function QuickActions() {
     {
       title: "View Inventory",
       desc: "Check available block listings",
+      href: "/inventory",
       color: "bg-pink-50/50 text-pink-600 border-pink-100 hover:bg-pink-100/60 hover:border-pink-200",
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -47,6 +53,7 @@ export default function QuickActions() {
     {
       title: "Generate Report",
       desc: "Download sales & leads PDF",
+      href: "/reports",
       color: "bg-orange-50/50 text-orange-600 border-orange-100 hover:bg-orange-100/60 hover:border-orange-200",
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -57,6 +64,7 @@ export default function QuickActions() {
     {
       title: "Schedule Visit",
       desc: "Arrange property site visit",
+      href: "/visits",
       color: "bg-cyan-50/50 text-cyan-600 border-cyan-100 hover:bg-cyan-100/60 hover:border-cyan-200",
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -74,7 +82,7 @@ export default function QuickActions() {
         {actions.map((act, index) => (
           <button
             key={index}
-            onClick={() => alert(`Triggering: ${act.title}`)}
+            onClick={() => router.push(act.href)}
             className={`p-4 rounded-xl border flex flex-col items-center text-center transition-all duration-300 hover:shadow-md ${act.color}`}
           >
             <div className="mb-2.5 p-2 bg-white rounded-lg shadow-sm border border-slate-100">

@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import api from "../../lib/axios";
 
 interface UserType {
   name: string;
@@ -24,6 +25,17 @@ interface DashboardLayoutProps {
   onLogout: () => void;
 }
 
+const searchContexts = [
+  { prefix: "/leads", section: "leads", href: "/leads", placeholder: "Search leads..." },
+  { prefix: "/customers", section: "customers", href: "/customers", placeholder: "Search customers..." },
+  { prefix: "/inventory", section: "inventory", href: "/inventory", placeholder: "Search properties or units..." },
+  { prefix: "/bookings", section: "bookings", href: "/bookings", placeholder: "Search bookings..." },
+  { prefix: "/collections", section: "payments", href: "/collections", placeholder: "Search payments..." },
+  { prefix: "/tasks", section: "tasks", href: "/tasks", placeholder: "Search tasks..." },
+  { prefix: "/messages", section: "messages", href: "/messages", placeholder: "Search messages..." },
+  { prefix: "/admin/users", section: "users", href: "/admin/users", placeholder: "Search users..." },
+];
+
 export default function DashboardLayout({
   children,
   user,
@@ -36,24 +48,51 @@ export default function DashboardLayout({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [dashboardSearch, setDashboardSearch] = useState("");
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
+  const searchContext = searchContexts.find(({ prefix }) =>
+    pathname.startsWith(prefix),
+  );
+
+  useEffect(() => {
+    const updateClock = () => setCurrentTime(new Date());
+    updateClock();
+    const interval = window.setInterval(updateClock, 1000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    setDashboardSearch(
+      new URLSearchParams(window.location.search).get("search") ?? "",
+    );
+  }, [pathname]);
 
   const getRoleLabel = (role: string) => {
     switch (role) {
       case "SUPER_ADMIN":
         return "Super Admin";
+      case "ADMIN":
+        return "Organization Admin";
       case "MANAGER":
         return "Branch Manager";
       case "EMPLOYEE":
         return "Sales Agent";
+      case "PARTNER":
+        return "Channel Partner Manager";
+      case "BROKER":
+        return "Broker / Channel Partner";
+      case "CUSTOMER":
+        return "Customer";
       default:
         return role;
     }
   };
 
-  // Nav items: Dashboard, Leads, Properties, Bookings, Customers, Payments, Reports, Analytics, Tasks, Messages, Settings
+  // Analytics are already presented on the dashboard.
   const navItems = [
     { name: "Dashboard", href: "/", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
     { name: "Leads", href: "/leads", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" },
@@ -62,19 +101,31 @@ export default function DashboardLayout({
     { name: "Customers", href: "/customers", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" },
     { name: "Payments", href: "/collections", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M12 16v1" },
     { name: "Reports", href: "/reports", icon: "M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
-    { name: "Analytics", href: "/", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
-    { name: "Tasks", href: "#", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" },
-    { name: "Messages", href: "#", icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" },
+    { name: "Tasks", href: "/tasks", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" },
+    { name: "Messages", href: "/messages", icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" },
     { name: "Settings", href: "/admin/settings", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" },
   ];
 
   const handleNavClick = (href: string) => {
     if (href !== "#") {
       router.push(href);
-    } else {
-      alert(`Navigation Link selected.`);
     }
     setIsMobileMenuOpen(false);
+  };
+
+  const performLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (refreshToken) {
+        await api.post("/auth/logout", { refresh_token: refreshToken });
+      }
+    } catch {
+      // Always clear local credentials when the server session already expired.
+    } finally {
+      onLogout();
+    }
   };
 
   return (
@@ -116,7 +167,9 @@ export default function DashboardLayout({
         {/* Unified Sidebar Navigation Links */}
         <div className="flex-1 overflow-y-auto scrollbar-hide p-3 space-y-1">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.name === "Dashboard" && pathname === "/");
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/" && pathname.startsWith(`${item.href}/`));
             return (
               <button
                 key={item.name}
@@ -151,7 +204,8 @@ export default function DashboardLayout({
             )}
             {!isSidebarCollapsed && (
               <button 
-                onClick={onLogout}
+                onClick={() => void performLogout()}
+                disabled={isLoggingOut}
                 className="p-1.5 rounded-lg hover:bg-slate-800 text-rose-400 hover:text-rose-350 transition-colors shrink-0"
                 title="Logout Session"
               >
@@ -163,7 +217,8 @@ export default function DashboardLayout({
           </div>
           {isSidebarCollapsed && (
             <button 
-              onClick={onLogout}
+              onClick={() => void performLogout()}
+              disabled={isLoggingOut}
               className="mt-3 w-full flex justify-center p-2 rounded-lg hover:bg-rose-500/10 text-rose-450 transition-colors"
               title="Logout Session"
             >
@@ -234,21 +289,82 @@ export default function DashboardLayout({
 
           <div className="flex items-center gap-3">
             {/* Large Rounded Search Input */}
-            <div className="relative hidden md:block">
+            {searchContext && <form
+              className="relative hidden md:block"
+              onSubmit={(event) => {
+                event.preventDefault();
+                const query = dashboardSearch.trim();
+                const target = query
+                  ? `${searchContext.href}?search=${encodeURIComponent(query)}`
+                  : searchContext.href;
+                router.push(target);
+                window.dispatchEvent(
+                  new CustomEvent(`crm:search:${searchContext.section}`, {
+                    detail: query,
+                  }),
+                );
+              }}
+            >
               <input
                 type="text"
-                placeholder="Search dashboard..."
-                className="h-[48px] w-60 pl-10 pr-4 bg-slate-50/40 border border-[#E8EDF7] rounded-[16px] text-slate-800 placeholder:text-slate-450 text-xs font-semibold focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-650/10 focus:border-blue-600 shadow-sm transition-all"
+                placeholder={searchContext.placeholder}
+                value={dashboardSearch}
+                onChange={(event) => setDashboardSearch(event.target.value)}
+                aria-label={searchContext.placeholder}
+                className="h-[48px] w-60 pl-10 pr-10 bg-slate-50/40 border border-[#E8EDF7] rounded-[16px] text-slate-800 placeholder:text-slate-450 text-xs font-semibold focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-650/10 focus:border-blue-600 shadow-sm transition-all"
               />
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
-                🔍
-              </span>
-            </div>
+              <button
+                type="submit"
+                aria-label={`Submit ${searchContext.section} search`}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-blue-600"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-4-4" />
+                </svg>
+              </button>
+              {dashboardSearch && (
+                <button
+                  type="button"
+                  onClick={() => setDashboardSearch("")}
+                  aria-label="Clear search"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-lg leading-none text-slate-400 transition hover:text-slate-700"
+                >
+                  {"\u00d7"}
+                </button>
+              )}
+            </form>}
 
-            {/* Calendar/Date Picker Button */}
-            <div className="hidden lg:flex items-center gap-2 h-[48px] px-4 bg-white border border-[#E8EDF7] hover:border-blue-300 hover:bg-blue-50/30 rounded-[16px] text-slate-700 text-xs font-bold transition-all shadow-sm cursor-pointer select-none">
-              <span className="text-sm">📅</span>
-              <span>July 27, 2026</span>
+            {/* Live local date and time */}
+            <div
+              className="hidden lg:flex items-center gap-3 h-[48px] px-4 bg-white border border-[#E8EDF7] rounded-[16px] text-slate-700 text-xs font-bold shadow-sm select-none"
+              aria-live="off"
+              title="Current local date and time"
+            >
+              <svg className="h-4 w-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 2" />
+              </svg>
+              <div className="leading-tight">
+                <span className="block">
+                  {currentTime
+                    ? currentTime.toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })
+                    : "Loading date"}
+                </span>
+                <span className="mt-0.5 block text-[10px] tabular-nums text-blue-600">
+                  {currentTime
+                    ? currentTime.toLocaleTimeString(undefined, {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })
+                    : "--:--:--"}
+                </span>
+              </div>
             </div>
 
             {/* Notification trigger */}
@@ -300,9 +416,9 @@ export default function DashboardLayout({
               )}
             </div>
 
-            {/* Messages Button (Circular 48px with red dot in top right) */}
             <button 
-              onClick={() => alert("Opening messages inbox panel")}
+              onClick={() => router.push("/messages")}
+              aria-label="Open messages"
               className="w-12 h-12 flex items-center justify-center bg-white border border-[#E8EDF7] rounded-full text-indigo-600 hover:bg-indigo-650 hover:text-white hover:border-indigo-650 transition-all duration-300 shadow-sm hover:shadow-[0_10px_20px_rgba(79,70,229,0.2)] hover:-translate-y-[3px] hover:scale-[1.05] relative"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -311,9 +427,8 @@ export default function DashboardLayout({
               <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white animate-pulse" />
             </button>
 
-            {/* Settings Button (Glass circle, rotate on hover) */}
             <button 
-              onClick={() => alert("Opening settings dashboard")}
+              onClick={() => router.push("/admin/settings")}
               className="w-12 h-12 flex items-center justify-center bg-white/80 backdrop-blur-md border border-[#E8EDF7] rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-50/50 transition-all duration-300 shadow-sm hover:-translate-y-[3px] hover:scale-[1.05] group"
             >
               <svg className="w-5 h-5 transition-transform duration-300 group-hover:rotate-[15deg]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -350,10 +465,11 @@ export default function DashboardLayout({
                     <p className="text-[10px] text-slate-450 font-semibold mt-0.5">{user.role}</p>
                   </div>
                   <button 
-                    onClick={onLogout} 
+                    onClick={() => void performLogout()}
+                    disabled={isLoggingOut}
                     className="w-full text-left px-4 py-2.5 text-xs text-rose-600 hover:bg-rose-50 font-bold border-t border-slate-100/60 transition-all"
                   >
-                    Logout Session
+                    {isLoggingOut ? "Ending session..." : "Logout Session"}
                   </button>
                 </div>
               )}

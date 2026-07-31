@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { FeedbackProvider } from "../components/ui/FeedbackProvider";
 
 export const metadata: Metadata = {
   title: "Real Estate CRM",
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="overflow-hidden h-screen">
       <body className="antialiased font-sans overflow-hidden h-screen">
-        {children}
+        <FeedbackProvider>{children}</FeedbackProvider>
       </body>
     </html>
   );

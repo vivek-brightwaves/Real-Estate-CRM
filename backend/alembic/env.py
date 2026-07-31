@@ -1,3 +1,5 @@
+import os
+import sys
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -14,13 +16,11 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-import sys
-import os
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from app.db.base import Base
-from app.models import *  # This registers all models with Base.metadata
-from app.core.config import settings
+import app.models  # noqa: E402,F401 - registers every model with Base.metadata
+from app.core.config import settings  # noqa: E402
+from app.db.base import Base  # noqa: E402
 
 # add your model's MetaData object here
 # for 'autogenerate' support

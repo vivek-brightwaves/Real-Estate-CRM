@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import api from "../../../lib/axios";
 import { useAuthStore } from "../../../store/authStore";
+import { useFeedback } from "../../../components/ui/FeedbackProvider";
+import { useSectionSearch } from "../../../hooks/useSectionSearch";
 
 interface User {
   id: number;
@@ -14,6 +16,7 @@ interface User {
   manager_id?: number;
   is_active: boolean;
   created_at?: string;
+  role_profiles?: RoleProfile[];
 }
 
 interface Branch {
@@ -21,16 +24,29 @@ interface Branch {
   name: string;
 }
 
+interface RoleProfile {
+  id: number;
+  name: string;
+  description?: string;
+  base_role: string;
+}
+
 const roleOptions = [
   { value: "SUPER_ADMIN", label: "Super Admin" },
+  { value: "ADMIN", label: "Organization Admin" },
   { value: "MANAGER", label: "Manager" },
   { value: "EMPLOYEE", label: "Employee" },
+  { value: "PARTNER", label: "Partner Manager" },
+  { value: "BROKER", label: "Broker / Channel Partner" },
+  { value: "CUSTOMER", label: "Customer / Tenant" },
 ];
 
 export default function UsersPage() {
   const { user: currentUser } = useAuthStore();
+  const { confirmAction, notify } = useFeedback();
   const [users, setUsers] = useState<User[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [roleProfiles, setRoleProfiles] = useState<RoleProfile[]>([]);
   const [loading, setLoading] = useState(false);
   
   // Existing state logic
@@ -38,6 +54,7 @@ export default function UsersPage() {
 
   // Client-side filtering states to support requested filters
   const [searchQuery, setSearchQuery] = useState("");
+  useSectionSearch("users", setSearchQuery);
   const [statusFilter, setStatusFilter] = useState(""); // "active", "inactive", ""
   const [branchFilter, setBranchFilter] = useState(""); // branchId or ""
 
@@ -50,10 +67,27 @@ export default function UsersPage() {
 
   // View profile modal state
   const [viewUser, setViewUser] = useState<User | null>(null);
+  const [showCreateUser, setShowCreateUser] = useState(false);
+  const [showCreateRole, setShowCreateRole] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    role: "EMPLOYEE",
+    role_profile_id: "",
+    branch_id: "",
+  });
+  const [newRole, setNewRole] = useState({
+    name: "",
+    description: "",
+    base_role: "EMPLOYEE",
+  });
 
   useEffect(() => {
     fetchUsers();
     fetchBranches();
+    fetchRoleProfiles();
   }, [roleFilter]);
 
   const fetchUsers = async () => {
@@ -80,9 +114,19 @@ export default function UsersPage() {
 
   const toggleUserStatus = async (user: User) => {
     const action = user.is_active ? "deactivate" : "activate";
-    if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+    const confirmed = await confirmAction({
+      title: `${user.is_active ? "Deactivate" : "Activate"} user?`,
+      message: `${user.name}'s account will be ${action}d.`,
+      confirmLabel: user.is_active ? "Deactivate user" : "Activate user",
+      tone: user.is_active ? "danger" : "primary",
+    });
+    if (!confirmed) return;
     try {
       await api.put(`/users/${user.id}/deactivate`);
+      notify({
+        title: `User ${action}d`,
+        message: `${user.name}'s access has been updated.`,
+      });
       fetchUsers();
     } catch (err) {
       console.error(err);
@@ -159,6 +203,82 @@ export default function UsersPage() {
     setBranchFilter("");
   };
 
+  const fetchRoleProfiles = async () => {
+    try {
+      const res = await api.get("/users/roles");
+      setRoleProfiles(res.data ?? []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const createUser = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      await api.post("/users", {
+        ...newUser,
+        phone: newUser.phone || null,
+        role_profile_id: newUser.role_profile_id
+          ? Number(newUser.role_profile_id)
+          : null,
+        branch_id: newUser.branch_id ? Number(newUser.branch_id) : null,
+      });
+      setShowCreateUser(false);
+      setNewUser({ name: "", email: "", phone: "", password: "", role: "EMPLOYEE", role_profile_id: "", branch_id: "" });
+      await fetchUsers();
+      notify({
+        title: "User created",
+        message: "The account and documented role profile are ready.",
+      });
+    } catch (err: any) {
+      alert(err.response?.data?.error?.message || err.response?.data?.detail || "Unable to create user");
+    }
+  };
+
+  const createRole = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      await api.post("/users/roles", newRole);
+      setShowCreateRole(false);
+      setNewRole({ name: "", description: "", base_role: "EMPLOYEE" });
+      await fetchRoleProfiles();
+      notify({
+        title: "Role profile created",
+        message: "The new business role is available when adding users.",
+      });
+    } catch (err: any) {
+      notify({
+        title: "Unable to create role",
+        message: err.response?.data?.detail || "Please check the role details.",
+        tone: "error",
+      });
+    }
+  };
+
+  const exportUsers = () => {
+    const rows = [
+      ["Name", "Email", "Phone", "Role", "Branch", "Active"],
+      ...filteredUsers.map((user) => [
+        user.name,
+        user.email,
+        user.phone ?? "",
+        user.role,
+        user.branch_id ?? "",
+        user.is_active,
+      ]),
+    ];
+    const blob = new Blob(
+      [rows.map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(",")).join("\n")],
+      { type: "text/csv;charset=utf-8" },
+    );
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "users.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6 animate-settings-entrance relative pb-12">
       {/* Radial decorative gradients */}
@@ -172,13 +292,23 @@ export default function UsersPage() {
           <p className="text-[16px] text-slate-500 mt-1.5 font-medium">Configure users, roles, assignments, and activation status.</p>
         </div>
         
-        <button 
-          type="button"
-          className="relative overflow-hidden group inline-flex items-center justify-center gap-2 px-6 h-[46px] bg-gradient-to-r from-blue-600 via-indigo-650 to-purple-650 text-white rounded-full text-xs font-black shadow-md shadow-purple-500/15 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer shrink-0"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-          <span className="relative z-10">+ Add User</span>
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => setShowCreateRole(true)}
+            className="inline-flex h-[46px] items-center justify-center rounded-full border border-indigo-200 bg-white px-5 text-xs font-black text-indigo-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-indigo-50"
+          >
+            + Add Role
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowCreateUser(true)}
+            className="relative overflow-hidden group inline-flex items-center justify-center gap-2 px-6 h-[46px] bg-gradient-to-r from-blue-600 via-indigo-650 to-purple-650 text-white rounded-full text-xs font-black shadow-md shadow-purple-500/15 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer shrink-0"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+            <span className="relative z-10">+ Add User</span>
+          </button>
+        </div>
       </div>
 
       {/* STATISTICS CARDS ROW */}
@@ -188,7 +318,7 @@ export default function UsersPage() {
         <div className="relative overflow-hidden bg-white border border-[#E7EEF8] rounded-[22px] p-5 shadow-[0_12px_35px_rgba(37,99,235,.08)] hover:shadow-[0_18px_45px_rgba(37,99,235,.14)] transition-all duration-350 hover:-translate-y-1 group flex justify-between items-center bg-gradient-to-br from-white to-slate-50/20">
           <div className="space-y-1">
             <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider block">Total Users</span>
-            <h4 className="text-[30px] font-black text-slate-900 tracking-tight leading-none">{totalUsersCount || 125}</h4>
+            <h4 className="text-[30px] font-black text-slate-900 tracking-tight leading-none">{totalUsersCount}</h4>
             <div className="flex items-center gap-1.5 mt-2">
               <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
                 +4.5%
@@ -213,7 +343,7 @@ export default function UsersPage() {
         <div className="relative overflow-hidden bg-white border border-[#E7EEF8] rounded-[22px] p-5 shadow-[0_12px_35px_rgba(37,99,235,.08)] hover:shadow-[0_18px_45px_rgba(37,99,235,.14)] transition-all duration-350 hover:-translate-y-1 group flex justify-between items-center bg-gradient-to-br from-white to-slate-50/20">
           <div className="space-y-1">
             <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider block">Active Users</span>
-            <h4 className="text-[30px] font-black text-slate-900 tracking-tight leading-none">{activeUsersCount || 118}</h4>
+            <h4 className="text-[30px] font-black text-slate-900 tracking-tight leading-none">{activeUsersCount}</h4>
             <div className="flex items-center gap-1.5 mt-2">
               <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
                 +3.2%
@@ -238,7 +368,7 @@ export default function UsersPage() {
         <div className="relative overflow-hidden bg-white border border-[#E7EEF8] rounded-[22px] p-5 shadow-[0_12px_35px_rgba(37,99,235,.08)] hover:shadow-[0_18px_45px_rgba(37,99,235,.14)] transition-all duration-350 hover:-translate-y-1 group flex justify-between items-center bg-gradient-to-br from-white to-slate-50/20">
           <div className="space-y-1">
             <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider block">Managers</span>
-            <h4 className="text-[30px] font-black text-slate-900 tracking-tight leading-none">{managersCount || 8}</h4>
+            <h4 className="text-[30px] font-black text-slate-900 tracking-tight leading-none">{managersCount}</h4>
             <div className="flex items-center gap-1.5 mt-2">
               <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-100">
                 +1.8%
@@ -263,7 +393,7 @@ export default function UsersPage() {
         <div className="relative overflow-hidden bg-white border border-[#E7EEF8] rounded-[22px] p-5 shadow-[0_12px_35px_rgba(37,99,235,.08)] hover:shadow-[0_18px_45px_rgba(37,99,235,.14)] transition-all duration-350 hover:-translate-y-1 group flex justify-between items-center bg-gradient-to-br from-white to-slate-50/20">
           <div className="space-y-1">
             <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider block">Employees</span>
-            <h4 className="text-[30px] font-black text-slate-900 tracking-tight leading-none">{employeesCount || 117}</h4>
+            <h4 className="text-[30px] font-black text-slate-900 tracking-tight leading-none">{employeesCount}</h4>
             <div className="flex items-center gap-1.5 mt-2">
               <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-100">
                 +5.4%
@@ -324,6 +454,7 @@ export default function UsersPage() {
               </svg>
             </span>
             <input
+              id="user-search"
               type="text"
               placeholder="Search name or email..."
               value={searchQuery}
@@ -406,13 +537,13 @@ export default function UsersPage() {
           </div>
           
           <div className="flex items-center gap-2">
-            <button className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-xl transition duration-200 shadow-sm border border-slate-150">
+            <button type="button" onClick={() => document.getElementById("user-search")?.focus()} aria-label="Focus user search" className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-xl transition duration-200 shadow-sm border border-slate-150">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </button>
-            <button className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-xl transition duration-200 shadow-sm border border-slate-150">
+            <button type="button" onClick={resetAllFilters} aria-label="Reset user filters" className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-xl transition duration-200 shadow-sm border border-slate-150">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
             </button>
-            <button className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-xl transition duration-200 shadow-sm border border-slate-150">
+            <button type="button" onClick={exportUsers} aria-label="Export users" className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-xl transition duration-200 shadow-sm border border-slate-150">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
             </button>
           </div>
@@ -479,6 +610,11 @@ export default function UsersPage() {
                         >
                           {u.role.replace("_", " ")}
                         </span>
+                        {u.role_profiles?.[0] && (
+                          <p className="mt-1 max-w-[180px] truncate text-[10px] font-bold text-slate-500">
+                            {u.role_profiles[0].name}
+                          </p>
+                        )}
                       </td>
 
                       {/* Status Badges */}
@@ -592,7 +728,7 @@ export default function UsersPage() {
                         <p className="text-xs text-slate-500 mt-1.5 max-w-sm font-medium">
                           Try changing filters or create a new user.
                         </p>
-                        <button className="mt-4 inline-flex items-center gap-1.5 px-4.5 py-2 bg-gradient-to-r from-blue-600 to-purple-650 text-white rounded-full text-xs font-black shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+                        <button type="button" onClick={() => setShowCreateUser(true)} className="mt-4 inline-flex items-center gap-1.5 px-4.5 py-2 bg-gradient-to-r from-blue-600 to-purple-650 text-white rounded-full text-xs font-black shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
                           + Add User
                         </button>
                       </div>
@@ -610,26 +746,137 @@ export default function UsersPage() {
             <span className="text-[12px] text-slate-400 font-bold">
               Showing 1 - {filteredUsers.length} of {users.length} Users
             </span>
-            <div className="inline-flex items-center gap-1.5">
-              <button className="h-8 px-3.5 bg-white border border-slate-200/80 rounded-xl text-xs font-bold text-slate-650 hover:bg-slate-50 transition shadow-sm cursor-pointer">
-                Previous
-              </button>
-              <button className="h-8 w-8 bg-blue-500 border border-blue-500 rounded-xl text-xs font-black text-white shadow-sm flex items-center justify-center">
-                1
-              </button>
-              <button className="h-8 w-8 bg-white border border-slate-200/80 rounded-xl text-xs font-bold text-slate-650 hover:bg-slate-50 transition shadow-sm flex items-center justify-center cursor-pointer">
-                2
-              </button>
-              <button className="h-8 w-8 bg-white border border-slate-200/80 rounded-xl text-xs font-bold text-slate-650 hover:bg-slate-50 transition shadow-sm flex items-center justify-center cursor-pointer">
-                3
-              </button>
-              <button className="h-8 px-3.5 bg-white border border-slate-200/80 rounded-xl text-xs font-bold text-slate-650 hover:bg-slate-50 transition shadow-sm cursor-pointer">
-                Next
-              </button>
-            </div>
+            <span className="text-[11px] font-semibold text-slate-500">All matching users are shown</span>
           </div>
         )}
       </div>
+
+      {showCreateUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm">
+          <form onSubmit={createUser} className="w-full max-w-lg space-y-4 rounded-[24px] border border-white/40 bg-white p-6 shadow-2xl">
+            <h3 className="border-b border-slate-100 pb-3 text-lg font-black text-slate-900">Add User</h3>
+            <input required value={newUser.name} onChange={(event) => setNewUser({ ...newUser, name: event.target.value })} placeholder="Full name" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+            <input required type="email" value={newUser.email} onChange={(event) => setNewUser({ ...newUser, email: event.target.value })} placeholder="Email" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+            <input value={newUser.phone} onChange={(event) => setNewUser({ ...newUser, phone: event.target.value })} placeholder="Phone" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+            <input required type="password" minLength={8} value={newUser.password} onChange={(event) => setNewUser({ ...newUser, password: event.target.value })} placeholder="Strong temporary password" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+            <label className="block space-y-1.5 text-xs font-bold text-slate-600">
+              Business role from the specification
+              <select
+                required
+                value={newUser.role_profile_id}
+                onChange={(event) => {
+                  const profile = roleProfiles.find(
+                    (item) => item.id === Number(event.target.value),
+                  );
+                  setNewUser({
+                    ...newUser,
+                    role_profile_id: event.target.value,
+                    role: profile?.base_role ?? "EMPLOYEE",
+                  });
+                }}
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
+              >
+                <option value="">Select documented role</option>
+                {roleProfiles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name} ({role.base_role.replaceAll("_", " ")})
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <select
+                aria-label="System access level"
+                value={newUser.role}
+                disabled={Boolean(newUser.role_profile_id)}
+                onChange={(event) => setNewUser({ ...newUser, role: event.target.value })}
+                className="rounded-xl border border-slate-200 px-4 py-3 text-sm disabled:bg-slate-50 disabled:text-slate-500"
+              >
+                {roleOptions.map((role) => <option key={role.value} value={role.value}>{role.label}</option>)}
+              </select>
+              <select value={newUser.branch_id} onChange={(event) => setNewUser({ ...newUser, branch_id: event.target.value })} className="rounded-xl border border-slate-200 px-4 py-3 text-sm">
+                <option value="">No branch</option>
+                {branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}
+              </select>
+            </div>
+            <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
+              <button type="button" onClick={() => setShowCreateUser(false)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-600">Cancel</button>
+              <button type="submit" className="rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-bold text-white">Create User</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {showCreateRole && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[24px] border border-white/40 bg-white p-6 shadow-2xl">
+            <div className="mb-4 flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <h3 className="text-lg font-black text-slate-900">Add Role</h3>
+                <p className="mt-1 text-xs leading-5 text-slate-500">
+                  Business roles map to a secure system access level. The catalogue below includes every primary role from the attached specification.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCreateRole(false)}
+                className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
+                aria-label="Close role dialog"
+              >
+                {"\u00d7"}
+              </button>
+            </div>
+
+            <form onSubmit={createRole} className="grid gap-3 rounded-2xl bg-slate-50 p-4 md:grid-cols-2">
+              <input
+                required
+                value={newRole.name}
+                onChange={(event) => setNewRole({ ...newRole, name: event.target.value })}
+                placeholder="Custom business role name"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
+              />
+              <select
+                value={newRole.base_role}
+                onChange={(event) => setNewRole({ ...newRole, base_role: event.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
+              >
+                {roleOptions.map((role) => (
+                  <option key={role.value} value={role.value}>
+                    Base access: {role.label}
+                  </option>
+                ))}
+              </select>
+              <textarea
+                value={newRole.description}
+                onChange={(event) => setNewRole({ ...newRole, description: event.target.value })}
+                placeholder="Responsibilities and scope"
+                className="min-h-20 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm md:col-span-2"
+              />
+              <div className="flex justify-end md:col-span-2">
+                <button type="submit" className="rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white">
+                  Save Role
+                </button>
+              </div>
+            </form>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              {roleProfiles.map((role) => (
+                <div key={role.id} className="rounded-2xl border border-slate-200 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="text-sm font-black text-slate-800">{role.name}</p>
+                    <span className="shrink-0 rounded-full bg-indigo-50 px-2 py-1 text-[9px] font-black text-indigo-700">
+                      {role.base_role.replaceAll("_", " ")}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs leading-5 text-slate-500">
+                    {role.description || "Custom organization role profile."}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* EDIT MODAL OVERLAY */}
       {editUser && (
@@ -811,7 +1058,7 @@ export default function UsersPage() {
                   <input
                     type="password"
                     required
-                    minLength={6}
+                    minLength={8}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full h-12 pl-11 pr-4 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all duration-300"

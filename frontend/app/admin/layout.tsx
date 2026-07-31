@@ -16,6 +16,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  useEffect(() => {
+    const updateClock = () => setCurrentTime(new Date());
+    updateClock();
+    const interval = window.setInterval(updateClock, 1000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -52,9 +61,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   };
 
-  const handleLogout = () => {
-    clearAuth();
-    router.push("/login");
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (refreshToken) {
+        await api.post("/auth/logout", { refresh_token: refreshToken });
+      }
+    } catch {
+      // Local credentials still need to be cleared if the server session expired.
+    } finally {
+      clearAuth();
+      router.push("/login");
+    }
   };
 
   const getRoleLabel = (role: string) => {
@@ -157,7 +177,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             )}
             {!isSidebarCollapsed && (
               <button 
-                onClick={handleLogout}
+                onClick={() => void handleLogout()}
+                disabled={isLoggingOut}
                 className="p-1.5 rounded-lg hover:bg-slate-800 text-rose-400 hover:text-rose-350 transition-colors shrink-0"
                 title="Logout Session"
               >
@@ -234,7 +255,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span>July 27, 2026</span>
+              <span>
+                {currentTime?.toLocaleString(undefined, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                }) ?? "Loading current time..."}
+              </span>
             </div>
 
             <div className="relative">
@@ -260,7 +286,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <p className="text-xs font-bold text-slate-900">{user.name}</p>
                     <p className="text-[10px] text-slate-400 mt-0.5">{user.role}</p>
                   </div>
-                  <button onClick={handleLogout} className="w-full text-left px-4 py-2.5 text-xs text-rose-600 hover:bg-rose-50 border-t border-slate-100 font-bold">Logout Session</button>
+                  <button
+                    onClick={() => void handleLogout()}
+                    disabled={isLoggingOut}
+                    className="w-full text-left px-4 py-2.5 text-xs text-rose-600 hover:bg-rose-50 border-t border-slate-100 font-bold disabled:opacity-60"
+                  >
+                    {isLoggingOut ? "Ending session..." : "Logout Session"}
+                  </button>
                 </div>
               )}
             </div>

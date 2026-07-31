@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import api from "../../../lib/axios";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAuthStore } from "../../../store/authStore";
 import DashboardLayout from "../../../components/dashboard/DashboardLayout";
 
-export default function LeadDetailPage({ params }: { params: { id: string } }) {
+export default function LeadDetailPage() {
+  const params = useParams<{ id: string }>();
   const [lead, setLead] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [newNote, setNewNote] = useState("");

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 
 interface LeadPipelineChartProps {
@@ -8,6 +9,7 @@ interface LeadPipelineChartProps {
 }
 
 export default function LeadPipelineChart({ data }: LeadPipelineChartProps) {
+  const router = useRouter();
   // Mock data if database is empty
   const chartData = data && data.length > 0 ? data : [
     { name: "New Leads", count: 180 },
@@ -34,7 +36,7 @@ export default function LeadPipelineChart({ data }: LeadPipelineChartProps) {
         </div>
         <div className="flex items-center gap-2">
           <button 
-            onClick={() => alert("Opening Lead Pipeline Details")}
+            onClick={() => router.push("/leads")}
             className="px-3 py-1.5 border border-[#E8EDF7] hover:border-slate-350 rounded-lg text-slate-700 hover:text-slate-900 text-xs font-bold transition-all bg-slate-50/50 hover:bg-slate-100 shadow-sm"
           >
             Details

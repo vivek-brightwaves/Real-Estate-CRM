@@ -1,91 +1,100 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+
+import api from "../../lib/axios";
 
 interface WelcomeBannerProps {
   userName: string;
   userRole: string;
 }
 
-export default function WelcomeBanner({ userName, userRole }: WelcomeBannerProps) {
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case "SUPER_ADMIN":
-        return "Super Admin";
-      case "MANAGER":
-        return "Branch Manager";
-      case "EMPLOYEE":
-        return "Sales Agent";
-      default:
-        return role;
-    }
-  };
+interface LoginHistoryItem {
+  id: number;
+  status: string;
+  attempt_time: string;
+}
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  };
+function parseServerTime(value: string): Date {
+  const hasTimezone = /(?:z|[+-]\d{2}:\d{2})$/i.test(value);
+  return new Date(hasTimezone ? value : `${value}Z`);
+}
 
-  const getGreetingEmoji = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "🌅";
-    if (hour < 18) return "☀️";
-    return "🌙";
-  };
+export default function WelcomeBanner({
+  userName,
+  userRole,
+}: WelcomeBannerProps) {
+  const [lastSession, setLastSession] = useState<{
+    label: string;
+    time: Date;
+  } | null>(null);
+
+  useEffect(() => {
+    const loadSessionHistory = async () => {
+      try {
+        const response = await api.get<LoginHistoryItem[]>(
+          "/auth/history?size=20",
+        );
+        const history = response.data ?? [];
+        const logout = history.find((item) => item.status === "LOGOUT");
+        const successfulLogins = history.filter(
+          (item) => item.status === "SUCCESS",
+        );
+        const priorLogin = successfulLogins[1];
+        const source = logout ?? priorLogin;
+        if (source) {
+          setLastSession({
+            label: logout ? "Last session ended" : "Previous login",
+            time: parseServerTime(source.attempt_time),
+          });
+        }
+      } catch {
+        setLastSession(null);
+      }
+    };
+    void loadSessionHistory();
+  }, []);
+
+  const roleLabel = userRole.replaceAll("_", " ").toLowerCase();
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
-    <div 
-      className="relative overflow-hidden rounded-[18px] p-6 sm:p-8 bg-white/75 backdrop-blur-[18px] border border-white/60 shadow-[0_10px_30px_rgba(15,23,42,0.08)] hover:shadow-[0_20px_50px_rgba(59,130,246,0.15)] mb-6 transition-all duration-300 animate-header-load"
+    <div
+      className="relative mb-6 overflow-hidden rounded-[18px] border border-white/60 bg-white/75 p-6 shadow-[0_10px_30px_rgba(15,23,42,0.08)] backdrop-blur-[18px] transition-all duration-300 hover:shadow-[0_20px_50px_rgba(59,130,246,0.15)] sm:p-8"
       style={{
-        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(239, 246, 255, 0.07) 50%, rgba(250, 245, 255, 0.07) 100%)'
+        background:
+          "linear-gradient(135deg, rgba(255,255,255,.95), rgba(239,246,255,.45), rgba(250,245,255,.4))",
       }}
     >
-      {/* Soft background radial decorations (< 5% opacity) */}
-      <div className="absolute top-0 right-0 -mt-12 -mr-12 w-80 h-80 bg-blue-400/5 rounded-full blur-[90px] pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 -mb-12 w-96 h-96 bg-purple-400/4 rounded-full blur-[110px] pointer-events-none" />
-      <div className="absolute top-1/2 left-2/3 -translate-y-1/2 w-64 h-64 bg-cyan-400/4 rounded-full blur-[80px] pointer-events-none" />
-
-      <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div className="flex flex-col gap-1">
-          {/* Greeting Row */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[18px] font-medium text-slate-600">
-              {getGreetingEmoji()} {getGreeting()},
-            </span>
-          </div>
-
-          {/* User Name / Role Row */}
-          <h2 className="text-[34px] font-black text-slate-900 leading-tight tracking-tight mt-0.5">
-            {userName || getRoleLabel(userRole)} 👋
+      <div className="pointer-events-none absolute -right-12 -top-12 h-80 w-80 rounded-full bg-blue-400/5 blur-[90px]" />
+      <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-lg font-medium text-slate-600">{greeting},</p>
+          <h2 className="mt-1 text-[34px] font-black leading-tight tracking-tight text-slate-900">
+            {userName}
           </h2>
-
-          {/* Description */}
-          <p className="text-[15px] text-slate-500 mt-1 max-w-xl">
-            Welcome back! Here's your real estate business overview for today.
+          <p className="mt-1 text-sm font-medium capitalize text-slate-500">
+            {roleLabel} workspace · live business overview
           </p>
-
-          {/* Quick Stats Pills */}
-          <div className="flex flex-wrap items-center gap-2.5 mt-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50/50 text-blue-700 border border-blue-100/40 text-xs font-bold shadow-sm">
-              <span>🏢</span> 12 Active Projects
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50/50 text-purple-700 border border-purple-100/40 text-xs font-bold shadow-sm">
-              <span>👥</span> 1,280 Customers
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50/50 text-emerald-700 border border-emerald-100/40 text-xs font-bold shadow-sm">
-              <span>💰</span> ₹4.8 Cr Revenue
-            </span>
-          </div>
         </div>
 
-        {/* Last Login Capsule */}
-        <div className="self-start md:self-center shrink-0">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100/50 text-xs font-bold shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Last Login: Today • 09:42 AM
-          </span>
+        <div
+          className="self-start rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 shadow-sm md:self-center"
+          aria-live="polite"
+        >
+          <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">
+            {lastSession?.label ?? "Session history"}
+          </p>
+          <p className="mt-1 text-xs font-bold text-emerald-800">
+            {lastSession
+              ? lastSession.time.toLocaleString(undefined, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })
+              : "No previous completed session"}
+          </p>
         </div>
       </div>
     </div>

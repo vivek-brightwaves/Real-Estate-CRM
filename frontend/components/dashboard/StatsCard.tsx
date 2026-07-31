@@ -6,8 +6,8 @@ import { AreaChart, Area, ResponsiveContainer } from "recharts";
 interface StatsCardProps {
   label: string;
   value: string | number;
-  growth: string | number;
-  isPositive: boolean;
+  growth?: string | number;
+  isPositive?: boolean;
   color: "blue" | "green" | "purple" | "orange" | "pink" | "cyan";
   sparklineData?: Array<{ value: number }>;
   icon: React.ReactNode;
@@ -73,7 +73,7 @@ const formatLargeValue = (val: string | number, label: string): string => {
   return `${finalPrefix}${formatNumber(numVal, finalPrefix)}${finalSuffix}`;
 };
 
-export default function StatsCard({ label, value, growth, isPositive, color, sparklineData, icon, delay = 0 }: StatsCardProps) {
+export default function StatsCard({ label, value, growth, isPositive = true, color, sparklineData, icon, delay = 0 }: StatsCardProps) {
   const themes = {
     blue: {
       gradient: "from-blue-50/40 via-white to-blue-50/15",
@@ -302,17 +302,26 @@ export default function StatsCard({ label, value, growth, isPositive, color, spa
             transform: isHovered ? `translate(${coords.x * 1.5}px, ${coords.y * 1.5}px)` : "none"
           }}
         >
-          <span 
-            className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold border transition-all duration-500 shrink-0 ${
-              isPositive 
-                ? "bg-emerald-50 text-emerald-700 border-emerald-100/60" 
-                : "bg-rose-50 text-rose-700 border-rose-100/60"
-            } ${displayValue !== "0" ? "scale-100 opacity-100" : "scale-80 opacity-0"}`}
-          >
-            <span>{isPositive ? "↑" : "↓"}</span>
-            {growth}%
-          </span>
-          <span className="text-[9px] text-slate-450 font-bold uppercase tracking-wider truncate">MoM Change</span>
+          {growth !== undefined ? (
+            <>
+              <span
+                className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold border transition-all duration-500 shrink-0 ${
+                  isPositive
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-100/60"
+                    : "bg-rose-50 text-rose-700 border-rose-100/60"
+                } ${displayValue !== "0" ? "scale-100 opacity-100" : "scale-80 opacity-0"}`}
+              >
+                <span>{isPositive ? "↑" : "↓"}</span>
+                {growth}%
+              </span>
+              <span className="text-[9px] text-slate-450 font-bold uppercase tracking-wider truncate">MoM Change</span>
+            </>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Live data
+            </span>
+          )}
         </div>
       </div>
 

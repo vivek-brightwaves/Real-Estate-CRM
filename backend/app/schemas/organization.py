@@ -1,12 +1,11 @@
-from typing import Optional
 from typing import Optional, Dict, Any
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 import json
 
 # Company Schemas
 class CompanyBase(BaseModel):
-    name: str
-    logo_url: Optional[str] = None
+    name: str = Field(min_length=1, max_length=100)
+    logo_url: Optional[str] = Field(None, max_length=255)
     settings_json: Optional[Dict[str, Any]] = None
 
     @field_validator("settings_json", mode="before")
@@ -30,50 +29,52 @@ class SettingsUpdate(BaseModel):
 class CompanyCreate(CompanyBase):
     pass
 
-class CompanyUpdate(CompanyBase):
-    pass
+class CompanyUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    logo_url: Optional[str] = Field(None, max_length=255)
+    settings_json: Optional[Dict[str, Any]] = None
 
 class CompanyOut(CompanyBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
-    class Config:
-        from_attributes = True
 
 # Branch Schemas
 class BranchBase(BaseModel):
-    name: str
-    company_id: int
+    name: str = Field(min_length=1, max_length=100)
+    company_id: int = Field(gt=0)
 
 class BranchCreate(BranchBase):
     pass
 
 class BranchUpdate(BaseModel):
-    name: Optional[str] = None
-    company_id: Optional[int] = None
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    company_id: Optional[int] = Field(None, gt=0)
 
 class BranchOut(BranchBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
-    class Config:
-        from_attributes = True
 
 # Project Schemas
 class ProjectBase(BaseModel):
-    name: str
-    branch_id: int
-    location: Optional[str] = None
-    description: Optional[str] = None
-    status: Optional[str] = None
+    name: str = Field(min_length=1, max_length=100)
+    branch_id: int = Field(gt=0)
+    location: Optional[str] = Field(None, max_length=255)
+    description: Optional[str] = Field(None, max_length=1000)
+    status: Optional[str] = Field(None, max_length=50)
 
 class ProjectCreate(ProjectBase):
     pass
 
 class ProjectUpdate(BaseModel):
-    name: Optional[str] = None
-    branch_id: Optional[int] = None
-    location: Optional[str] = None
-    description: Optional[str] = None
-    status: Optional[str] = None
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    branch_id: Optional[int] = Field(None, gt=0)
+    location: Optional[str] = Field(None, max_length=255)
+    description: Optional[str] = Field(None, max_length=1000)
+    status: Optional[str] = Field(None, max_length=50)
 
 class ProjectOut(ProjectBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
-    class Config:
-        from_attributes = True

@@ -32,15 +32,17 @@ class Booking(Base):
     id = Column(Integer, primary_key=True, index=True)
     unit_id = Column(Integer, ForeignKey("units.id"), nullable=False, index=True)
     customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False, index=True)
-    created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     status = Column(Enum(BookingStatusEnum), default=BookingStatusEnum.PENDING, index=True)
-    approved_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    approved_by_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
+    broker_id = Column(Integer, ForeignKey("brokers.id"), nullable=True, index=True)
 
     unit = relationship("Unit")
     customer = relationship("Customer")
     created_by = relationship("User", foreign_keys=[created_by_id])
     approved_by = relationship("User", foreign_keys=[approved_by_id])
+    broker = relationship("Broker", foreign_keys=[broker_id])
     payments = relationship("Payment", back_populates="booking")
     # discounts are fetched via the bookings router since ApprovalRequest links via JSON payload
 
@@ -54,7 +56,7 @@ class Payment(Base):
     mode = Column(Enum(PaymentModeEnum), nullable=True)
     received_date = Column(Date, nullable=True)
     receipt_number = Column(String(100), nullable=True)
-    recorded_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    recorded_by_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
 
     booking = relationship("Booking", back_populates="payments")
     recorded_by = relationship("User", foreign_keys=[recorded_by_id])
