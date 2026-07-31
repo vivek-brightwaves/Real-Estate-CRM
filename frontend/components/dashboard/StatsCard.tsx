@@ -6,8 +6,8 @@ import { AreaChart, Area, ResponsiveContainer } from "recharts";
 interface StatsCardProps {
   label: string;
   value: string | number;
-  growth: string | number;
-  isPositive: boolean;
+  growth?: string | number;
+  isPositive?: boolean;
   color: "blue" | "green" | "purple" | "orange" | "pink" | "cyan";
   sparklineData?: Array<{ value: number }>;
   icon: React.ReactNode;
@@ -73,7 +73,7 @@ const formatLargeValue = (val: string | number, label: string): string => {
   return `${finalPrefix}${formatNumber(numVal, finalPrefix)}${finalSuffix}`;
 };
 
-export default function StatsCard({ label, value, growth, isPositive, color, sparklineData, icon, delay = 0 }: StatsCardProps) {
+export default function StatsCard({ label, value, growth = 0, isPositive = true, color, sparklineData, icon, delay = 0 }: StatsCardProps) {
   const themes = {
     blue: {
       gradient: "from-blue-50/40 via-white to-blue-50/15 dark:from-blue-955/10 dark:via-[#1E293B] dark:to-blue-955/5",
