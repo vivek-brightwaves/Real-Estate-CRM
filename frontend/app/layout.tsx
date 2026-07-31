@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="overflow-hidden h-screen" suppressHydrationWarning>
-      <body className="antialiased font-sans overflow-hidden h-screen bg-[#f8fbff] dark:bg-[#0F172A] text-slate-800 dark:text-[#F8FAFC]">
+      <body className="antialiased font-sans overflow-hidden h-screen bg-[#f8fbff] dark:bg-background text-slate-800 dark:text-[#F8FAFC]">
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

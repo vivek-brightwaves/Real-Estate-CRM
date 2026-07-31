@@ -8,7 +8,7 @@
   --foreground: #0f172a;
   /* slate-900 */
   --card: #ffffff;
-  --border: #e2e8f0;
+  --border: #E8EDF7;
   --text: #0f172a;
   --text-secondary: #64748b;
   --hover: #f1f5f9;
@@ -564,70 +564,93 @@ rect,
   --welcome-bg-start: rgba(30, 41, 59, 0.95);
   --welcome-bg-mid: rgba(30, 41, 59, 0.4);
   --welcome-bg-end: rgba(15, 23, 42, 0.1);
-  --background: #0F172A;
-  --card: #111827;
-  --border: #1E293B;
+  --background: #0B1120;
+  --card: #1E293B;
+  --border: #334155;
   --text: #F8FAFC;
   --text-secondary: #94A3B8;
-  --hover: #1E293B;
+  --hover: #273449;
 }
 
 /* Premium Dark Theme Global Utilities */
 .dark body {
-  background-color: #0F172A !important;
+  background-color: #0B1120 !important;
   color: #F8FAFC !important;
 }
 
+/* Page Content Wrapper overrides */
 .dark .bg-white {
-  background-color: #1E293B !important;
+  background-color: #111827 !important;
+}
+
+/* Gradient backgrounds mapping to dark equivalents */
+.dark .from-white {
+  --tw-gradient-from: #111827 !important;
+  --tw-gradient-to: rgba(17, 24, 39, 0) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+.dark .via-white {
+  --tw-gradient-to: rgba(17, 24, 39, 0) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), #111827, var(--tw-gradient-to) !important;
+}
+.dark .to-slate-50\/30,
+.dark .to-slate-50\/10 {
+  --tw-gradient-to: rgba(17, 24, 39, 0.3) !important;
+}
+.dark .bg-white\/95,
+.dark .bg-white\/98,
+.dark .bg-white\/90 {
+  background-color: rgba(17, 24, 39, 0.95) !important;
 }
 
 /* Text color overrides */
 .dark .text-slate-900,
 .dark .text-slate-850,
 .dark .text-slate-800 {
-  color: #F8FAFC !important;
+  color: #F8FAFC !important; /* Primary Text */
 }
 
 .dark .text-slate-700,
 .dark .text-slate-600,
 .dark .text-slate-655 {
-  color: #CBD5E1 !important;
+  color: #94A3B8 !important; /* Secondary Text */
 }
 
 .dark .text-slate-500,
 .dark .text-slate-400,
 .dark .text-slate-450 {
-  color: #94A3B8 !important;
+  color: #64748B !important; /* Muted Text */
 }
 
-/* Borders */
+/* Borders mapping to #334155 */
 .dark .border-slate-100,
 .dark .border-slate-200,
 .dark .border-slate-200\/80,
 .dark .border-\[\#E8EDF7\],
 .dark .border-white\/60,
-.dark .border-white\/80 {
+.dark .border-white\/80,
+.dark .border-dashed {
   border-color: #334155 !important;
 }
 
-/* Table styling */
+/* Table styling: th #1E293B, tr/td #111827, hover #1E293B */
 .dark th {
   background-color: #1E293B !important;
-  color: #CBD5E1 !important;
+  color: #F8FAFC !important;
   border-color: #334155 !important;
 }
 
 .dark td {
   border-color: #334155 !important;
+  background-color: #111827 !important;
 }
 
 .dark tr {
-  background-color: #1E293B;
+  background-color: #111827 !important;
 }
 
 .dark tbody tr {
-  background-color: #0F172A !important;
+  background-color: #111827 !important;
 }
 
 .dark tbody tr:nth-child(even) {
@@ -637,16 +660,16 @@ rect,
 .dark .hover\:bg-slate-50:hover,
 .dark tr:hover,
 .dark tbody tr:hover {
-  background-color: #273449 !important;
+  background-color: #1E293B !important;
 }
 
-/* Inputs and forms */
+/* Inputs and forms: bg-[#0F172A], border #334155, text white, placeholder #64748B */
 .dark input,
 .dark select,
 .dark textarea {
-  background-color: #1E293B !important;
+  background-color: #0F172A !important;
   border-color: #334155 !important;
-  color: #F8FAFC !important;
+  color: #FFFFFF !important;
 }
 
 .dark input::placeholder,
@@ -655,42 +678,74 @@ rect,
 }
 
 .dark select option {
-  background-color: #1E293B !important;
-  color: #F8FAFC !important;
+  background-color: #0F172A !important;
+  color: #FFFFFF !important;
+}
+
+.dark select option:hover {
+  background-color: #2563EB !important;
 }
 
 /* Modals Overlay & Card */
+.dark .bg-slate-955\/40,
 .dark .bg-slate-950\/40,
 .dark .bg-black\/40 {
   background-color: rgba(0, 0, 0, 0.65) !important;
 }
 
 .dark .bg-slate-900 {
+  background-color: #111827 !important; /* modal wrapper background */
+}
+
+/* Nested Cards (bg-slate-50, bg-slate-100, bg-gray-50, etc.) -> #0F172A */
+.dark .bg-slate-50,
+.dark .bg-slate-50\/50,
+.dark .bg-slate-50\/40,
+.dark .bg-slate-100,
+.dark .bg-gray-50,
+.dark .bg-gray-100 {
   background-color: #0F172A !important;
 }
 
-/* Custom tabs & status background cards */
-.dark .bg-slate-50,
-.dark .bg-slate-50\/50,
-.dark .bg-slate-50\/40 {
-  background-color: #1E293B !important;
-}
-
-.dark .bg-slate-100 {
-  background-color: #273449 !important;
+/* Dropdown selections and filters */
+.dark .dropdown-item:hover,
+.dark select option:hover,
+.dark .hover\:bg-slate-50:hover {
+  background-color: #2563EB !important;
 }
 
 /* Scrollbar override */
 .dark ::-webkit-scrollbar-track {
-  background: #0F172A !important;
+  background: #0B1120 !important;
 }
 
 .dark ::-webkit-scrollbar-thumb {
   background: #334155 !important;
-  border-color: #0F172A !important;
+  border-color: #0B1120 !important;
 }
 
-/* Input elements, Select tags & Option menus */
+/* Dynamic glow overlays for bright light mode boxes in dark mode */
+.dark .from-\[\#FFF7ED\] { --tw-gradient-from: rgba(251, 191, 36, 0.1) !important; }
+.dark .to-\[\#FFEDD5\] { --tw-gradient-to: rgba(251, 191, 36, 0.02) !important; }
+.dark .border-orange-200 { border-color: rgba(251, 191, 36, 0.15) !important; }
+
+.dark .from-\[\#EFF6FF\] { --tw-gradient-from: rgba(59, 130, 246, 0.1) !important; }
+.dark .to-\[\#DBEAFE\] { --tw-gradient-to: rgba(59, 130, 246, 0.02) !important; }
+.dark .border-blue-200 { border-color: rgba(59, 130, 246, 0.15) !important; }
+
+.dark .from-\[\#ECFDF5\] { --tw-gradient-from: rgba(16, 185, 129, 0.1) !important; }
+.dark .to-\[\#D1FAE5\] { --tw-gradient-to: rgba(16, 185, 129, 0.02) !important; }
+.dark .border-emerald-250 { border-color: rgba(16, 185, 129, 0.15) !important; }
+
+.dark .from-\[\#F5F3FF\] { --tw-gradient-from: rgba(139, 92, 246, 0.1) !important; }
+.dark .to-\[\#EDE9FE\] { --tw-gradient-to: rgba(139, 92, 246, 0.02) !important; }
+.dark .border-purple-200 { border-color: rgba(139, 92, 246, 0.15) !important; }
+
+.dark .from-\[\#FEF2F2\] { --tw-gradient-from: rgba(239, 68, 68, 0.1) !important; }
+.dark .to-\[\#FEE2E2\] { --tw-gradient-to: rgba(239, 68, 68, 0.02) !important; }
+.dark .border-red-200 { border-color: rgba(239, 68, 68, 0.15) !important; }
+
+/* Light/Dark theme-provider fallbacks for root elements */
 input,
 select,
 textarea {

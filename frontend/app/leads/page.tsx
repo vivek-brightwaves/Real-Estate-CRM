@@ -113,7 +113,7 @@ export default function LeadsPage() {
     >
       <div className="min-h-full flex flex-col">
         <div className="mx-auto w-full py-2">
-          <div className="bg-gradient-to-br from-white via-white to-slate-50/30 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 p-6 md:p-8 backdrop-blur-md bg-white/95">
+          <div className="bg-gradient-to-br from-white via-white to-slate-50/30 dark:from-background dark:via-background dark:to-background/30 rounded-[20px] border border-border shadow-sm hover:shadow-lg transition-all duration-300 p-6 md:p-8 backdrop-blur-md bg-white/95 dark:bg-background/95">
             <LeadsBoard
               leads={visibleLeads}
               loading={loading}

@@ -25,17 +25,17 @@ export default function StatusCard({
   statusOptions?: StatusOption[];
 }) {
   return (
-    <div className="h-full rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow duration-200 hover:shadow-lg overflow-hidden flex flex-col">
-      <div className="sticky top-0 z-10 border-b border-slate-100 bg-white px-5 py-5">
+    <div className="h-full rounded-2xl border border-border bg-card shadow-sm transition-shadow duration-200 hover:shadow-lg overflow-hidden flex flex-col">
+      <div className="sticky top-0 z-10 border-b border-border bg-card px-5 py-5">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className={`inline-flex h-3.5 w-3.5 rounded-full ${color}`} />
             <div>
-              <p className="text-sm font-semibold text-slate-900">{title}</p>
-              <p className="text-xs text-slate-500">{leads.length} active leads</p>
+              <p className="text-sm font-semibold text-foreground">{title}</p>
+              <p className="text-xs text-muted-foreground">{leads.length} active leads</p>
             </div>
           </div>
-          <span className="rounded-2xl bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-500">
+          <span className="rounded-2xl bg-slate-50 dark:bg-slate-800 px-3 py-1 text-xs font-semibold text-muted-foreground">
             {leads.length} items
           </span>
         </div>

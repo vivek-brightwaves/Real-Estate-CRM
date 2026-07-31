@@ -30,7 +30,7 @@ const PremiumInput = ({
   return (
     <div className="relative w-full group/input h-12">
       {/* Icon (18px) */}
-      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-blue-500 transition-all duration-300 z-10">
+      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] group-focus-within/input:text-blue-500 transition-all duration-300 z-10">
         {icon}
       </span>
       <input
@@ -39,11 +39,11 @@ const PremiumInput = ({
         value={value ?? ""}
         onChange={onChange}
         placeholder=" "
-        className="peer w-full h-full pl-11 pr-3.5 pt-4 pb-1 bg-white/40 border border-slate-200/85 rounded-[14px] text-[14px] font-semibold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300 shadow-sm focus:bg-white placeholder-transparent"
+        className="peer w-full h-full pl-11 pr-3.5 pt-4 pb-1 bg-[#0F172A] border border-[#334155] rounded-[14px] text-[14px] font-semibold text-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300 shadow-sm placeholder-transparent"
       />
       <label
         htmlFor={id}
-        className="absolute left-11 top-[22px] -translate-y-1/2 text-[14px] font-semibold text-slate-400 pointer-events-none transition-all duration-300 origin-left
+        className="absolute left-11 top-[22px] -translate-y-1/2 text-[14px] font-semibold text-[#94A3B8] pointer-events-none transition-all duration-300 origin-left
         peer-placeholder-shown:text-[14px] peer-placeholder-shown:top-1/2
         peer-focus:text-[12px] peer-focus:top-2.5 peer-focus:text-blue-500
         peer-[:not(:placeholder-shown)]:text-[12px] peer-[:not(:placeholder-shown)]:top-2.5"
@@ -69,14 +69,14 @@ const ToggleSwitch = ({
   label
 }: ToggleSwitchProps) => {
   return (
-    <div className="flex items-center justify-between px-3.5 h-14 bg-white/40 border border-slate-200/50 rounded-[14px] shadow-sm hover:bg-white/60 transition-all duration-200">
-      <span className="text-[14px] font-bold text-slate-700">{label}</span>
+    <div className="flex items-center justify-between px-3.5 h-14 bg-[#0F172A] border border-[#334155] rounded-[14px] shadow-sm transition-all duration-200">
+      <span className="text-[14px] font-bold text-[#CBD5E1]">{label}</span>
       <button
         type="button"
         id={id}
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-blue-500/10 ${
-          checked ? 'bg-gradient-to-r from-blue-600 to-blue-500' : 'bg-slate-200'
+          checked ? 'bg-blue-600' : 'bg-slate-700'
         }`}
       >
         <span
@@ -136,14 +136,14 @@ const CustomDropdown = ({
   return (
     <div id={`dropdown-${id}`} className="relative w-full group/dropdown h-12">
       {/* Icon (18px) */}
-      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/dropdown:text-blue-500 transition-colors duration-200 z-10">
+      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] group-focus-within/dropdown:text-blue-500 transition-colors duration-250 z-10">
         {icon}
       </span>
       
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full h-full text-left pl-11 pr-10 pt-4 pb-1 bg-white/40 border border-slate-200/80 rounded-[14px] text-[14px] font-semibold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300 shadow-sm hover:bg-white/60 flex justify-between items-center"
+        className="w-full h-full text-left pl-11 pr-10 pt-4 pb-1 bg-[#0F172A] border border-[#334155] rounded-[14px] text-[14px] font-semibold text-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300 shadow-sm flex justify-between items-center"
       >
         <span className="truncate">{selectedOption?.label || value}</span>
         <svg 
@@ -156,14 +156,14 @@ const CustomDropdown = ({
         </svg>
       </button>
       
-      <span className="absolute left-11 top-2.5 text-[12px] font-bold text-slate-400 pointer-events-none">
+      <span className="absolute left-11 top-2 text-[11px] font-bold text-[#94A3B8] pointer-events-none">
         {label}
       </span>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 mt-1.5 bg-white/95 backdrop-blur-xl border border-slate-200/80 rounded-[14px] shadow-xl z-50 p-2 overflow-hidden animate-settings-tab-fade">
+        <div className="absolute left-0 right-0 mt-1.5 bg-[#1E293B] border border-[#334155] rounded-[14px] shadow-xl z-50 p-2 overflow-hidden animate-settings-tab-fade">
           <div className="relative mb-1.5">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400">
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#94A3B8]">
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -173,7 +173,7 @@ const CustomDropdown = ({
               placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200/60 rounded-lg text-slate-700 text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all duration-200"
+              className="w-full pl-8 pr-3 py-1.5 bg-[#0F172A] border border-[#334155] rounded-lg text-white text-xs font-semibold focus:outline-none focus:border-blue-500 transition-all duration-200"
             />
           </div>
 
@@ -190,8 +190,8 @@ const CustomDropdown = ({
                   }}
                   className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-between ${
                     opt.value === value
-                      ? "bg-blue-500 text-white"
-                      : "text-slate-650 hover:bg-slate-50 hover:text-slate-900"
+                      ? "bg-blue-600 text-white"
+                      : "text-[#CBD5E1] hover:bg-[#273449] hover:text-white"
                   }`}
                 >
                   <span>{opt.label}</span>
@@ -203,7 +203,7 @@ const CustomDropdown = ({
                 </button>
               ))
             ) : (
-              <div className="text-center py-2 text-slate-400 text-xs">No options found</div>
+              <div className="text-center py-2 text-[#94A3B8] text-xs">No options found</div>
             )}
           </div>
         </div>
@@ -354,16 +354,16 @@ export default function SettingsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 relative z-10">
         <div>
           {/* Breadcrumbs */}
-          <nav className="flex items-center gap-1.5 text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">
-            <span className="hover:text-blue-600 transition-colors cursor-pointer" onClick={() => router.push("/")}>Dashboard</span>
-            <span className="text-slate-300">/</span>
-            <span className="text-slate-400">Administration</span>
-            <span className="text-slate-300">/</span>
-            <span className="text-slate-600">Global Settings</span>
+          <nav className="flex items-center gap-1.5 text-[9px] font-extrabold text-[#94A3B8] uppercase tracking-widest mb-1.5">
+            <span className="hover:text-blue-500 transition-colors cursor-pointer" onClick={() => router.push("/")}>Dashboard</span>
+            <span className="text-[#334155]">/</span>
+            <span className="text-[#94A3B8]">Administration</span>
+            <span className="text-[#334155]">/</span>
+            <span className="text-white">Global Settings</span>
           </nav>
           
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-tr from-blue-600/10 to-purple-600/10 rounded-[14px] border border-blue-500/15 text-blue-600 shadow-sm flex items-center justify-center">
+            <div className="p-2 bg-gradient-to-tr from-blue-600/10 to-purple-600/10 rounded-[14px] border border-blue-500/15 text-blue-400 shadow-sm flex items-center justify-center">
               {/* Settings Gear Icon (optimized to 18px size) */}
               <svg className="w-[18px] h-[18px] animate-[spin_10s_linear_infinite]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -371,8 +371,8 @@ export default function SettingsPage() {
               </svg>
             </div>
             <div>
-              <h2 className="text-lg md:text-xl font-black text-slate-900 tracking-tight">Global Settings</h2>
-              <p className="text-[11px] text-slate-500 mt-0.5 font-medium">Configure SMTP credentials, backup policies, messaging, and storage providers</p>
+              <h2 className="text-lg md:text-xl font-black text-white tracking-tight">Global Settings</h2>
+              <p className="text-[11px] text-[#94A3B8] mt-0.5 font-medium">Configure SMTP credentials, backup policies, messaging, and storage providers</p>
             </div>
           </div>
         </div>
@@ -380,11 +380,8 @@ export default function SettingsPage() {
         <button 
           onClick={saveSettings}
           disabled={saving || loading}
-          className="btn-premium-action btn-save-changes disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+          className="relative inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-650 hover:opacity-90 transition-all text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
         >
-          {/* Hover backdrop gradient layer */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-          
           <svg className="w-[18px] h-[18px] text-white relative z-10 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
           </svg>
@@ -393,7 +390,7 @@ export default function SettingsPage() {
       </div>
 
       {loading ? (
-        <div className="relative z-10 overflow-hidden bg-white/70 backdrop-blur-xl border border-white/40 rounded-[14px] shadow-sm p-10 text-center text-slate-550 font-bold text-xs">
+        <div className="relative z-10 overflow-hidden bg-[#111827] border border-[rgba(255,255,255,0.08)] rounded-[14px] shadow-sm p-10 text-center text-[#94A3B8] font-bold text-xs">
           <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           Loading system configurations...
         </div>
@@ -401,7 +398,7 @@ export default function SettingsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start relative z-10">
           
           {/* COMPACT LEFT SIDEBAR NAVIGATION */}
-          <div className="md:col-span-1 flex flex-row md:flex-col gap-1.5 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 scrollbar-hide shrink-0 bg-white/40 backdrop-blur-md p-1.5 rounded-[14px] border border-slate-200/50">
+          <div className="md:col-span-1 flex flex-row md:flex-col gap-1.5 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 scrollbar-hide shrink-0 bg-[#111827] p-1.5 rounded-[14px] border border-[rgba(255,255,255,0.08)]">
             {['email', 'messaging', 'security', 'storage', 'backup'].map((tab) => {
               const active = activeTab === tab;
               const meta = tabMetadata[tab];
@@ -413,7 +410,7 @@ export default function SettingsPage() {
                   className={`w-full relative flex items-center gap-2.5 px-3 py-2.5 rounded-full text-xs font-bold transition-all duration-300 shrink-0 select-none ${
                     active 
                       ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/15 translate-x-1" 
-                      : "text-slate-500 hover:bg-white/70 hover:text-slate-900 hover:translate-x-1 hover:shadow-sm"
+                      : "text-[#94A3B8] hover:bg-[#1E293B]/70 hover:text-white hover:translate-x-1 hover:shadow-sm"
                   }`}
                 >
                   {/* Left glowing indicator */}
@@ -435,21 +432,21 @@ export default function SettingsPage() {
           <div className="md:col-span-3">
             <div 
               key={activeTab}
-              className="relative overflow-hidden bg-white/70 backdrop-blur-xl border border-white/40 rounded-[14px] shadow-[0_8px_24px_rgba(31,38,135,0.04)] p-6 transition-all duration-300 hover:shadow-[0_12px_32px_rgba(31,38,135,0.08)] animate-settings-tab-fade"
+              className="relative overflow-hidden bg-[#111827] border border-[rgba(255,255,255,0.08)] rounded-[14px] shadow-sm p-6 transition-all duration-300 hover:shadow-[0_12px_32px_rgba(31,38,135,0.08)] animate-settings-tab-fade"
             >
               {/* Top Accent Gradient Border */}
               <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-blue-500 via-purple-500 to-transparent" />
               
               {/* Card Header & Title */}
               <div className="mb-4 flex items-center gap-2.5">
-                <span className="p-1.5 bg-blue-500/10 rounded-lg text-blue-600 flex items-center justify-center">
+                <span className="p-1.5 bg-blue-500/10 rounded-lg text-blue-400 flex items-center justify-center">
                   {tabMetadata[activeTab].icon}
                 </span>
-                <h3 className="text-[15px] font-extrabold text-slate-900">{tabMetadata[activeTab].cardTitle}</h3>
+                <h3 className="text-[15px] font-extrabold text-white">{tabMetadata[activeTab].cardTitle}</h3>
               </div>
               
               {/* Divider */}
-              <div className="h-[1px] bg-slate-200/50 mb-4" />
+              <div className="h-[1px] bg-[#334155] mb-4" />
 
               {/* Form Controls (Optimized Gaps to 16px = space-y-4) */}
               <div className="max-w-2xl space-y-4">

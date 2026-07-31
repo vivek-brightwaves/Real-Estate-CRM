@@ -87,11 +87,11 @@ export default function DashboardLayout({
       {/* LEFT FIXED SIDEBAR                                           */}
       {/* ============================================================ */}
       <aside
-        className={`fixed left-0 top-0 h-screen hidden md:flex flex-col bg-slate-900 dark:bg-[#111827] text-white shrink-0 border-r border-slate-850 dark:border-slate-800 transition-all duration-300 z-30 overflow-hidden ${isSidebarCollapsed ? "w-20" : "w-[250px]"
+        className={`fixed left-0 top-0 h-screen hidden md:flex flex-col bg-white dark:bg-[#111827] text-slate-800 dark:text-white shrink-0 border-r border-slate-100 dark:border-slate-800 transition-all duration-300 z-30 overflow-hidden ${isSidebarCollapsed ? "w-20" : "w-[250px]"
           }`}
       >
         {/* Brand Logo Header */}
-        <div className="h-16 px-6 flex items-center justify-between border-b border-slate-850 dark:border-slate-800/60">
+        <div className="h-16 px-6 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-500 to-indigo-650 flex items-center justify-center shrink-0 shadow-md">
               <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -99,7 +99,7 @@ export default function DashboardLayout({
               </svg>
             </div>
             {!isSidebarCollapsed && (
-              <span className="text-base font-extrabold tracking-tight text-white whitespace-nowrap">
+              <span className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">
                 CRM <span className="text-blue-500">Dashboard</span>
               </span>
             )}
@@ -107,7 +107,7 @@ export default function DashboardLayout({
 
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="p-1 rounded-lg bg-slate-800/60 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+            className="p-1 rounded-lg bg-slate-100 dark:bg-slate-800/60 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors"
           >
             <svg className={`w-4 h-4 transform transition-transform duration-200 ${isSidebarCollapsed ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
@@ -123,13 +123,21 @@ export default function DashboardLayout({
               <button
                 key={item.name}
                 onClick={() => handleNavClick(item.href)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 group ${isActive
-                  ? "bg-gradient-to-r from-blue-600 to-indigo-650 text-white shadow-md shadow-blue-600/10"
-                  : "text-slate-400 hover:bg-slate-850 hover:text-white dark:hover:bg-slate-800/60"
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 ease-in-out group ${isActive
+                  ? "bg-[#2563EB] text-white dark:bg-gradient-to-r dark:from-[#2563EB] dark:to-[#3B82F6] dark:text-white shadow-md shadow-blue-600/10 font-semibold"
+                  : "bg-transparent text-[#334155] hover:bg-[#EEF4FF] hover:text-[#2563EB] dark:text-[#CBD5E1] dark:hover:bg-[#2563EB] dark:hover:text-white"
                   }`}
                 title={item.name}
               >
-                <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg
+                  className={`w-4 h-4 shrink-0 transition-colors duration-200 ${isActive
+                    ? "text-white"
+                    : "text-[#64748B] group-hover:text-[#2563EB] dark:text-[#94A3B8] dark:group-hover:text-white"
+                    }`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                 </svg>
                 {!isSidebarCollapsed && <span className="truncate">{item.name}</span>}
@@ -139,21 +147,21 @@ export default function DashboardLayout({
         </div>
 
         {/* User Profile Section at the bottom */}
-        <div className="p-4 border-t border-slate-850 dark:border-slate-800 bg-slate-950/20">
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-extrabold text-sm shrink-0 border border-slate-850 dark:border-slate-800/50 shadow-inner">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-650 text-white flex items-center justify-center font-extrabold text-sm shrink-0 border border-slate-100 dark:border-slate-800/50 shadow-inner">
               {user.name.charAt(0)}
             </div>
             {!isSidebarCollapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-white truncate">{user.name}</p>
-                <p className="text-[9px] text-slate-400 truncate mt-0.5">{getRoleLabel(user.role)}</p>
+                <p className="text-xs font-bold text-slate-800 dark:text-white truncate">{user.name}</p>
+                <p className="text-[9px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{getRoleLabel(user.role)}</p>
               </div>
             )}
             {!isSidebarCollapsed && (
               <button
                 onClick={onLogout}
-                className="p-1.5 rounded-lg hover:bg-slate-800 text-rose-400 hover:text-rose-350 transition-colors shrink-0"
+                className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-850 text-rose-600 dark:text-rose-400 hover:text-rose-755 dark:hover:text-rose-350 transition-colors shrink-0"
                 title="Logout Session"
               >
                 <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,7 +173,7 @@ export default function DashboardLayout({
           {isSidebarCollapsed && (
             <button
               onClick={onLogout}
-              className="mt-3 w-full flex justify-center p-2 rounded-lg hover:bg-rose-500/10 text-rose-450 transition-colors"
+              className="mt-3 w-full flex justify-center p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-600 dark:text-rose-450 transition-colors"
               title="Logout Session"
             >
               <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -182,28 +190,42 @@ export default function DashboardLayout({
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
           <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
-          <aside className="relative flex flex-col w-72 max-w-[80vw] bg-slate-900 dark:bg-[#111827] text-white p-6 shadow-2xl z-10">
+          <aside className="relative flex flex-col w-72 max-w-[80vw] bg-white dark:bg-[#111827] text-slate-800 dark:text-white p-6 shadow-2xl z-10">
             <div className="flex items-center justify-between mb-8">
-              <span className="text-lg font-extrabold tracking-tight text-white">CRM <span className="text-blue-500">Dashboard</span></span>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="p-1 rounded bg-slate-850 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-750">
-                <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <span className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">CRM <span className="text-blue-500">Dashboard</span></span>
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <nav className="flex-1 overflow-y-auto space-y-4">
-              {navItems.map((item) => (
-                <button
-                  key={item.name}
-                  onClick={() => handleNavClick(item.href)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-850 dark:hover:bg-slate-800"
-                >
-                  <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={item.icon} />
-                  </svg>
-                  <span>{item.name}</span>
-                </button>
-              ))}
+            <nav className="flex-1 overflow-y-auto space-y-2">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href || (item.name === "Dashboard" && pathname === "/");
+                return (
+                  <button
+                    key={item.name}
+                    onClick={() => handleNavClick(item.href)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all duration-200 ease-in-out group ${isActive
+                      ? "bg-[#2563EB] text-white dark:bg-gradient-to-r dark:from-[#2563EB] dark:to-[#3B82F6] dark:text-white shadow-md shadow-blue-600/10 font-semibold"
+                      : "bg-transparent text-[#334155] hover:bg-[#EEF4FF] hover:text-[#2563EB] dark:text-[#CBD5E1] dark:hover:bg-[#2563EB] dark:hover:text-white"
+                      }`}
+                  >
+                    <svg
+                      className={`w-5 h-5 shrink-0 transition-colors duration-200 ${isActive
+                        ? "text-white"
+                        : "text-[#64748B] group-hover:text-[#2563EB] dark:text-[#94A3B8] dark:group-hover:text-white"
+                        }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={item.icon} />
+                    </svg>
+                    <span>{item.name}</span>
+                  </button>
+                );
+              })}
             </nav>
           </aside>
         </div>
@@ -415,10 +437,10 @@ export default function DashboardLayout({
 
         {/* Master Content Area */}
         <div className="flex-1 flex flex-col min-h-0 relative">
-          <main className="flex-1 overflow-y-auto p-8 bg-[#F5F8FF] dark:bg-[#0F172A] relative overflow-x-hidden">
+          <main className="flex-1 overflow-y-auto p-8 bg-[#F5F8FF] dark:bg-background relative overflow-x-hidden">
 
             {/* Background Layer 2: Soft Gradient Overlays */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#F5F8FF] via-blue-50/30 to-indigo-50/20 dark:from-[#0F172A] dark:via-blue-950/10 dark:to-indigo-950/10 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#F5F8FF] via-blue-50/30 to-indigo-50/20 dark:from-background dark:via-blue-950/10 dark:to-indigo-950/10 pointer-events-none" />
 
             {/* Background Layer 3: Top Right Blurred Blue Glow */}
             <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-blue-400/8 dark:bg-blue-500/3 rounded-full blur-[140px] pointer-events-none" />

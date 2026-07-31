@@ -104,7 +104,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!mounted || !accessToken || !user || user.role !== "SUPER_ADMIN") return null;
 
   return (
-    <div className="h-screen overflow-hidden w-full flex bg-[#F5F8FF] font-sans selection:bg-blue-600 selection:text-white">
+    <div className="h-screen overflow-hidden w-full flex bg-[#F5F8FF] dark:bg-background font-sans selection:bg-blue-600 selection:text-white">
       
       {/* ============================================================ */}
       {/* LEFT FIXED SIDEBAR                                           */}
@@ -232,27 +232,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       }`}>
         
         {/* Top Header */}
-        <header className="sticky top-0 z-50 w-full h-[64px] bg-white/95 backdrop-blur-md border-b border-[#E8EDF7] px-6 flex items-center justify-between shadow-sm">
+        <header className="sticky top-0 z-50 w-full h-[64px] bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md border-b border-border px-6 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-4">
-            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 md:hidden rounded-lg hover:bg-slate-100 text-slate-600">
+            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 md:hidden rounded-lg hover:bg-hover text-foreground">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
               </svg>
             </button>
             
             <div className="flex flex-col">
-              <h2 className="text-sm md:text-base font-bold text-slate-800 tracking-tight leading-none">
+              <h2 className="text-sm md:text-base font-bold text-foreground tracking-tight leading-none">
                 Good Afternoon, {getRoleLabel(user.role)} 👋
               </h2>
-              <span className="hidden sm:inline text-[10px] text-slate-400 font-semibold mt-1">
+              <span className="hidden sm:inline text-[10px] text-muted-foreground font-semibold mt-1">
                 CRM Admin Console - Manage organizational settings.
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold shadow-sm">
-              <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-xl text-foreground text-xs font-semibold shadow-sm">
+              <svg className="w-3.5 h-3.5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <span>
@@ -264,7 +264,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             <div className="relative">
-              <button onClick={() => setIsNotifOpen(!isNotifOpen)} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-600 border border-[#E8EDF7] relative">
+              <button onClick={() => setIsNotifOpen(!isNotifOpen)} className="p-2 bg-card hover:bg-hover rounded-xl text-foreground border border-border relative">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
@@ -275,21 +275,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             <div className="relative">
-              <button onClick={() => setIsProfileOpen(!isProfileOpen)} className="flex items-center gap-3 pl-3 border-l border-slate-200 focus:outline-none">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-650 text-white flex items-center justify-center font-extrabold text-sm border border-[#E8EDF7]">
+              <button onClick={() => setIsProfileOpen(!isProfileOpen)} className="flex items-center gap-3 pl-3 border-l border-border focus:outline-none">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-650 text-white flex items-center justify-center font-extrabold text-sm border border-border">
                   {user.name.charAt(0)}
                 </div>
               </button>
               {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-[#E8EDF7] z-50 py-1">
-                  <div className="px-4 py-2 border-b border-slate-100">
-                    <p className="text-xs font-bold text-slate-900">{user.name}</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">{user.role}</p>
+                <div className="absolute right-0 mt-2 w-48 bg-card rounded-xl shadow-xl border border-border z-50 py-1">
+                  <div className="px-4 py-2 border-b border-border">
+                    <p className="text-xs font-bold text-foreground">{user.name}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{user.role}</p>
                   </div>
                   <button
                     onClick={() => void handleLogout()}
                     disabled={isLoggingOut}
-                    className="w-full text-left px-4 py-2.5 text-xs text-rose-600 hover:bg-rose-50 border-t border-slate-100 font-bold disabled:opacity-60"
+                    className="w-full text-left px-4 py-2.5 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 border-t border-border font-bold disabled:opacity-60"
                   >
                     {isLoggingOut ? "Ending session..." : "Logout Session"}
                   </button>
@@ -301,10 +301,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Master Content Area */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 relative">
-          <main className="flex-1 overflow-y-auto p-8 bg-[#F5F8FF] relative overflow-x-hidden">
+          <main className="flex-1 overflow-y-auto p-8 bg-[#F5F8FF] dark:bg-background relative overflow-x-hidden">
             
             {/* Background Layer 2: Soft Gradient Overlays */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#F5F8FF] via-blue-50/30 to-indigo-50/20 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#F5F8FF] via-blue-50/30 to-indigo-50/20 dark:from-background dark:via-blue-950/10 dark:to-indigo-950/10 pointer-events-none" />
 
             {/* Background Layer 3: Top Right Blurred Blue Glow */}
             <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-blue-400/8 rounded-full blur-[140px] pointer-events-none" />

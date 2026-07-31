@@ -29,8 +29,8 @@ export default function LeadSection({
   onViewAll,
 }: LeadSectionProps) {
   return (
-    <section className="flex h-[680px] min-h-[520px] flex-col overflow-hidden rounded-[20px] border border-[#E8EDF7] bg-white shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-md">
-      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#E8EDF7] px-5 py-4">
+    <section className="flex h-[680px] min-h-[520px] flex-col overflow-hidden rounded-[20px] border border-border bg-[#ffffff] dark:bg-[#1E293B] shadow-sm transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-md">
+      <div className="sticky top-0 z-30 bg-[#ffffff]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border-b border-border px-5 py-4">
         <LeadSectionHeader title={title} count={leads.length} icon={icon} badgeClass={badgeClass} />
       </div>
 
@@ -54,11 +54,11 @@ export default function LeadSection({
         )}
       </div>
 
-      <div className="border-t border-[#E8EDF7] bg-slate-50/40 px-5 py-3">
+      <div className="border-t border-border bg-slate-50/40 dark:bg-slate-850/40 px-5 py-3">
         <button
           type="button"
           onClick={onViewAll}
-          className="text-xs font-bold text-slate-550 transition hover:text-blue-600 cursor-pointer"
+          className="text-xs font-bold text-slate-550 dark:text-slate-400 transition hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer"
         >
           View All Leads &rarr;
         </button>

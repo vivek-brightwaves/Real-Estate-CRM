@@ -229,37 +229,37 @@ export default function CustomersPage() {
       onMarkRead={markRead}
       onLogout={handleLogout}
     >
-      <div className="space-y-8 bg-gradient-to-br from-[#F8FAFF] via-[#EEF5FF] to-[#F7FAFC] min-h-[calc(100vh-120px)] p-1 rounded-3xl relative overflow-hidden">
+      <div className="space-y-8 bg-gradient-to-br from-[#F8FAFF] via-[#EEF5FF] to-[#F7FAFC] dark:from-transparent dark:to-transparent min-h-[calc(100vh-120px)] p-1 rounded-3xl relative overflow-hidden">
         
         {/* Soft header background mesh gradient */}
         <div className="absolute top-0 left-0 right-0 h-40 bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.05),transparent_70%)] pointer-events-none" />
 
         {/* HEADER SECTION */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-2 border-b border-slate-200/50 relative z-10">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-2 border-b border-slate-200/50 dark:border-border/50 relative z-10">
           <div>
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-              <span className="text-2xl">👥</span> Customers Directory
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+              <span className="text-2xl">👥</span> Customer Directory
             </h2>
-            <p className="text-xs text-slate-500 mt-1 font-semibold">Manage converted buyers, contact details and document verifications.</p>
+            <p className="text-xs text-slate-500 dark:text-[#94A3B8] mt-1 font-semibold">Manage converted buyers, contact details and document verifications.</p>
           </div>
           
-          <div className="flex flex-wrap gap-2.5 items-center w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full lg:w-auto shrink-0">
             <input 
               type="text" 
               placeholder="Search Name, Phone, Email, ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm w-full md:w-60"
+              className="h-12 px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm w-full sm:w-60 placeholder-slate-400 dark:placeholder-slate-500"
             />
             <button 
               onClick={exportCustomers}
-              className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm cursor-pointer"
+              className="h-12 px-3.5 py-2.5 bg-slate-50 dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[#334155] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold hover:bg-slate-100 dark:hover:bg-[#273449] rounded-xl transition shadow-sm cursor-pointer flex items-center justify-center shrink-0"
             >
               Export
             </button>
             <button 
               onClick={() => setShowAddModal(true)}
-              className="btn-premium-action btn-add-customer"
+              className="h-12 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-650 hover:opacity-90 active:scale-95 transition-all text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 flex items-center justify-center shrink-0 cursor-pointer"
             >
               + Add Customer
             </button>
@@ -270,126 +270,152 @@ export default function CustomersPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
           
           {/* Card 1 */}
-          <div className="bg-gradient-to-br from-blue-50/40 via-white to-blue-50/15 border border-[#E8EDF7] rounded-[22px] p-5 shadow-[0_20px_50px_rgba(30,41,59,.08)] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 relative flex flex-col justify-between overflow-hidden backdrop-blur-md bg-white/95">
-            <div className="flex justify-between items-start">
+          <div className="bg-white dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[22px] p-5 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 relative flex flex-col justify-between overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500 rounded-t-[22px]" />
+            <div className="flex justify-between items-start pt-1">
               <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-450 uppercase tracking-widest">Total Customers</span>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight mt-0.5">1,280</h3>
+                <span className="text-[10px] font-bold text-slate-450 dark:text-[#94A3B8] uppercase tracking-widest">Total Customers</span>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-[#F8FAFC] tracking-tight mt-0.5">1,280</h3>
               </div>
-              <div className="p-2.5 rounded-xl bg-blue-50/60 text-blue-600 border border-blue-100/50">
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#111827] text-blue-500 border border-slate-100 dark:border-border shadow-sm">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
             </div>
             <div className="flex items-center gap-1.5 mt-3">
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-700 border-emerald-100/60">↑ 12.4%</span>
-              <span className="text-[9px] text-slate-450 font-bold uppercase">MoM Change</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-450 border-emerald-100/60 dark:border-emerald-900/30">↑ 12.4%</span>
+              <span className="text-[9px] text-slate-450 dark:text-slate-500 font-bold uppercase">MoM Change</span>
             </div>
             <div className="w-full h-10 mt-3 overflow-hidden rounded-xl">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={sparkData.total}>
-                  <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} fillOpacity={0.06} fill="#3b82f6" dot={false} />
+                  <defs>
+                    <linearGradient id="totalGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15}/>
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.01}/>
+                    </linearGradient>
+                  </defs>
+                  <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#totalGrad)" dot={false} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           {/* Card 2 */}
-          <div className="bg-gradient-to-br from-emerald-50/40 via-white to-emerald-50/15 border border-[#E8EDF7] rounded-[22px] p-5 shadow-[0_20px_50px_rgba(30,41,59,.08)] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 relative flex flex-col justify-between overflow-hidden backdrop-blur-md bg-white/95">
-            <div className="flex justify-between items-start">
+          <div className="bg-white dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[22px] p-5 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 relative flex flex-col justify-between overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500 rounded-t-[22px]" />
+            <div className="flex justify-between items-start pt-1">
               <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-450 uppercase tracking-widest">Verified Customers</span>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight mt-0.5">1,098</h3>
+                <span className="text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest">Verified Customers</span>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-[#F8FAFC] tracking-tight mt-0.5">1,098</h3>
               </div>
-              <div className="p-2.5 rounded-xl bg-emerald-50/60 text-emerald-600 border border-emerald-100/50">
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#111827] text-emerald-500 border border-slate-100 dark:border-border shadow-sm">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
             </div>
             <div className="flex items-center gap-1.5 mt-3">
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-700 border-emerald-100/60">↑ 8.2%</span>
-              <span className="text-[9px] text-slate-450 font-bold uppercase">MoM Change</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-455 border-emerald-100/60 dark:border-emerald-900/30">↑ 8.2%</span>
+              <span className="text-[9px] text-slate-450 dark:text-slate-500 font-bold uppercase">MoM Change</span>
             </div>
             <div className="w-full h-10 mt-3 overflow-hidden rounded-xl">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={sparkData.verified}>
-                  <Area type="monotone" dataKey="value" stroke="#10b981" strokeWidth={2} fillOpacity={0.06} fill="#10b981" dot={false} />
+                  <defs>
+                    <linearGradient id="verifiedGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.15}/>
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.01}/>
+                    </linearGradient>
+                  </defs>
+                  <Area type="monotone" dataKey="value" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#verifiedGrad)" dot={false} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           {/* Card 3 */}
-          <div className="bg-gradient-to-br from-orange-50/40 via-white to-orange-50/15 border border-[#E8EDF7] rounded-[22px] p-5 shadow-[0_20px_50px_rgba(30,41,59,.08)] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 relative flex flex-col justify-between overflow-hidden backdrop-blur-md bg-white/95">
-            <div className="flex justify-between items-start">
+          <div className="bg-white dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[22px] p-5 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 relative flex flex-col justify-between overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-orange-500 rounded-t-[22px]" />
+            <div className="flex justify-between items-start pt-1">
               <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-455 uppercase tracking-widest">Pending Verification</span>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight mt-0.5">112</h3>
+                <span className="text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest">Pending Verification</span>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-[#F8FAFC] tracking-tight mt-0.5">112</h3>
               </div>
-              <div className="p-2.5 rounded-xl bg-orange-50/60 text-orange-600 border border-orange-100/50">
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#111827] text-orange-500 border border-slate-100 dark:border-border shadow-sm">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
             </div>
             <div className="flex items-center gap-1.5 mt-3">
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-rose-50 text-rose-700 border-rose-100/60">↓ 4.6%</span>
-              <span className="text-[9px] text-slate-455 font-bold uppercase">MoM Change</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-455 border-rose-100/60 dark:border-rose-900/30">↓ 4.6%</span>
+              <span className="text-[9px] text-slate-455 dark:text-slate-500 font-bold uppercase">MoM Change</span>
             </div>
             <div className="w-full h-10 mt-3 overflow-hidden rounded-xl">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={sparkData.pending}>
-                  <Area type="monotone" dataKey="value" stroke="#f97316" strokeWidth={2} fillOpacity={0.06} fill="#f97316" dot={false} />
+                  <defs>
+                    <linearGradient id="pendingGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f97316" stopOpacity={0.15}/>
+                      <stop offset="95%" stopColor="#f97316" stopOpacity={0.01}/>
+                    </linearGradient>
+                  </defs>
+                  <Area type="monotone" dataKey="value" stroke="#f97316" strokeWidth={2} fillOpacity={1} fill="url(#pendingGrad)" dot={false} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           {/* Card 4 */}
-          <div className="bg-gradient-to-br from-[#FEF2F2]/40 via-white to-[#FEF2F2]/15 border border-[#E8EDF7] rounded-[22px] p-5 shadow-[0_20px_50px_rgba(30,41,59,.08)] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 relative flex flex-col justify-between overflow-hidden backdrop-blur-md bg-white/95">
-            <div className="flex justify-between items-start">
+          <div className="bg-white dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[22px] p-5 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 relative flex flex-col justify-between overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-red-500 rounded-t-[22px]" />
+            <div className="flex justify-between items-start pt-1">
               <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-450 uppercase tracking-widest">Blocked Customers</span>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight mt-0.5">70</h3>
+                <span className="text-[10px] font-bold text-slate-450 dark:text-[#94A3B8] uppercase tracking-widest">Blocked Customers</span>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-[#F8FAFC] tracking-tight mt-0.5">70</h3>
               </div>
-              <div className="p-2.5 rounded-xl bg-red-50/60 text-red-650 border border-red-100/50">
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#111827] text-red-500 border border-slate-100 dark:border-border shadow-sm">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                 </svg>
               </div>
             </div>
             <div className="flex items-center gap-1.5 mt-3">
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-700 border-emerald-100/60">↑ 1.1%</span>
-              <span className="text-[9px] text-slate-450 font-bold uppercase">MoM Change</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-450 border-emerald-100/60 dark:border-emerald-900/30">↑ 1.1%</span>
+              <span className="text-[9px] text-slate-450 dark:text-slate-500 font-bold uppercase">MoM Change</span>
             </div>
             <div className="w-full h-10 mt-3 overflow-hidden rounded-xl">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={sparkData.blocked}>
-                  <Area type="monotone" dataKey="value" stroke="#ef4444" strokeWidth={2} fillOpacity={0.06} fill="#ef4444" dot={false} />
+                  <defs>
+                    <linearGradient id="blockedGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.15}/>
+                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0.01}/>
+                    </linearGradient>
+                  </defs>
+                  <Area type="monotone" dataKey="value" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#blockedGrad)" dot={false} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-        </div>
-
-        {/* CUSTOMERS GLASS TABLE CONTAINER */}
-        <div className="bg-white/90 backdrop-blur-[20px] border border-[#E8EDF7] rounded-[24px] shadow-[0_20px_50px_rgba(15,23,42,.08)] p-6 relative z-10 overflow-hidden">
+        </div>            {/* CUSTOMERS GLASS TABLE CONTAINER */}
+        <div className="bg-white dark:bg-[#111827] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[24px] shadow-sm p-6 relative z-10 overflow-hidden">
           
           {/* SEARCH & FILTERS BAR */}
-          <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+          <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mb-6 pb-4 border-b border-slate-100 dark:border-border">
             <div>
-              <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">All Customer Directory</h3>
-              <p className="text-[10px] text-slate-450 font-bold mt-0.5">Filter, search, sort and check converted buyers KYC parameters</p>
+              <h3 className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wider">All Customer Directory</h3>
+              <p className="text-[10px] text-slate-455 dark:text-[#94A3B8] font-bold mt-0.5">Filter, search, sort and check converted buyers KYC parameters</p>
             </div>
             
             <div className="flex flex-wrap gap-2.5 items-center w-full xl:w-auto">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+                className="h-10 px-3.5 py-2 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
               >
                 <option value="ALL">All Statuses</option>
                 <option value="ACTIVE">ACTIVE</option>
@@ -402,7 +428,7 @@ export default function CustomersPage() {
               <select
                 value={kycFilter}
                 onChange={(e) => setKycFilter(e.target.value)}
-                className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+                className="h-10 px-3.5 py-2 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
               >
                 <option value="ALL">All KYC</option>
                 <option value="VERIFIED">VERIFIED</option>
@@ -413,7 +439,7 @@ export default function CustomersPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+                className="h-10 px-3.5 py-2 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
               >
                 <option value="name">Sort by Name</option>
                 <option value="id">Sort by ID</option>
@@ -425,7 +451,7 @@ export default function CustomersPage() {
                   setRowsPerPage(Number(e.target.value));
                   setCurrentPage(1);
                 }}
-                className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+                className="h-10 px-3.5 py-2 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
               >
                 <option value={6}>6 Rows</option>
                 <option value={10}>10 Rows</option>
@@ -434,7 +460,7 @@ export default function CustomersPage() {
 
               <button 
                 onClick={resetFilters}
-                className="px-3.5 py-2.5 bg-slate-50 border border-[#E8EDF7] hover:bg-slate-100 rounded-xl text-slate-705 text-xs font-bold transition shadow-sm cursor-pointer"
+                className="h-10 px-3.5 py-2 bg-slate-50 dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[#334155] hover:bg-slate-100 dark:hover:bg-[#273449] rounded-xl text-slate-700 dark:text-[#CBD5E1] text-xs font-bold transition shadow-sm cursor-pointer"
               >
                 Reset Filter
               </button>
@@ -442,14 +468,14 @@ export default function CustomersPage() {
           </div>
 
           {loading ? (
-            <div className="p-8 text-center text-slate-500 font-semibold text-xs bg-white rounded-[20px] border border-[#E8EDF7] shadow-sm">Loading Customers...</div>
+            <div className="p-8 text-center text-slate-500 dark:text-[#94A3B8] font-semibold text-xs bg-white dark:bg-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-sm">Loading Customers...</div>
           ) : (
             <>
               {/* TABLE */}
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="sticky top-0 bg-slate-50/60 border-b border-[#E8EDF7] text-xs font-bold text-slate-500 uppercase tracking-wider z-10">
+                    <tr className="sticky top-0 bg-slate-50/60 dark:bg-[#1E293B] border-b border-[#E8EDF7] dark:border-border text-xs font-bold text-slate-500 dark:text-[#94A3B8] uppercase tracking-wider z-10">
                       <th className="px-6 py-4">Customer</th>
                       <th className="px-6 py-4">Phone</th>
                       <th className="px-6 py-4">Email</th>
@@ -460,28 +486,28 @@ export default function CustomersPage() {
                       <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#E8EDF7] text-sm">
+                  <tbody className="divide-y divide-[#E8EDF7] dark:divide-border text-sm">
                     {paginatedCustomers.map((c: Customer) => {
                       const enriched = getEnrichedData(c);
                       
                       const statusStyles: Record<string, string> = {
-                        ACTIVE: "bg-emerald-50 text-emerald-700 border-emerald-100",
-                        INACTIVE: "bg-slate-50 text-slate-700 border-slate-100",
-                        BLOCKED: "bg-rose-50 text-rose-700 border-rose-100",
-                        VIP: "bg-purple-50 text-purple-700 border-purple-100",
-                        VERIFIED: "bg-blue-50 text-blue-700 border-blue-100"
+                        ACTIVE: "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-450 dark:border-emerald-900/30",
+                        INACTIVE: "bg-slate-50 text-slate-700 border-slate-100 dark:bg-slate-800/30 dark:text-slate-400 dark:border-slate-700/30",
+                        BLOCKED: "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/20 dark:text-rose-455 dark:border-rose-900/30",
+                        VIP: "bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-950/20 dark:text-purple-455 dark:border-purple-900/30",
+                        VERIFIED: "bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/20 dark:text-blue-455 dark:border-blue-900/30"
                       };
 
                       const kycStyles: Record<string, string> = {
-                        VERIFIED: "bg-blue-50 text-blue-700 border-blue-100",
-                        PENDING: "bg-orange-50 text-orange-700 border-orange-100",
-                        FAILED: "bg-rose-50 text-rose-700 border-rose-100"
+                        VERIFIED: "bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/20 dark:text-blue-455 dark:border-blue-900/30",
+                        PENDING: "bg-orange-50 text-orange-700 border-orange-100 dark:bg-orange-950/20 dark:text-orange-400 dark:border-orange-900/30",
+                        FAILED: "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/20 dark:text-rose-455 dark:border-rose-900/30"
                       };
 
                       return (
                         <tr 
                           key={c.id} 
-                          className="hover:bg-slate-50/60 transition-all group rounded-xl cursor-pointer"
+                          className="hover:bg-slate-50/60 dark:hover:bg-[#273449] transition-all group rounded-xl cursor-pointer"
                           onClick={() => router.push(`/customers/${c.id}`)}
                         >
                           {/* CUSTOMER PROFILE */}
@@ -491,14 +517,14 @@ export default function CustomersPage() {
                                 {c.name.charAt(0)}
                               </div>
                               <div>
-                                <span className="block font-black text-slate-900 group-hover:text-blue-600 transition-colors">{c.name}</span>
-                                <span className="text-[10px] text-slate-450 font-bold uppercase tracking-wide">CUS-100{c.id}</span>
+                                <span className="block font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-455 transition-colors">{c.name}</span>
+                                <span className="text-[10px] text-slate-455 dark:text-[#94A3B8] font-bold uppercase tracking-wide">CUS-100{c.id}</span>
                               </div>
                             </div>
                           </td>
 
                           {/* PHONE */}
-                          <td className="px-6 py-4 font-bold text-slate-700">
+                          <td className="px-6 py-4 font-bold text-slate-700 dark:text-[#CBD5E1]">
                             <span className="flex items-center gap-1.5">
                               <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -508,7 +534,7 @@ export default function CustomersPage() {
                           </td>
 
                           {/* EMAIL */}
-                          <td className="px-6 py-4 font-semibold text-slate-650">
+                          <td className="px-6 py-4 font-semibold text-slate-655 dark:text-[#CBD5E1]">
                             <span className="flex items-center gap-1.5">
                               <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -533,38 +559,38 @@ export default function CustomersPage() {
 
                           {/* BOOKINGS COUNT */}
                           <td className="px-6 py-4">
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200 text-xs font-black text-slate-700">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-50 dark:bg-[#1E293B] border border-slate-200 dark:border-[#334155] text-xs font-black text-slate-700 dark:text-[#CBD5E1]">
                               🏠 {enriched.bookings} Bookings
                             </span>
                           </td>
 
                           {/* CREATED DATE */}
-                          <td className="px-6 py-4 font-bold text-slate-450 text-xs uppercase">{enriched.date}</td>
+                          <td className="px-6 py-4 font-bold text-slate-455 dark:text-[#94A3B8] text-xs uppercase">{enriched.date}</td>
 
                           {/* ACTIONS */}
                           <td className="px-6 py-4 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                             <div className="inline-flex gap-1.5">
                               <button 
                                 onClick={() => router.push(`/customers/${c.id}`)}
-                                className="inline-flex items-center gap-0.5 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-lg text-blue-650 hover:bg-blue-100 hover:text-blue-700 text-xs font-bold transition shadow-sm cursor-pointer"
+                                className="inline-flex items-center gap-0.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-955/20 border border-blue-100 dark:border-blue-900/30 rounded-lg text-blue-650 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 hover:text-blue-700 text-xs font-bold transition shadow-sm cursor-pointer"
                               >
                                 👁 View
                               </button>
                               <button 
                                 onClick={() => setEditingCustomer({ ...c })}
-                                className="inline-flex items-center gap-0.5 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-100 text-xs font-bold transition shadow-sm cursor-pointer"
+                                className="inline-flex items-center gap-0.5 px-3 py-1.5 bg-slate-50 dark:bg-[#1E293B] border border-slate-200 dark:border-[#334155] rounded-lg text-slate-700 dark:text-[#CBD5E1] hover:bg-slate-100 dark:hover:bg-[#273449] text-xs font-bold transition shadow-sm cursor-pointer"
                               >
                                 ✏ Edit
                               </button>
                               <button 
                                 onClick={() => router.push(`/customers/${c.id}`)}
-                                className="inline-flex items-center gap-0.5 px-3 py-1.5 bg-purple-50 border border-purple-100 rounded-lg text-purple-700 hover:bg-purple-100 text-xs font-bold transition shadow-sm cursor-pointer"
+                                className="inline-flex items-center gap-0.5 px-3 py-1.5 bg-purple-50 dark:bg-purple-955/20 border border-purple-100 dark:border-purple-900/30 rounded-lg text-purple-700 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/40 text-xs font-bold transition shadow-sm cursor-pointer"
                               >
                                 📄 Docs
                               </button>
                               <button 
                                 onClick={() => router.push(`/customers/${c.id}`)}
-                                className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-100 transition shadow-sm cursor-pointer font-black text-xs"
+                                className="px-2.5 py-1.5 bg-slate-50 dark:bg-[#1E293B] border border-slate-200 dark:border-[#334155] rounded-lg text-slate-555 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#273449] transition shadow-sm cursor-pointer font-black text-xs"
                               >
                                 ⋮
                               </button>
@@ -575,21 +601,20 @@ export default function CustomersPage() {
                     })}
                     {paginatedCustomers.length === 0 && (
                       <tr>
-                        <td colSpan={8} className="px-6 py-16 text-center">
-                          {/* Mock Empty State illustration */}
-                          <div className="flex flex-col items-center justify-center text-center">
-                            <div className="w-24 h-24 bg-blue-50/50 rounded-full flex items-center justify-center mb-4 border border-blue-100/60 shadow-inner">
-                              <svg className="w-12 h-12 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <td colSpan={8} className="px-6 py-12">
+                          <div className="flex flex-col items-center justify-center text-center p-8 bg-[#0F172A] rounded-2xl border border-dashed border-[rgba(255,255,255,0.08)] max-w-lg mx-auto my-6 animate-fade-in">
+                            <div className="w-16 h-16 rounded-full bg-blue-955/20 border border-blue-900/30 flex items-center justify-center text-blue-400 mb-4 shadow-sm shadow-blue-500/5">
+                              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857" />
                               </svg>
                             </div>
-                            <h4 className="text-sm font-black text-slate-800 tracking-tight">No customers found</h4>
-                            <p className="text-[11px] text-slate-450 font-semibold max-w-xs mt-1 mb-4">No converted customers fit the filter/search criteria.</p>
+                            <h4 className="text-sm font-bold text-white mb-1">No Customers Found</h4>
+                            <p className="text-xs text-[#94A3B8] max-w-sm mb-5 font-medium">You don't have any customers yet. Start by adding your first customer.</p>
                             <button 
-                              onClick={() => setShowAddModal(true)}
-                              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition cursor-pointer"
+                              onClick={() => setShowAddModal(true)} 
+                              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 hover:opacity-90 transition-all text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 cursor-pointer"
                             >
-                              Create First Customer
+                              + Add Customer
                             </button>
                           </div>
                         </td>
@@ -601,20 +626,20 @@ export default function CustomersPage() {
 
               {/* PAGINATION LOGIC */}
               {filteredCustomers.length > 0 && (
-                <div className="flex justify-between items-center border-t border-slate-100 pt-6 mt-6 text-xs font-bold text-slate-450 uppercase">
+                <div className="flex justify-between items-center border-t border-slate-100 dark:border-border pt-6 mt-6 text-xs font-bold text-slate-455 dark:text-slate-400 uppercase">
                   <span>Showing {Math.min(filteredCustomers.length, (currentPage - 1) * rowsPerPage + 1)} to {Math.min(filteredCustomers.length, currentPage * rowsPerPage)} of {filteredCustomers.length} Customers</span>
                   <div className="flex gap-2">
                     <button 
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      className="px-3.5 py-2 border border-[#E8EDF7] rounded-xl hover:bg-slate-50 transition text-slate-700 shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-3.5 py-2 border border-[#E8EDF7] dark:border-[#334155] rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-700 dark:text-[#CBD5E1] shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Previous
                     </button>
                     <button 
                       disabled={currentPage === totalPages}
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      className="px-3.5 py-2 border border-[#E8EDF7] rounded-xl hover:bg-slate-50 transition text-slate-700 shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-3.5 py-2 border border-[#E8EDF7] dark:border-[#334155] rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-700 dark:text-[#CBD5E1] shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Next
                     </button>
@@ -628,55 +653,55 @@ export default function CustomersPage() {
 
         {/* ADD CUSTOMER MODAL */}
         {showAddModal && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 rounded-[20px] border border-[#E8EDF7] shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 border-b border-slate-100 pb-2">Add Customer</h3>
+          <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 dark:from-[#111827] dark:via-[#111827] dark:to-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98 dark:bg-[#111827]/98">
+              <h3 className="text-base font-bold mb-4 text-slate-900 dark:text-white border-b border-slate-100 dark:border-border pb-2">Add Customer</h3>
               <form onSubmit={handleAddCustomer} className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest mb-1.5">Converted Lead ID</label>
+                  <label className="block text-[10px] font-bold text-slate-450 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">Converted Lead ID</label>
                   <input
                     type="number"
                     min="1"
                     required
                     value={newCustLeadId}
                     onChange={(e) => setNewCustLeadId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                     placeholder="Lead ID"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest mb-1.5">Customer Name</label>
+                  <label className="block text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">Customer Name</label>
                   <input 
                     type="text" required
                     value={newCustName} onChange={(e) => setNewCustName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                     placeholder="e.g. Rohan Sharma"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest mb-1.5">Phone Number</label>
+                  <label className="block text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">Phone Number</label>
                   <input 
                     type="text" required
                     value={newCustPhone} onChange={(e) => setNewCustPhone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                     placeholder="e.g. +91 9876543210"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest mb-1.5">Email Address</label>
+                  <label className="block text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">Email Address</label>
                   <input 
                     type="email" required
                     value={newCustEmail} onChange={(e) => setNewCustEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                     placeholder="e.g. rohan@email.com"
                   />
                 </div>
                 
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                  <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 border border-[#E8EDF7] rounded-xl hover:bg-slate-50 transition text-slate-655 text-xs font-bold cursor-pointer">Cancel</button>
-                  <button type="submit" className="btn-premium-action btn-add-customer">Add Customer</button>
+                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
+                  <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 border border-[#E8EDF7] dark:border-[#334155] rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-655 dark:text-slate-300 text-xs font-bold cursor-pointer">Cancel</button>
+                  <button type="submit" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Add Customer</button>
                 </div>
               </form>
             </div>
@@ -684,15 +709,15 @@ export default function CustomersPage() {
         )}
 
         {editingCustomer && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <form onSubmit={saveCustomer} className="w-full max-w-md space-y-4 rounded-[20px] border border-slate-200 bg-white p-6 shadow-2xl">
-              <h3 className="border-b border-slate-100 pb-3 text-base font-bold text-slate-900">Edit Customer</h3>
-              <input required value={editingCustomer.name} onChange={(event) => setEditingCustomer({ ...editingCustomer, name: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" placeholder="Name" />
-              <input value={editingCustomer.phone || ""} onChange={(event) => setEditingCustomer({ ...editingCustomer, phone: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" placeholder="Phone" />
-              <input type="email" value={editingCustomer.email || ""} onChange={(event) => setEditingCustomer({ ...editingCustomer, email: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" placeholder="Email" />
-              <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
-                <button type="button" onClick={() => setEditingCustomer(null)} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-bold text-slate-600">Cancel</button>
-                <button type="submit" className="rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white">Save Changes</button>
+          <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+            <form onSubmit={saveCustomer} className="w-full max-w-md space-y-4 rounded-[20px] border border-slate-200 dark:border-border bg-white dark:bg-[#111827] p-6 shadow-2xl">
+              <h3 className="border-b border-slate-100 dark:border-border pb-3 text-base font-bold text-slate-900 dark:text-white">Edit Customer</h3>
+              <input required value={editingCustomer.name} onChange={(event) => setEditingCustomer({ ...editingCustomer, name: event.target.value })} className="w-full rounded-xl border border-slate-200 dark:border-[#334155] bg-white dark:bg-[#0F172A] px-4 py-3 text-sm text-slate-700 dark:text-white" placeholder="Name" />
+              <input value={editingCustomer.phone || ""} onChange={(event) => setEditingCustomer({ ...editingCustomer, phone: event.target.value })} className="w-full rounded-xl border border-slate-200 dark:border-[#334155] bg-white dark:bg-[#0F172A] px-4 py-3 text-sm text-slate-700 dark:text-white" placeholder="Phone" />
+              <input type="email" value={editingCustomer.email || ""} onChange={(event) => setEditingCustomer({ ...editingCustomer, email: event.target.value })} className="w-full rounded-xl border border-slate-200 dark:border-[#334155] bg-white dark:bg-[#0F172A] px-4 py-3 text-sm text-slate-700 dark:text-white" placeholder="Email" />
+              <div className="flex justify-end gap-3 border-t border-slate-100 dark:border-border pt-4">
+                <button type="button" onClick={() => setEditingCustomer(null)} className="rounded-xl border border-slate-200 dark:border-[#334155] hover:bg-slate-50 dark:hover:bg-[#1E293B] px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 cursor-pointer">Cancel</button>
+                <button type="submit" className="rounded-xl bg-blue-600 hover:bg-blue-700 px-5 py-2 text-xs font-bold text-white cursor-pointer">Save Changes</button>
               </div>
             </form>
           </div>

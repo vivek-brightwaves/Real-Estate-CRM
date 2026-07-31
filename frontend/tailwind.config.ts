@@ -12,6 +12,9 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        card: "var(--card)",
+        border: "var(--border)",
+        "muted-foreground": "var(--text-secondary)",
         primary: "#3b82f6", // tailwind blue-500
         secondary: "#10b981", // tailwind emerald-500
       },

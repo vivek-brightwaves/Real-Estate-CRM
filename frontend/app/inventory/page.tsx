@@ -668,25 +668,25 @@ export default function InventoryPage() {
       onMarkRead={markRead}
       onLogout={handleLogout}
     >
-      <div className="space-y-8 bg-gradient-to-br from-[#F5F8FC] to-[#EEF4FF] min-h-[calc(100vh-120px)] p-1 rounded-3xl">
+      <div className="space-y-8 bg-gradient-to-br from-[#F5F8FC] to-[#EEF4FF] dark:from-transparent dark:to-transparent min-h-[calc(100vh-120px)] p-1 rounded-3xl">
         
         {/* HEADER SECTION */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-2 border-b border-slate-200/50">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-2 border-b border-slate-200/50 dark:border-border/50">
           <div>
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-              <span className="text-2xl">🏢</span> Real Estate Inventory
-            </h2>
-            <p className="text-xs text-slate-500 mt-1">Explore projects, towers, floors, units, availability and pricing.</p>
+            <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-[#F8FAFC] tracking-tight flex items-center gap-2">
+              <span className="text-2xl">🏢</span> Property Inventory
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Explore projects, towers, floors, units, availability and pricing.</p>
           </div>
           <div className="flex flex-wrap gap-2.5 items-center">
             {demoModeAvailable && (
               <>
                 <button
                   onClick={() => setUseDemoData(!useDemoData)}
-                  className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${
+                  className={`h-10 px-3.5 rounded-2xl text-xs font-bold border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     useDemoData
-                      ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm"
-                      : "bg-blue-50 text-blue-700 border-blue-200 shadow-sm"
+                      ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800/30 shadow-sm"
+                      : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800/30 shadow-sm"
                   }`}
                 >
                   Mode: {useDemoData ? "Demo Data" : "Live Backend"}
@@ -697,7 +697,7 @@ export default function InventoryPage() {
                     setLiveProjects([]);
                     setSelectedNode({ type: "project", id: "", data: null });
                   }}
-                  className="px-3 py-2 bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 rounded-xl text-xs font-bold transition-all shadow-sm"
+                  className="h-10 px-3.5 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-2xl text-xs font-bold transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   title="Clear the optional demo view"
                 >
                   Clear Demo View
@@ -706,19 +706,19 @@ export default function InventoryPage() {
             )}
             <button 
               onClick={() => setShowProjectModal(true)}
-              className="btn-premium-action btn-new-project"
+              className="h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-xs font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
             >
               + New Project
             </button>
             <button 
               onClick={openBulkUpload}
-              className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm cursor-pointer"
+              className="h-10 px-4 bg-white dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-border rounded-2xl text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 dark:hover:bg-[#273449] transition-all duration-200 hover:scale-[1.02] shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
             >
               Import
             </button>
             <button 
               onClick={() => document.getElementById("inventory-filters")?.scrollIntoView({ behavior: "smooth" })}
-              className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm cursor-pointer"
+              className="h-10 px-4 bg-white dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-border rounded-2xl text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 dark:hover:bg-[#273449] transition-all duration-200 hover:scale-[1.02] shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
             >
               Filter
             </button>
@@ -783,34 +783,34 @@ export default function InventoryPage() {
 
         {/* EMPTY STATE OR MAIN LAYOUT */}
         {projectsToDisplay.length === 0 ? (
-          <div className="bg-white/95 backdrop-blur-md border border-[#E8EDF7] rounded-[20px] shadow-[0_12px_40px_rgba(15,23,42,.08)] p-16 flex flex-col items-center justify-center text-center max-w-4xl mx-auto">
-            <div className="w-40 h-40 bg-blue-50/50 rounded-full flex items-center justify-center mb-6 border border-blue-100/60 shadow-inner">
-              <svg className="w-20 h-20 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="bg-white dark:bg-[#111827] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[20px] shadow-[0_12px_40px_rgba(15,23,42,.08)] p-10 flex flex-col items-center justify-center text-center max-w-xl mx-auto">
+            <div className="w-20 h-20 bg-blue-50/50 dark:bg-blue-950/20 rounded-full flex items-center justify-center mb-6 border border-blue-100/60 dark:border-blue-800/20 shadow-inner">
+              <svg className="w-10 h-10 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9m4 0V7m0 0h4m-4 0H9" />
               </svg>
             </div>
-            <h3 className="text-xl font-black text-slate-800 tracking-tight mb-2">No active projects found</h3>
-            <p className="text-xs text-slate-400 font-semibold max-w-xs mb-6">Get started by creating your first real estate project or building pipeline units.</p>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-[#F8FAFC] tracking-tight mb-2">No active projects found</h3>
+            <p className="text-xs text-slate-400 dark:text-[#94A3B8] font-semibold max-w-xs mb-6">Get started by creating your first real estate project or building pipeline units.</p>
             <button 
               onClick={() => setShowProjectModal(true)}
-              className="px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition cursor-pointer"
+              className="h-10 px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-xs font-bold shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer flex items-center justify-center"
             >
-              Create First Project
+              Create Project
             </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-6 items-start">
             
             {/* LEFT (70%): INVENTORY TREE CARD */}
-            <div className="bg-white/95 backdrop-blur-md border border-[#E8EDF7] rounded-[20px] shadow-[0_12px_40px_rgba(15,23,42,.08)] p-6 overflow-hidden">
-              <div className="flex justify-between items-center mb-6 pb-2 border-b border-slate-100">
-                <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider flex items-center gap-1.5">
+            <div className="bg-white dark:bg-[#111827] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[20px] shadow-sm p-6 overflow-hidden">
+              <div className="flex justify-between items-center mb-6 pb-2 border-b border-slate-100 dark:border-border">
+                <h3 className="font-bold text-slate-900 dark:text-[#F8FAFC] text-sm uppercase tracking-wider flex items-center gap-1.5">
                   <svg className="w-4.5 h-4.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                   </svg>
                   Inventory Tree
                 </h3>
-                <span className="text-[10px] text-slate-400 font-bold uppercase">Click nodes to inspect details</span>
+                <span className="text-[10px] text-slate-400 dark:text-[#64748B] font-bold uppercase">Click nodes to inspect details</span>
               </div>
 
               {/* TREE COMPONENT */}
@@ -828,20 +828,20 @@ export default function InventoryPage() {
                         }}
                         className={`flex justify-between items-center px-4 py-2.5 rounded-xl cursor-pointer transition-all border ${
                           isProjSelected 
-                            ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm" 
-                            : "bg-slate-50/50 hover:bg-slate-100/50 border-transparent text-slate-800"
+                            ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950/30 dark:border-blue-800/40 dark:text-blue-400 shadow-sm" 
+                            : "bg-slate-50/50 dark:bg-[#1E293B] hover:bg-slate-100/50 dark:hover:bg-[#273449] border-transparent dark:border-[rgba(255,255,255,0.04)] text-slate-800 dark:text-slate-200"
                         }`}
                       >
                         <span className="flex items-center gap-2">
                           <span className="text-base">🏢</span>
-                          <span className="font-bold text-slate-900">{proj.name}</span>
+                          <span className="font-bold text-slate-900 dark:text-[#F8FAFC]">{proj.name}</span>
                         </span>
-                        <span className="text-slate-440 font-bold">{isProjExpanded ? "▼" : "▲"}</span>
+                        <span className="text-slate-440 dark:text-slate-500 font-bold">{isProjExpanded ? "▼" : "▲"}</span>
                       </div>
 
                       {/* Towers Subtree */}
                       {isProjExpanded && (
-                        <div className="pl-6 border-l-2 border-slate-200/60 ml-4 space-y-2 mt-1 py-1">
+                        <div className="pl-6 border-l-2 border-slate-200/60 dark:border-border/60 ml-4 space-y-2 mt-1 py-1">
                           {proj.towers.map(tower => {
                             const isTowerSelected = selectedNode.type === "tower" && selectedNode.id === tower.id;
                             const isTowerExpanded = expandedNodes.includes(tower.id);
@@ -856,20 +856,20 @@ export default function InventoryPage() {
                                   }}
                                   className={`flex justify-between items-center px-3.5 py-2 rounded-lg cursor-pointer transition-all border ${
                                     isTowerSelected 
-                                      ? "bg-blue-50/70 border-blue-150 text-blue-650" 
-                                      : "hover:bg-slate-100/40 border-transparent text-slate-700"
+                                      ? "bg-blue-50/70 border-blue-150 text-blue-650 dark:bg-blue-950/20 dark:border-blue-800/30 dark:text-blue-400" 
+                                      : "hover:bg-slate-100/40 dark:hover:bg-[#1E293B] border-transparent text-slate-700 dark:text-slate-300"
                                   }`}
                                 >
                                   <span className="flex items-center gap-2">
                                     <span className="text-sm">🗼</span>
                                     <span>{tower.name}</span>
                                   </span>
-                                  <span className="text-slate-400 font-bold">{isTowerExpanded ? "▼" : "▲"}</span>
+                                  <span className="text-slate-400 dark:text-slate-500 font-bold">{isTowerExpanded ? "▼" : "▲"}</span>
                                 </div>
 
                                 {/* Floors Subtree */}
                                 {isTowerExpanded && (
-                                  <div className="pl-6 border-l border-dashed border-slate-200 ml-3.5 space-y-2 py-1">
+                                  <div className="pl-6 border-l border-dashed border-slate-200 dark:border-border ml-3.5 space-y-2 py-1">
                                     {tower.floors.map(floor => {
                                       const isFloorSelected = selectedNode.type === "floor" && selectedNode.id === floor.id;
                                       const isFloorExpanded = expandedNodes.includes(floor.id);
@@ -884,15 +884,15 @@ export default function InventoryPage() {
                                             }}
                                             className={`flex justify-between items-center px-3 py-1.5 rounded-lg cursor-pointer transition-all border ${
                                               isFloorSelected 
-                                                ? "bg-blue-50/50 border-blue-100 text-blue-600" 
-                                                : "hover:bg-slate-100/30 border-transparent text-slate-655"
+                                                ? "bg-blue-50/50 border-blue-100 text-blue-600 dark:bg-blue-950/10 dark:border-blue-800/20 dark:text-blue-400" 
+                                                : "hover:bg-slate-100/30 dark:hover:bg-[#1E293B] border-transparent text-slate-655 dark:text-slate-350"
                                             }`}
                                           >
                                             <span className="flex items-center gap-2">
                                               <span className="text-slate-400">📊</span>
                                               <span>{floor.name}</span>
                                             </span>
-                                            <span className="text-slate-400 font-bold">{isFloorExpanded ? "▼" : "▲"}</span>
+                                            <span className="text-slate-400 dark:text-slate-500 font-bold">{isFloorExpanded ? "▼" : "▲"}</span>
                                           </div>
 
                                           {/* Units Grid */}
@@ -901,10 +901,10 @@ export default function InventoryPage() {
                                               {floor.units.map(unit => {
                                                 const isUnitSelected = selectedNode.type === "unit" && selectedNode.id === unit.id;
                                                 const statusColors = {
-                                                  AVAILABLE: "bg-emerald-50 text-emerald-700 border-emerald-200",
-                                                  BOOKED: "bg-blue-50 text-blue-700 border-blue-200",
-                                                  BLOCKED: "bg-rose-50 text-rose-700 border-rose-200",
-                                                  HOLD: "bg-amber-50 text-amber-750 border-amber-200"
+                                                  AVAILABLE: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-450 dark:border-emerald-900/30",
+                                                  BOOKED: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-450 dark:border-blue-900/30",
+                                                  BLOCKED: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/20 dark:text-rose-450 dark:border-rose-900/30",
+                                                  HOLD: "bg-amber-50 text-amber-750 border-amber-200 dark:bg-amber-950/20 dark:text-amber-450 dark:border-amber-900/30"
                                                 };
                                                 return (
                                                   <div
@@ -916,7 +916,7 @@ export default function InventoryPage() {
                                                     className={`px-2.5 py-1.5 rounded-lg border text-center cursor-pointer transition-all shadow-sm ${
                                                       isUnitSelected
                                                         ? "ring-2 ring-blue-500 border-blue-500 font-black scale-105"
-                                                        : statusColors[unit.status] || "bg-white border-slate-200 text-slate-700"
+                                                        : statusColors[unit.status] || "bg-white dark:bg-[#111827] border-slate-200 dark:border-border text-slate-700 dark:text-slate-355"
                                                     }`}
                                                   >
                                                     <div className="text-[10px] uppercase font-black">{unit.unit_number}</div>
@@ -952,8 +952,8 @@ export default function InventoryPage() {
             <div className="space-y-6 w-full shrink-0">
               
               {/* CARD 1: PROJECT / NODE DETAILS */}
-              <div className="bg-white/95 backdrop-blur-md border border-[#E8EDF7] rounded-[20px] shadow-[0_12px_40px_rgba(15,23,42,.08)] p-6">
-                <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider mb-4 pb-2 border-b border-slate-100">
+              <div className="bg-white dark:bg-[#111827] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[20px] shadow-sm p-6">
+                <h3 className="font-bold text-slate-900 dark:text-[#F8FAFC] text-sm uppercase tracking-wider mb-4 pb-2 border-b border-slate-100 dark:border-border">
                   Node Details
                 </h3>
 
@@ -963,29 +963,29 @@ export default function InventoryPage() {
                     {selectedNode.type === "project" && (
                       <div className="space-y-3">
                         <div className="flex justify-between text-xs">
-                          <span className="text-slate-450 font-bold">Project Name</span>
-                          <span className="text-slate-900 font-extrabold">{selectedNode.data.name}</span>
+                          <span className="text-slate-455 dark:text-slate-500 font-bold">Project Name</span>
+                          <span className="text-slate-900 dark:text-[#F8FAFC] font-extrabold">{selectedNode.data.name}</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-slate-450 font-bold">Location</span>
-                          <span className="text-slate-700 font-semibold">{selectedNode.data.location}</span>
+                          <span className="text-slate-455 dark:text-slate-500 font-bold">Location</span>
+                          <span className="text-slate-700 dark:text-slate-300 font-semibold">{selectedNode.data.location}</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-slate-450 font-bold">Status</span>
-                          <span className="px-2.5 py-0.5 rounded-full bg-slate-50 border border-slate-150 font-black text-[10px] text-slate-700 uppercase">
+                          <span className="text-slate-455 dark:text-slate-500 font-bold">Status</span>
+                          <span className="px-2.5 py-0.5 rounded-full bg-slate-50 dark:bg-slate-900 border border-slate-150 dark:border-border font-black text-[10px] text-slate-700 dark:text-slate-300 uppercase">
                             {selectedNode.data.status}
                           </span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-slate-450 font-bold">Total Towers</span>
-                          <span className="text-slate-800 font-extrabold">{selectedNode.data.totalTowers}</span>
+                          <span className="text-slate-455 dark:text-slate-500 font-bold">Total Towers</span>
+                          <span className="text-slate-800 dark:text-slate-200 font-extrabold">{selectedNode.data.totalTowers}</span>
                         </div>
                         <div className="space-y-1.5 pt-2">
-                          <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                          <div className="flex justify-between text-[10px] font-bold text-slate-400 dark:text-[#64748B] uppercase tracking-wide">
                             <span>Completion</span>
                             <span>{selectedNode.data.completion}%</span>
                           </div>
-                          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden shadow-inner">
+                          <div className="w-full bg-slate-100 dark:bg-[#0F172A] rounded-full h-2 overflow-hidden shadow-inner">
                             <div 
                               className="bg-gradient-to-r from-blue-500 to-indigo-650 h-full rounded-full transition-all duration-500" 
                               style={{ width: `${selectedNode.data.completion}%` }}
@@ -999,33 +999,33 @@ export default function InventoryPage() {
                     {selectedNode.type === "unit" && (
                       <div className="space-y-3">
                         <div className="flex justify-between text-xs">
-                          <span className="text-slate-450 font-bold">Unit Number</span>
-                          <span className="text-slate-900 font-extrabold">#{selectedNode.data.unit_number}</span>
+                          <span className="text-slate-455 dark:text-slate-500 font-bold">Unit Number</span>
+                          <span className="text-slate-900 dark:text-[#F8FAFC] font-extrabold">#{selectedNode.data.unit_number}</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-slate-450 font-bold">Floor Group</span>
-                          <span className="text-slate-700 font-semibold">{selectedNode.data.floor}</span>
+                          <span className="text-slate-455 dark:text-slate-500 font-bold">Floor Group</span>
+                          <span className="text-slate-700 dark:text-slate-300 font-semibold">{selectedNode.data.floor}</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-slate-450 font-bold">Area Size</span>
-                          <span className="text-slate-800 font-extrabold">{selectedNode.data.area} Sq.Ft</span>
+                          <span className="text-slate-455 dark:text-slate-500 font-bold">Area Size</span>
+                          <span className="text-slate-800 dark:text-slate-200 font-extrabold">{selectedNode.data.area} Sq.Ft</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-slate-450 font-bold">Price</span>
-                          <span className="text-slate-800 font-extrabold">₹{(selectedNode.data.price / 100000).toFixed(1)} Lakhs</span>
+                          <span className="text-slate-455 dark:text-slate-500 font-bold">Price</span>
+                          <span className="text-slate-800 dark:text-slate-200 font-extrabold">₹{(selectedNode.data.price / 100000).toFixed(1)} Lakhs</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-slate-450 font-bold">Assigned Agent</span>
-                          <span className="text-slate-700 font-semibold">{selectedNode.data.agent}</span>
+                          <span className="text-slate-455 dark:text-slate-500 font-bold">Assigned Agent</span>
+                          <span className="text-slate-700 dark:text-slate-300 font-semibold">{selectedNode.data.agent}</span>
                         </div>
 
                         {/* Unit Edit Price Form (SUPER ADMIN & MANAGER) */}
                         {user?.role === "SUPER_ADMIN" && (
                           <div className="pt-2">
-                            <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Update Price (₹)</label>
+                            <label className="block text-[9px] font-bold text-slate-400 dark:text-[#64748B] uppercase tracking-widest mb-1">Update Price (₹)</label>
                             <input 
                               type="number"
-                              className="w-full px-3 py-1.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                              className="w-full px-3 py-1.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                               defaultValue={selectedNode.data.price}
                               onBlur={(e) => handlePriceUpdate(selectedNode.data.id, Number(e.target.value))}
                             />
@@ -1034,7 +1034,7 @@ export default function InventoryPage() {
 
                         {/* Interactive Hold/Release Triggers */}
                         {(user?.role === "SUPER_ADMIN" || user?.role === "MANAGER") && (
-                          <div className="flex gap-2 pt-2 border-t border-slate-100">
+                          <div className="flex gap-2 pt-2 border-t border-slate-100 dark:border-border">
                             {selectedNode.data.status === "AVAILABLE" ? (
                               <button 
                                 onClick={() => handleHold(selectedNode.data.id)}
@@ -1059,24 +1059,24 @@ export default function InventoryPage() {
                     {(selectedNode.type === "tower" || selectedNode.type === "floor") && (
                       <div className="space-y-3">
                         <div className="flex justify-between text-xs">
-                          <span className="text-slate-455 font-bold">Type</span>
-                          <span className="text-slate-800 font-extrabold capitalize">{selectedNode.type}</span>
+                          <span className="text-slate-455 dark:text-slate-500 font-bold">Type</span>
+                          <span className="text-slate-800 dark:text-slate-200 font-extrabold capitalize">{selectedNode.type}</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-slate-455 font-bold">Name</span>
-                          <span className="text-slate-900 font-extrabold">{selectedNode.data.name}</span>
+                          <span className="text-slate-455 dark:text-slate-500 font-bold">Name</span>
+                          <span className="text-slate-900 dark:text-[#F8FAFC] font-extrabold">{selectedNode.data.name}</span>
                         </div>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-400 font-bold py-6 text-center">Select a node in the tree to show its properties.</p>
+                  <p className="text-xs text-slate-400 dark:text-[#64748B] font-bold py-6 text-center">Select a node in the tree to show its properties.</p>
                 )}
               </div>
 
               {/* CARD 2: AVAILABILITY CIRCULAR CHART */}
-              <div className="bg-white/95 backdrop-blur-md border border-[#E8EDF7] rounded-[20px] shadow-[0_12px_40px_rgba(15,23,42,.08)] p-6">
-                <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider mb-4 pb-2 border-b border-slate-100">
+              <div className="bg-white dark:bg-[#111827] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[20px] shadow-sm p-6">
+                <h3 className="font-bold text-slate-900 dark:text-[#F8FAFC] text-sm uppercase tracking-wider mb-4 pb-2 border-b border-slate-100 dark:border-border">
                   Availability Split
                 </h3>
 
@@ -1084,7 +1084,7 @@ export default function InventoryPage() {
                   {/* SVG Circular Graph */}
                   <div className="relative w-28 h-28 flex items-center justify-center mb-4">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                      <circle cx="50" cy="50" r="40" stroke="#f1f5f9" strokeWidth="8" fill="transparent" />
+                      <circle cx="50" cy="50" r="40" stroke="#f1f5f9" className="stroke-[#f1f5f9] dark:stroke-[#1E293B]" strokeWidth="8" fill="transparent" />
                       {/* Available segment circle */}
                       <circle 
                         cx="50" cy="50" r="40" 
@@ -1105,41 +1105,41 @@ export default function InventoryPage() {
                       />
                     </svg>
                     <div className="absolute text-center">
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wide">Total Units</p>
-                      <p className="text-lg font-black text-slate-900 leading-none mt-1">{projectStats.total}</p>
+                      <p className="text-[10px] text-slate-400 dark:text-[#64748B] font-bold uppercase tracking-wide">Total Units</p>
+                      <p className="text-lg font-black text-slate-900 dark:text-white leading-none mt-1">{projectStats.total}</p>
                     </div>
                   </div>
 
                   {/* Legends */}
-                  <div className="w-full space-y-2.5 font-semibold text-xs text-slate-650">
+                  <div className="w-full space-y-2.5 font-semibold text-xs text-slate-655 dark:text-[#94A3B8]">
                     <div className="flex justify-between items-center">
-                      <span className="flex items-center gap-1.5">
+                      <span className="flex items-center gap-1.5 text-slate-650 dark:text-[#94A3B8]">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                         Available
                       </span>
-                      <span className="text-slate-800 font-black">{projectStats.avail}</span>
+                      <span className="text-slate-800 dark:text-[#F8FAFC] font-black">{projectStats.avail}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="flex items-center gap-1.5">
+                      <span className="flex items-center gap-1.5 text-slate-650 dark:text-[#94A3B8]">
                         <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
                         Booked
                       </span>
-                      <span className="text-slate-800 font-black">{projectStats.booked}</span>
+                      <span className="text-slate-800 dark:text-[#F8FAFC] font-black">{projectStats.booked}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="flex items-center gap-1.5">
+                      <span className="flex items-center gap-1.5 text-slate-650 dark:text-[#94A3B8]">
                         <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
                         Blocked
                       </span>
-                      <span className="text-slate-800 font-black">{projectStats.blocked}</span>
+                      <span className="text-slate-800 dark:text-[#F8FAFC] font-black">{projectStats.blocked}</span>
                     </div>
                     {projectStats.hold > 0 && (
                       <div className="flex justify-between items-center">
-                        <span className="flex items-center gap-1.5">
+                        <span className="flex items-center gap-1.5 text-slate-650 dark:text-[#94A3B8]">
                           <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
                           On Hold
                         </span>
-                        <span className="text-slate-800 font-black">{projectStats.hold}</span>
+                        <span className="text-slate-800 dark:text-[#F8FAFC] font-black">{projectStats.hold}</span>
                       </div>
                     )}
                   </div>
@@ -1147,8 +1147,8 @@ export default function InventoryPage() {
               </div>
 
               {/* CARD 3: QUICK ACTIONS PANEL */}
-              <div className="bg-white/95 backdrop-blur-md border border-[#E8EDF7] rounded-[20px] shadow-[0_12px_40px_rgba(15,23,42,.08)] p-6">
-                <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider mb-4 pb-2 border-b border-slate-100">
+              <div className="bg-white dark:bg-[#111827] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[20px] shadow-sm p-6">
+                <h3 className="font-bold text-slate-900 dark:text-[#F8FAFC] text-sm uppercase tracking-wider mb-4 pb-2 border-b border-slate-100 dark:border-border">
                   Quick Actions
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
@@ -1160,7 +1160,7 @@ export default function InventoryPage() {
                       }
                       setShowTowerModal(true);
                     }}
-                    className="p-3 bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200 text-blue-700 hover:from-blue-100 hover:to-blue-200 text-center rounded-xl text-xs font-bold transition duration-200 shadow-sm flex flex-col items-center gap-1 cursor-pointer"
+                    className="p-3 bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200 text-blue-700 dark:from-blue-950/20 dark:to-blue-950/5 dark:border-blue-900/30 dark:text-blue-400 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-900/30 dark:hover:to-blue-955/10 text-center rounded-xl text-xs font-bold transition duration-205 shadow-sm flex flex-col items-center gap-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <span>🗼</span> Add Tower
                   </button>
@@ -1172,7 +1172,7 @@ export default function InventoryPage() {
                       }
                       setShowFloorModal(true);
                     }}
-                    className="p-3 bg-gradient-to-br from-purple-50 to-purple-100/50 border border-purple-200 text-purple-700 hover:from-purple-100 hover:to-purple-200 text-center rounded-xl text-xs font-bold transition duration-200 shadow-sm flex flex-col items-center gap-1 cursor-pointer"
+                    className="p-3 bg-gradient-to-br from-purple-50 to-purple-100/50 border border-purple-200 text-purple-700 dark:from-purple-950/20 dark:to-purple-950/5 dark:border-purple-900/30 dark:text-purple-400 hover:from-purple-100 hover:to-purple-200 dark:hover:from-purple-900/30 dark:hover:to-purple-955/10 text-center rounded-xl text-xs font-bold transition duration-205 shadow-sm flex flex-col items-center gap-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <span>📊</span> Add Floor
                   </button>
@@ -1184,19 +1184,18 @@ export default function InventoryPage() {
                       }
                       setShowUnitModal(true);
                     }}
-                    className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-200 text-emerald-700 hover:from-emerald-100 hover:to-emerald-200 text-center rounded-xl text-xs font-bold transition duration-200 shadow-sm flex flex-col items-center gap-1 cursor-pointer"
+                    className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-200 text-emerald-700 dark:from-emerald-950/20 dark:to-emerald-950/5 dark:border-emerald-900/30 dark:text-emerald-455 hover:from-emerald-100 hover:to-emerald-200 dark:hover:from-emerald-900/30 dark:hover:to-emerald-955/10 text-center rounded-xl text-xs font-bold transition duration-205 shadow-sm flex flex-col items-center gap-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <span>🚪</span> Add Unit
                   </button>
                   <button 
                     onClick={openBulkUpload}
-                    className="p-3 bg-gradient-to-br from-orange-50 to-orange-100/50 border border-orange-200 text-orange-700 hover:from-orange-100 hover:to-orange-200 text-center rounded-xl text-xs font-bold transition duration-200 shadow-sm flex flex-col items-center gap-1 cursor-pointer"
+                    className="p-3 bg-gradient-to-br from-orange-50 to-orange-100/50 border border-orange-200 text-orange-700 dark:from-orange-950/20 dark:to-orange-950/5 dark:border-orange-900/30 dark:text-orange-400 hover:from-orange-100 hover:to-orange-200 dark:hover:from-orange-900/30 dark:hover:to-orange-955/10 text-center rounded-xl text-xs font-bold transition duration-205 shadow-sm flex flex-col items-center gap-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <span>📤</span> Bulk Upload
                   </button>
                 </div>
               </div>
-
             </div>
 
           </div>
@@ -1204,11 +1203,11 @@ export default function InventoryPage() {
 
         {/* BOTTOM SECTION: PREMIUM UNITS FULL-WIDTH TABLE */}
         {projectsToDisplay.length > 0 && (
-          <div className="bg-white/95 backdrop-blur-md border border-[#E8EDF7] rounded-[20px] shadow-[0_12px_40px_rgba(15,23,42,.08)] p-6 mt-8 overflow-hidden">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-2 border-b border-slate-100">
+          <div className="bg-white dark:bg-[#111827] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[20px] shadow-sm p-6 mt-8 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-2 border-b border-slate-100 dark:border-border">
               <div>
-                <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">All Units Directory</h3>
-                <p className="text-[10px] text-slate-450 font-bold mt-0.5">Filter, search and execute pricing/hold overrides</p>
+                <h3 className="font-bold text-slate-900 dark:text-[#F8FAFC] text-sm uppercase tracking-wider">All Units Directory</h3>
+                <p className="text-[10px] text-slate-450 dark:text-[#94A3B8] font-bold mt-0.5">Filter, search and execute pricing/hold overrides</p>
               </div>
               
               <div id="inventory-filters" className="flex flex-wrap gap-3 items-center w-full sm:w-auto">
@@ -1217,13 +1216,13 @@ export default function InventoryPage() {
                   placeholder="Search by Unit / Project / Agent..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="px-3.5 py-2 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm w-full sm:w-60"
+                  className="px-3.5 py-2 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm w-full sm:w-60"
                 />
 
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+                  className="px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
                 >
                   <option value="ALL">All Statuses</option>
                   <option value="AVAILABLE">AVAILABLE</option>
@@ -1237,7 +1236,7 @@ export default function InventoryPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="sticky top-0 bg-slate-50/60 border-b border-[#E8EDF7] text-xs font-bold text-slate-500 uppercase tracking-wider z-10">
+                  <tr className="sticky top-0 bg-slate-50/60 dark:bg-[#1E293B]/60 border-b border-[#E8EDF7] dark:border-[#334155] text-xs font-bold text-slate-500 dark:text-[#94A3B8] uppercase tracking-wider z-10">
                     <th className="px-6 py-4">Project</th>
                     <th className="px-6 py-4">Tower</th>
                     <th className="px-6 py-4">Floor</th>
@@ -1249,38 +1248,38 @@ export default function InventoryPage() {
                     <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#E8EDF7] text-sm">
+                <tbody className="divide-y divide-[#E8EDF7] dark:divide-border text-sm">
                   {paginatedUnits.map((unit) => {
                     const statusStyles = {
-                      AVAILABLE: "bg-emerald-50 text-emerald-700 border-emerald-100",
-                      BOOKED: "bg-blue-50 text-blue-755 border-blue-100",
-                      BLOCKED: "bg-rose-50 text-rose-700 border-rose-100",
-                      HOLD: "bg-amber-50 text-amber-750 border-amber-100"
+                      AVAILABLE: "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-450 dark:border-emerald-900/30",
+                      BOOKED: "bg-blue-50 text-blue-755 border-blue-100 dark:bg-blue-950/20 dark:text-blue-450 dark:border-blue-900/30",
+                      BLOCKED: "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/20 dark:text-rose-450 dark:border-rose-900/30",
+                      HOLD: "bg-amber-50 text-amber-750 border-amber-100 dark:bg-amber-950/20 dark:text-amber-450 dark:border-amber-900/30"
                     };
                     return (
                       <tr 
                         key={unit.id}
-                        className="hover:bg-slate-50/60 transition-colors group cursor-pointer"
+                        className="hover:bg-slate-50/60 dark:hover:bg-[#1E293B]/60 transition-colors group cursor-pointer"
                         onClick={() => setSelectedNode({ type: "unit", id: unit.id, data: unit })}
                       >
-                        <td className="px-6 py-4 font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{unit.projectName}</td>
-                        <td className="px-6 py-4 font-semibold text-slate-650">{unit.towerName}</td>
-                        <td className="px-6 py-4 font-semibold text-slate-655">{unit.floorName}</td>
-                        <td className="px-6 py-4 font-black text-slate-900">#{unit.unit_number}</td>
-                        <td className="px-6 py-4 font-semibold text-slate-650">{unit.area}</td>
-                        <td className="px-6 py-4 font-bold text-slate-800">₹{(unit.price / 100000).toFixed(1)} Lakhs</td>
+                        <td className="px-6 py-4 font-bold text-slate-900 dark:text-[#F8FAFC] group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{unit.projectName}</td>
+                        <td className="px-6 py-4 font-semibold text-slate-650 dark:text-slate-300">{unit.towerName}</td>
+                        <td className="px-6 py-4 font-semibold text-slate-655 dark:text-slate-300">{unit.floorName}</td>
+                        <td className="px-6 py-4 font-black text-slate-900 dark:text-white">#{unit.unit_number}</td>
+                        <td className="px-6 py-4 font-semibold text-slate-650 dark:text-slate-300">{unit.area}</td>
+                        <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">₹{(unit.price / 100000).toFixed(1)} Lakhs</td>
                         <td className="px-6 py-4">
                           <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${statusStyles[unit.status]}`}>
                             {unit.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 font-semibold text-slate-700">{unit.agent}</td>
+                        <td className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-300">{unit.agent}</td>
                         <td className="px-6 py-4 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                           <div className="inline-flex gap-2">
                             {unit.status === "AVAILABLE" && (user?.role === "SUPER_ADMIN" || user?.role === "MANAGER") && (
                               <button 
                                 onClick={() => handleHold(unit.id)}
-                                className="px-3 py-1.5 bg-amber-50 border border-amber-100 text-amber-700 text-xs font-bold rounded-lg hover:bg-amber-100 transition shadow-sm cursor-pointer"
+                                className="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/40 transition shadow-sm cursor-pointer"
                               >
                                 Hold
                               </button>
@@ -1288,7 +1287,7 @@ export default function InventoryPage() {
                             {unit.status === "HOLD" && (user?.role === "SUPER_ADMIN" || user?.role === "MANAGER") && (
                               <button 
                                 onClick={() => handleRelease(unit.id)}
-                                className="px-3 py-1.5 bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold rounded-lg hover:bg-emerald-100 transition shadow-sm cursor-pointer"
+                                className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition shadow-sm cursor-pointer"
                               >
                                 Release
                               </button>
@@ -1315,7 +1314,7 @@ export default function InventoryPage() {
                                 }
                                 await handlePriceUpdate(unit.id, amount);
                               }}
-                              className="px-3 py-1.5 bg-slate-50 border border-[#E8EDF7] rounded-lg text-slate-700 text-xs font-bold hover:bg-slate-100 transition shadow-sm cursor-pointer"
+                              className="px-3 py-1.5 bg-slate-50 dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[#334155] rounded-lg text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-105 dark:hover:bg-[#273449] transition shadow-sm cursor-pointer"
                             >
                               Edit Price
                             </button>
@@ -1335,20 +1334,20 @@ export default function InventoryPage() {
 
             {/* Pagination */}
             {filteredUnits.length > 0 && (
-              <div className="flex justify-between items-center border-t border-slate-100 pt-6 mt-6 text-xs font-bold text-slate-450 uppercase">
+              <div className="flex justify-between items-center border-t border-slate-100 dark:border-border pt-6 mt-6 text-xs font-bold text-slate-455 dark:text-slate-400 uppercase">
                 <span>Showing {Math.min(filteredUnits.length, (currentPage - 1) * unitsPerPage + 1)} to {Math.min(filteredUnits.length, currentPage * unitsPerPage)} of {filteredUnits.length} Units</span>
                 <div className="flex gap-2">
                   <button 
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    className="px-3.5 py-2 border border-[#E8EDF7] rounded-xl hover:bg-slate-50 transition text-slate-700 shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3.5 py-2 border border-[#E8EDF7] dark:border-[#334155] rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-700 dark:text-slate-350 shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
                   <button 
                     disabled={currentPage === totalPages}
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    className="px-3.5 py-2 border border-[#E8EDF7] rounded-xl hover:bg-slate-50 transition text-slate-700 shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3.5 py-2 border border-[#E8EDF7] dark:border-[#334155] rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-700 dark:text-slate-350 shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                   </button>
@@ -1367,38 +1366,36 @@ export default function InventoryPage() {
           aria-label="Upload unit CSV"
         />
 
-        {/* MODALS */}
-
         {/* Create Project Modal */}
         {showProjectModal && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 rounded-[20px] border border-[#E8EDF7] shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 border-b border-slate-100 pb-2">Create New Project</h3>
+          <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 dark:from-[#111827] dark:via-[#111827] dark:to-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98 dark:bg-[#111827]/98">
+              <h3 className="text-base font-bold mb-4 text-slate-900 dark:text-white border-b border-slate-100 dark:border-border pb-2">Create New Project</h3>
               <form onSubmit={handleCreateProject} className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest mb-1.5">Project Name</label>
+                  <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest mb-1.5">Project Name</label>
                   <input 
                     type="text" required
                     value={newProjectName} onChange={(e) => setNewProjectName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                     placeholder="e.g. Project C"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-455 uppercase tracking-widest mb-1.5">Location</label>
+                  <label className="block text-[10px] font-bold text-slate-455 dark:text-slate-500 uppercase tracking-widest mb-1.5">Location</label>
                   <input 
                     type="text" required
                     value={newProjectLoc} onChange={(e) => setNewProjectLoc(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                     placeholder="e.g. Sector 5, Uptown"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-455 uppercase tracking-widest mb-1.5">Status</label>
+                    <label className="block text-[10px] font-bold text-slate-455 dark:text-slate-500 uppercase tracking-widest mb-1.5">Status</label>
                     <select 
                       value={newProjectStatus} onChange={(e) => setNewProjectStatus(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
                     >
                       <option value="Under Construction">Under Construction</option>
                       <option value="Planning">Planning</option>
@@ -1406,16 +1403,16 @@ export default function InventoryPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-455 uppercase tracking-widest mb-1.5">Completion %</label>
+                    <label className="block text-[10px] font-bold text-slate-455 dark:text-slate-500 uppercase tracking-widest mb-1.5">Completion %</label>
                     <input 
                       type="number" min="0" max="100"
                       value={newProjectCompletion} onChange={(e) => setNewProjectCompletion(Number(e.target.value))}
-                      className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                     />
                   </div>
                 </div>
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                  <button type="button" onClick={() => setShowProjectModal(false)} className="px-4 py-2 border border-[#E8EDF7] rounded-xl hover:bg-slate-50 transition text-slate-655 text-xs font-bold cursor-pointer">Cancel</button>
+                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
+                  <button type="button" onClick={() => setShowProjectModal(false)} className="px-4 py-2 border border-[#E8EDF7] dark:border-border rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-655 dark:text-slate-300 text-xs font-bold cursor-pointer">Cancel</button>
                   <button type="submit" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-655 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Create</button>
                 </div>
               </form>
@@ -1425,21 +1422,21 @@ export default function InventoryPage() {
 
         {/* Add Tower Modal */}
         {showTowerModal && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 rounded-[20px] border border-[#E8EDF7] shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 border-b border-slate-100 pb-2">Add Tower to {selectedNode.data?.name}</h3>
+          <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 dark:from-[#111827] dark:via-[#111827] dark:to-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98 dark:bg-[#111827]/98">
+              <h3 className="text-base font-bold mb-4 text-slate-900 dark:text-white border-b border-slate-100 dark:border-border pb-2">Add Tower to {selectedNode.data?.name}</h3>
               <form onSubmit={handleCreateTower} className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest mb-1.5">Tower Name</label>
+                  <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest mb-1.5">Tower Name</label>
                   <input 
                     type="text" required
                     value={newTowerName} onChange={(e) => setNewTowerName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                     placeholder="e.g. Tower C"
                   />
                 </div>
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                  <button type="button" onClick={() => setShowTowerModal(false)} className="px-4 py-2 border border-[#E8EDF7] rounded-xl hover:bg-slate-50 transition text-slate-650 text-xs font-bold cursor-pointer">Cancel</button>
+                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
+                  <button type="button" onClick={() => setShowTowerModal(false)} className="px-4 py-2 border border-[#E8EDF7] dark:border-border rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-650 dark:text-slate-300 text-xs font-bold cursor-pointer">Cancel</button>
                   <button type="submit" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Add Tower</button>
                 </div>
               </form>
@@ -1449,21 +1446,21 @@ export default function InventoryPage() {
 
         {/* Add Floor Modal */}
         {showFloorModal && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 rounded-[20px] border border-[#E8EDF7] shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 border-b border-slate-100 pb-2">Add Floor to {selectedNode.data?.name}</h3>
+          <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 dark:from-[#111827] dark:via-[#111827] dark:to-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98 dark:bg-[#111827]/98">
+              <h3 className="text-base font-bold mb-4 text-slate-900 dark:text-white border-b border-slate-100 dark:border-border pb-2">Add Floor to {selectedNode.data?.name}</h3>
               <form onSubmit={handleCreateFloor} className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-455 uppercase tracking-widest mb-1.5">Floor Name</label>
+                  <label className="block text-[10px] font-bold text-slate-455 dark:text-slate-500 uppercase tracking-widest mb-1.5">Floor Name</label>
                   <input 
                     type="text" required
                     value={newFloorName} onChange={(e) => setNewFloorName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                     placeholder="e.g. Floor 2"
                   />
                 </div>
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                  <button type="button" onClick={() => setShowFloorModal(false)} className="px-4 py-2 border border-[#E8EDF7] rounded-xl hover:bg-slate-50 transition text-slate-650 text-xs font-bold cursor-pointer">Cancel</button>
+                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
+                  <button type="button" onClick={() => setShowFloorModal(false)} className="px-4 py-2 border border-[#E8EDF7] dark:border-border rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-650 dark:text-slate-300 text-xs font-bold cursor-pointer">Cancel</button>
                   <button type="submit" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Add Floor</button>
                 </div>
               </form>
@@ -1473,25 +1470,25 @@ export default function InventoryPage() {
 
         {/* Add Unit Modal */}
         {showUnitModal && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 rounded-[20px] border border-[#E8EDF7] shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 border-b border-slate-100 pb-2">Add Unit to {selectedNode.data?.name}</h3>
+          <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 dark:from-[#111827] dark:via-[#111827] dark:to-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98 dark:bg-[#111827]/98">
+              <h3 className="text-base font-bold mb-4 text-slate-900 dark:text-white border-b border-slate-100 dark:border-border pb-2">Add Unit to {selectedNode.data?.name}</h3>
               <form onSubmit={handleCreateUnit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest mb-1.5">Unit Number</label>
+                    <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest mb-1.5">Unit Number</label>
                     <input 
                       type="text" required
                       value={newUnitNumber} onChange={(e) => setNewUnitNumber(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                       placeholder="e.g. 104"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest mb-1.5">Initial Status</label>
+                    <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest mb-1.5">Initial Status</label>
                     <select
                       value={newUnitStatus} onChange={(e: any) => setNewUnitStatus(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
                     >
                       <option value="AVAILABLE">AVAILABLE</option>
                       <option value="BOOKED">BOOKED</option>
@@ -1502,35 +1499,35 @@ export default function InventoryPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-455 uppercase tracking-widest mb-1.5">Area Size (Sq.Ft)</label>
+                    <label className="block text-[10px] font-bold text-slate-455 dark:text-slate-500 uppercase tracking-widest mb-1.5">Area Size (Sq.Ft)</label>
                     <input 
                       type="number" required
                       value={newUnitArea} onChange={(e) => setNewUnitArea(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                       placeholder="e.g. 1250"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-455 uppercase tracking-widest mb-1.5">Price (₹)</label>
+                    <label className="block text-[10px] font-bold text-slate-455 dark:text-slate-500 uppercase tracking-widest mb-1.5">Price (₹)</label>
                     <input 
                       type="number" required
                       value={newUnitPrice} onChange={(e) => setNewUnitPrice(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                       placeholder="e.g. 6500000"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest mb-1.5">Assigned Agent</label>
+                  <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest mb-1.5">Assigned Agent</label>
                   <input 
                     type="text"
                     value={newUnitAgent} onChange={(e) => setNewUnitAgent(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                     placeholder="e.g. Sarah Connor"
                   />
                 </div>
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                  <button type="button" onClick={() => setShowUnitModal(false)} className="px-4 py-2 border border-[#E8EDF7] rounded-xl hover:bg-slate-50 transition text-slate-650 text-xs font-bold cursor-pointer">Cancel</button>
+                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
+                  <button type="button" onClick={() => setShowUnitModal(false)} className="px-4 py-2 border border-[#E8EDF7] dark:border-border rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-655 dark:text-slate-300 text-xs font-bold cursor-pointer">Cancel</button>
                   <button type="submit" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Add Unit</button>
                 </div>
               </form>
