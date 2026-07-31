@@ -1,153 +1,175 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Literal, Optional
 
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from sqlalchemy import or_
+from sqlalchemy.orm import Session, selectinload
+
+from app.api.query import apply_sort, paginate
 from app.db.session import get_db
 from app.api.deps import get_current_user, require_roles, scope_query_to_branch
 from app.models.users import User, RoleEnum
-from app.models.leads import Lead, LeadNote, SiteVisit, LeadStatusEnum
+from app.models.leads import Lead, LeadStatusEnum
 from app.schemas.leads import (
     LeadCreate, LeadUpdate, LeadOut, LeadAssign,
+    LeadMerge,
     LeadNoteCreate, LeadNoteOut,
     SiteVisitCreate, SiteVisitOut
 )
+from app.services.lead_service import (
+    create_lead as create_lead_service,
+    get_lead_or_404 as get_lead_service,
+    update_lead as update_lead_service,
+    add_note_to_lead,
+    assign_lead as assign_lead_service,
+    reject_lead as reject_lead_service,
+    schedule_site_visit,
+    merge_leads,
+)
 
-router = APIRouter()
-
-def get_lead_or_404(db: Session, lead_id: int):
-    lead = db.query(Lead).filter(Lead.id == lead_id).first()
-    if not lead:
-        raise HTTPException(status_code=404, detail="Lead not found")
-    return lead
+CRM_STAFF_ROLES = [
+    RoleEnum.SUPER_ADMIN,
+    RoleEnum.ADMIN,
+    RoleEnum.MANAGER,
+    RoleEnum.EMPLOYEE,
+]
+router = APIRouter(
+    dependencies=[Depends(require_roles(CRM_STAFF_ROLES))]
+)
 
 def verify_lead_access(lead: Lead, current_user: User):
     if current_user.role == RoleEnum.SUPER_ADMIN:
         return
+    if hasattr(lead, 'company_id') and current_user.branch is not None:
+        if lead.company_id != current_user.branch.company_id:
+            raise HTTPException(status_code=403, detail="Not authorized to access this lead")
+
     if current_user.role == RoleEnum.MANAGER:
-        # Assuming we check branch via the creator or assigned user
-        # In a real app we'd verify the assigned user belongs to the manager's branch
-        pass
+        return
     if current_user.role == RoleEnum.EMPLOYEE:
         if lead.assigned_to_id != current_user.id and lead.created_by_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized to access this lead")
 
-@router.post("/", response_model=LeadOut, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=LeadOut, status_code=status.HTTP_201_CREATED)
 def create_lead(lead_in: LeadCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    lead_data = lead_in.model_dump(exclude={"initial_note"})
-    
-    lead = Lead(
-        **lead_data,
-        status=LeadStatusEnum.NEW,
-        created_by_id=current_user.id,
-        assigned_to_id=current_user.id
-    )
-    db.add(lead)
-    db.flush() # flush to get lead.id
-    
-    if lead_in.initial_note:
-        note = LeadNote(lead_id=lead.id, note=lead_in.initial_note, created_by_id=current_user.id)
-        db.add(note)
-        
-    db.commit()
-    db.refresh(lead)
-    
-    from app.services.audit import log_audit
-    log_audit(db, current_user.id, "LEAD", lead.id, "CREATE", lead_in.model_dump(exclude={"initial_note"}))
-    
-    return lead
+    return create_lead_service(db=db, current_user=current_user, lead_in=lead_in)
 
-@router.get("/", response_model=List[LeadOut])
-def get_leads(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    query = db.query(Lead).filter(scope_query_to_branch(current_user, Lead))
-    return query.offset(skip).limit(limit).all()
+@router.get("", response_model=List[LeadOut])
+def get_leads(
+    response: Response,
+    status_filter: Optional[LeadStatusEnum] = Query(None, alias="status"),
+    assigned_to_id: Optional[int] = None,
+    source: Optional[str] = Query(None, max_length=100),
+    priority: Optional[str] = Query(None, max_length=50),
+    search: Optional[str] = Query(None, min_length=1, max_length=100),
+    sort_by: str = "created_at",
+    sort_order: Literal["asc", "desc"] = "desc",
+    page: int = Query(1, ge=1),
+    size: int = Query(50, ge=1, le=200),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    query = (
+        db.query(Lead)
+        .filter(
+            Lead.is_deleted.is_(False),
+            scope_query_to_branch(current_user, Lead),
+        )
+        .options(
+            selectinload(Lead.notes),
+            selectinload(Lead.activities),
+            selectinload(Lead.site_visits),
+        )
+    )
+    if status_filter:
+        query = query.filter(Lead.status == status_filter)
+    if assigned_to_id is not None:
+        query = query.filter(Lead.assigned_to_id == assigned_to_id)
+    if source:
+        query = query.filter(Lead.source == source)
+    if priority:
+        query = query.filter(Lead.priority == priority)
+    if search:
+        term = f"%{search.strip()}%"
+        query = query.filter(
+            or_(
+                Lead.name.ilike(term),
+                Lead.email.ilike(term),
+                Lead.phone.ilike(term),
+                Lead.source.ilike(term),
+            )
+        )
+    query = apply_sort(
+        query,
+        model=Lead,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        allowed_fields={"id", "name", "status", "priority", "created_at", "updated_at"},
+        tie_breaker=Lead.id,
+    )
+    items, _ = paginate(query, page=page, size=size, response=response)
+    return items
 
 @router.get("/{lead_id}", response_model=LeadOut)
 def get_lead(lead_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    lead = get_lead_or_404(db, lead_id)
+    lead = get_lead_service(db, lead_id)
     verify_lead_access(lead, current_user)
     return lead
 
 @router.patch("/{lead_id}", response_model=LeadOut)
 def update_lead(lead_id: int, lead_in: LeadUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    lead = get_lead_or_404(db, lead_id)
+    lead = get_lead_service(db, lead_id)
     verify_lead_access(lead, current_user)
-    
-    update_data = lead_in.model_dump(exclude_unset=True)
-    if "status" in update_data:
-        new_status = update_data["status"]
-        current_status = lead.status
-        
-        valid_transitions = {
-            LeadStatusEnum.NEW: [LeadStatusEnum.CONTACTED, LeadStatusEnum.LOST],
-            LeadStatusEnum.CONTACTED: [LeadStatusEnum.VISIT_SCHEDULED, LeadStatusEnum.LOST],
-            LeadStatusEnum.VISIT_SCHEDULED: [LeadStatusEnum.NEGOTIATION, LeadStatusEnum.LOST],
-            LeadStatusEnum.NEGOTIATION: [LeadStatusEnum.CONVERTED, LeadStatusEnum.LOST],
-            LeadStatusEnum.CONVERTED: [],
-            LeadStatusEnum.LOST: []
-        }
-        
-        if new_status != current_status and new_status not in valid_transitions.get(current_status, []):
-            raise HTTPException(status_code=400, detail=f"Invalid state transition from {current_status} to {new_status}")
-
-    for field, value in update_data.items():
-        setattr(lead, field, value)
-        
-    db.commit()
-    db.refresh(lead)
-    return lead
+    return update_lead_service(db=db, lead=lead, lead_in=lead_in, updated_by=current_user)
 
 @router.post("/{lead_id}/notes", response_model=LeadNoteOut, status_code=status.HTTP_201_CREATED)
 def add_note(lead_id: int, note_in: LeadNoteCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    lead = get_lead_or_404(db, lead_id)
+    lead = get_lead_service(db, lead_id)
     verify_lead_access(lead, current_user)
-    
-    note = LeadNote(lead_id=lead.id, note=note_in.note, created_by_id=current_user.id)
-    db.add(note)
-    db.commit()
-    db.refresh(note)
-    return note
+    return add_note_to_lead(db=db, lead=lead, note_text=note_in.note, user=current_user)
 
-@router.post("/{lead_id}/assign", response_model=LeadOut, dependencies=[Depends(require_roles([RoleEnum.SUPER_ADMIN, RoleEnum.MANAGER]))])
-def assign_lead(lead_id: int, payload: LeadAssign, db: Session = Depends(get_db)):
-    lead = get_lead_or_404(db, lead_id)
-    lead.assigned_to_id = payload.assigned_to_id
-    db.commit()
-    db.refresh(lead)
-    
-    from app.services.notifications import send_notification
-    send_notification(
-        db=db, 
-        user_id=lead.assigned_to_id, 
-        notif_type="LEAD_ASSIGNED", 
-        message=f"You have been assigned a new lead: {lead.name}",
-        email_subject="New Lead Assigned"
+@router.post("/{lead_id}/assign", response_model=LeadOut, dependencies=[Depends(require_roles([RoleEnum.SUPER_ADMIN, RoleEnum.ADMIN, RoleEnum.MANAGER]))])
+def assign_lead(lead_id: int, payload: LeadAssign, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    lead = get_lead_service(db, lead_id)
+    verify_lead_access(lead, current_user)
+    return assign_lead_service(db=db, lead=lead, assigned_to_id=payload.assigned_to_id, assigned_by=current_user)
+
+@router.post("/{lead_id}/reject", response_model=LeadOut, dependencies=[Depends(require_roles([RoleEnum.SUPER_ADMIN, RoleEnum.ADMIN, RoleEnum.MANAGER]))])
+def reject_lead(lead_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    lead = get_lead_service(db, lead_id)
+    verify_lead_access(lead, current_user)
+    return reject_lead_service(db=db, lead=lead, updated_by=current_user)
+
+
+@router.post(
+    "/{lead_id}/merge",
+    response_model=LeadOut,
+    dependencies=[
+        Depends(
+            require_roles(
+                [RoleEnum.SUPER_ADMIN, RoleEnum.ADMIN, RoleEnum.MANAGER]
+            )
+        )
+    ],
+)
+def merge_duplicate_lead(
+    lead_id: int,
+    payload: LeadMerge,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    primary = get_lead_service(db, lead_id)
+    duplicate = get_lead_service(db, payload.duplicate_lead_id)
+    verify_lead_access(primary, current_user)
+    verify_lead_access(duplicate, current_user)
+    return merge_leads(
+        db,
+        primary=primary,
+        duplicate=duplicate,
+        merged_by=current_user,
     )
-    
-    return lead
-
-@router.post("/{lead_id}/reject", response_model=LeadOut, dependencies=[Depends(require_roles([RoleEnum.SUPER_ADMIN, RoleEnum.MANAGER]))])
-def reject_lead(lead_id: int, db: Session = Depends(get_db)):
-    lead = get_lead_or_404(db, lead_id)
-    lead.status = LeadStatusEnum.LOST
-    db.commit()
-    db.refresh(lead)
-    return lead
 
 @router.post("/{lead_id}/schedule-visit", response_model=SiteVisitOut, status_code=status.HTTP_201_CREATED)
 def schedule_visit(lead_id: int, visit_in: SiteVisitCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    lead = get_lead_or_404(db, lead_id)
+    lead = get_lead_service(db, lead_id)
     verify_lead_access(lead, current_user)
-    
-    # Automatically set status if appropriate
-    if lead.status in [LeadStatusEnum.NEW, LeadStatusEnum.CONTACTED]:
-        lead.status = LeadStatusEnum.VISIT_SCHEDULED
-        
-    visit = SiteVisit(
-        lead_id=lead.id,
-        scheduled_at=visit_in.scheduled_at,
-        employee_id=visit_in.employee_id or lead.assigned_to_id or current_user.id
-    )
-    db.add(visit)
-    db.commit()
-    db.refresh(visit)
-    return visit
+    return schedule_site_visit(db=db, lead=lead, visit_in=visit_in, current_user=current_user)

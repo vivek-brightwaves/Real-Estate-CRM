@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import api from "../../../lib/axios";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAuthStore } from "../../../store/authStore";
 import DashboardLayout from "../../../components/dashboard/DashboardLayout";
 
-export default function CustomerDetailPage({ params }: { params: { id: string } }) {
+export default function CustomerDetailPage() {
+  const params = useParams<{ id: string }>();
   const [customer, setCustomer] = useState<any>(null);
   const [timeline, setTimeline] = useState<any>([]);
   const [loading, setLoading] = useState(false);

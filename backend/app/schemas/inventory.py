@@ -1,66 +1,66 @@
-from typing import Optional, List
-from pydantic import BaseModel
+from typing import Optional
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 from app.models.projects import UnitStatusEnum
 
 # Tower Schemas
 class TowerBase(BaseModel):
-    name: str
-    project_id: int
+    name: str = Field(min_length=1, max_length=100)
+    project_id: int = Field(gt=0)
 
 class TowerCreate(TowerBase):
     pass
 
 class TowerUpdate(BaseModel):
-    name: Optional[str] = None
-    project_id: Optional[int] = None
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    project_id: Optional[int] = Field(None, gt=0)
 
 class TowerOut(TowerBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
-    class Config:
-        from_attributes = True
 
 # Block Schemas
 class BlockBase(BaseModel):
-    name: str
-    tower_id: int
+    name: str = Field(min_length=1, max_length=100)
+    tower_id: int = Field(gt=0)
 
 class BlockCreate(BlockBase):
     pass
 
 class BlockUpdate(BaseModel):
-    name: Optional[str] = None
-    tower_id: Optional[int] = None
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    tower_id: Optional[int] = Field(None, gt=0)
 
 class BlockOut(BlockBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
-    class Config:
-        from_attributes = True
 
 # Unit Schemas
 class UnitBase(BaseModel):
-    unit_number: str
-    block_id: int
-    type: Optional[str] = None
-    area: Optional[float] = None
-    price: Optional[float] = None
+    unit_number: str = Field(min_length=1, max_length=50)
+    block_id: int = Field(gt=0)
+    type: Optional[str] = Field(None, max_length=50)
+    area: Optional[float] = Field(None, gt=0)
+    price: Optional[float] = Field(None, ge=0)
 
 class UnitCreate(UnitBase):
     pass
 
 class UnitUpdate(BaseModel):
-    unit_number: Optional[str] = None
-    block_id: Optional[int] = None
-    type: Optional[str] = None
-    area: Optional[float] = None
+    unit_number: Optional[str] = Field(None, min_length=1, max_length=50)
+    block_id: Optional[int] = Field(None, gt=0)
+    type: Optional[str] = Field(None, max_length=50)
+    area: Optional[float] = Field(None, gt=0)
 
 class UnitPriceUpdate(BaseModel):
-    price: float
+    price: float = Field(ge=0)
     # Future enhancement: add discount rules, tax fields here
 
 class UnitOut(UnitBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     status: UnitStatusEnum
     hold_expires_at: Optional[datetime] = None
-    class Config:
-        from_attributes = True

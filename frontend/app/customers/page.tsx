@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "../../store/authStore";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { AreaChart, Area, ResponsiveContainer } from "recharts";
+import { useSectionSearch } from "../../hooks/useSectionSearch";
 
 interface Customer {
   id: number;
@@ -29,6 +30,7 @@ export default function CustomersPage() {
 
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState("");
+  useSectionSearch("customers", setSearchTerm);
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [kycFilter, setKycFilter] = useState("ALL");
   const [sortBy, setSortBy] = useState("name");
@@ -40,6 +42,8 @@ export default function CustomersPage() {
   const [newCustName, setNewCustName] = useState("");
   const [newCustPhone, setNewCustPhone] = useState("");
   const [newCustEmail, setNewCustEmail] = useState("");
+  const [newCustLeadId, setNewCustLeadId] = useState("");
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
   useEffect(() => {
     if (!accessToken) {
@@ -96,39 +100,19 @@ export default function CustomersPage() {
     if (!newCustName) return;
 
     try {
-      // Mocking lead conversion or direct customer creation. Since we keep backend unchanged,
-      // we check if direct customer post is supported, or mock it locally if it fails.
-      // Usually real database has direct customers or from lead updates.
-      // We will try posting, and fallback to local state if there's no direct route.
-      const directData = {
+      await api.post("/customers", {
         name: newCustName,
         phone: newCustPhone,
-        email: newCustEmail
-      };
-      
-      try {
-        await api.post("/customers", directData);
-      } catch (postErr) {
-        // Fallback to local state demo additions if route lacks direct customer posts
-        setCustomers(prev => [
-          ...prev,
-          {
-            id: Date.now(),
-            name: newCustName,
-            phone: newCustPhone,
-            email: newCustEmail,
-            status: "ACTIVE",
-            kyc: "PENDING",
-            bookings_count: 0
-          }
-        ]);
-      }
+        email: newCustEmail,
+        lead_id: Number(newCustLeadId),
+      });
       
       alert("Customer created successfully!");
       setShowAddModal(false);
       setNewCustName("");
       setNewCustPhone("");
       setNewCustEmail("");
+      setNewCustLeadId("");
       fetchCustomers();
     } catch (err) {
       alert("Error adding customer");
@@ -182,6 +166,44 @@ export default function CustomersPage() {
     currentPage * rowsPerPage
   );
 
+  const exportCustomers = () => {
+    const escape = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
+    const rows = [
+      ["ID", "Name", "Phone", "Email"],
+      ...sortedCustomers.map((customer) => [
+        customer.id,
+        customer.name,
+        customer.phone,
+        customer.email,
+      ]),
+    ];
+    const blob = new Blob([rows.map((row) => row.map(escape).join(",")).join("\n")], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "customers.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const saveCustomer = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!editingCustomer) return;
+    try {
+      await api.patch(`/customers/${editingCustomer.id}`, {
+        name: editingCustomer.name,
+        phone: editingCustomer.phone || null,
+        email: editingCustomer.email || null,
+      });
+      setEditingCustomer(null);
+      await fetchCustomers();
+    } catch (err: any) {
+      alert(err.response?.data?.error?.message || err.response?.data?.detail || "Unable to update customer");
+    }
+  };
+
   const resetFilters = () => {
     setSearchTerm("");
     setStatusFilter("ALL");
@@ -230,7 +252,7 @@ export default function CustomersPage() {
               className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm w-full md:w-60"
             />
             <button 
-              onClick={() => alert("Exporter spreadsheet output triggered")}
+              onClick={exportCustomers}
               className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm cursor-pointer"
             >
               Export
@@ -529,7 +551,7 @@ export default function CustomersPage() {
                                 👁 View
                               </button>
                               <button 
-                                onClick={() => alert("Edit client metadata modal")}
+                                onClick={() => setEditingCustomer({ ...c })}
                                 className="inline-flex items-center gap-0.5 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-100 text-xs font-bold transition shadow-sm cursor-pointer"
                               >
                                 ✏ Edit
@@ -541,7 +563,7 @@ export default function CustomersPage() {
                                 📄 Docs
                               </button>
                               <button 
-                                onClick={() => alert("More client options...")}
+                                onClick={() => router.push(`/customers/${c.id}`)}
                                 className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-100 transition shadow-sm cursor-pointer font-black text-xs"
                               >
                                 ⋮
@@ -611,6 +633,18 @@ export default function CustomersPage() {
               <h3 className="text-base font-bold mb-4 text-slate-900 border-b border-slate-100 pb-2">Add Customer</h3>
               <form onSubmit={handleAddCustomer} className="space-y-4">
                 <div>
+                  <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest mb-1.5">Converted Lead ID</label>
+                  <input
+                    type="number"
+                    min="1"
+                    required
+                    value={newCustLeadId}
+                    onChange={(e) => setNewCustLeadId(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    placeholder="Lead ID"
+                  />
+                </div>
+                <div>
                   <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest mb-1.5">Customer Name</label>
                   <input 
                     type="text" required
@@ -646,6 +680,21 @@ export default function CustomersPage() {
                 </div>
               </form>
             </div>
+          </div>
+        )}
+
+        {editingCustomer && (
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <form onSubmit={saveCustomer} className="w-full max-w-md space-y-4 rounded-[20px] border border-slate-200 bg-white p-6 shadow-2xl">
+              <h3 className="border-b border-slate-100 pb-3 text-base font-bold text-slate-900">Edit Customer</h3>
+              <input required value={editingCustomer.name} onChange={(event) => setEditingCustomer({ ...editingCustomer, name: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" placeholder="Name" />
+              <input value={editingCustomer.phone || ""} onChange={(event) => setEditingCustomer({ ...editingCustomer, phone: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" placeholder="Phone" />
+              <input type="email" value={editingCustomer.email || ""} onChange={(event) => setEditingCustomer({ ...editingCustomer, email: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" placeholder="Email" />
+              <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
+                <button type="button" onClick={() => setEditingCustomer(null)} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-bold text-slate-600">Cancel</button>
+                <button type="submit" className="rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white">Save Changes</button>
+              </div>
+            </form>
           </div>
         )}
 

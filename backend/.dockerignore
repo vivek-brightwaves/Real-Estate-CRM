@@ -13,3 +13,8 @@ README.md
 *.log
 .DS_Store
 .pytest_cache
+.coverage
+coverage*.json
+coverage.xml
+htmlcov
+tests

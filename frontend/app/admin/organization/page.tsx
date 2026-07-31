@@ -1,489 +1,573 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import api from "../../../lib/axios";
+import { getApiErrorMessage } from "../../../lib/errors";
+import { useFeedback } from "../../../components/ui/FeedbackProvider";
 
-// ============================================================
-// COMPACT CUSTOM SELECTOR COMPONENT (54px Height)
-// ============================================================
-interface SelectorOption {
-  value: string;
-  label: string;
-}
+type EntityType = "companies" | "branches" | "projects";
+type ModalMode = "create" | "view" | "edit" | null;
 
-interface CustomSelectorProps {
-  value: string;
-  onChange: (value: string) => void;
-  options: SelectorOption[];
-}
-
-const CustomSelector = ({ value, onChange, options }: CustomSelectorProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleOutsideClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest("#org-type-dropdown")) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("click", handleOutsideClick);
-    return () => document.removeEventListener("click", handleOutsideClick);
-  }, [isOpen]);
-
-  const selectedOption = options.find((opt) => opt.value === value);
-
-  return (
-    <div id="org-type-dropdown" className="relative w-full md:w-72">
-      <label className="block text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-2 ml-1">
-        Organization Type
-      </label>
-      
-      <div className="relative group/select">
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover/select:text-blue-500 transition-colors duration-200 z-10">
-          {/* Building/search icon */}
-          <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9m4 0V7m0 0h4m-4 0H9" />
-          </svg>
-        </span>
-        
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className={`w-full h-[54px] text-left pl-12 pr-10 bg-white/50 border ${
-            isOpen ? "border-blue-500 ring-4 ring-blue-500/10" : "border-[#E8EDF7] hover:border-blue-500/60"
-          } rounded-xl text-slate-800 text-[14px] font-bold shadow-sm transition-all duration-300 flex justify-between items-center cursor-pointer`}
-        >
-          <span className="truncate">{selectedOption?.label || value}</span>
-          <svg 
-            className={`w-[18px] h-[18px] text-slate-400 transition-transform duration-300 ${isOpen ? "rotate-180 text-blue-500" : ""}`} 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-      </div>
-
-      {isOpen && (
-        <div className="absolute left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl border border-slate-200/80 rounded-xl shadow-xl z-50 p-1.5 overflow-hidden animate-settings-tab-fade">
-          <div className="space-y-0.5">
-            {options.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => {
-                  onChange(opt.value);
-                  setIsOpen(false);
-                }}
-                className={`w-full text-left px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all duration-150 flex items-center justify-between ${
-                  opt.value === value
-                    ? "bg-blue-500 text-white"
-                    : "text-slate-650 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-              >
-                <span>{opt.label}</span>
-                {opt.value === value && (
-                  <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+type OrganizationEntity = {
+  id: number;
+  name: string;
+  company_id?: number;
+  branch_id?: number;
+  logo_url?: string | null;
+  location?: string | null;
+  description?: string | null;
+  status?: string | null;
 };
 
-// ============================================================
-// MAIN PAGE COMPONENT
-// ============================================================
+type FormState = {
+  name: string;
+  company_id: string;
+  branch_id: string;
+  logo_url: string;
+  location: string;
+  description: string;
+  status: string;
+};
+
+const EMPTY_FORM: FormState = {
+  name: "",
+  company_id: "",
+  branch_id: "",
+  logo_url: "",
+  location: "",
+  description: "",
+  status: "ACTIVE",
+};
+
+const LABELS: Record<EntityType, { singular: string; plural: string }> = {
+  companies: { singular: "Company", plural: "Companies" },
+  branches: { singular: "Branch", plural: "Branches" },
+  projects: { singular: "Project", plural: "Projects" },
+};
+
+function csvCell(value: unknown) {
+  return `"${String(value ?? "").replaceAll('"', '""')}"`;
+}
+
 export default function OrganizationPage() {
-  const [activeTab, setActiveTab] = useState("companies");
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { confirmAction, notify } = useFeedback();
+  const [activeTab, setActiveTab] = useState<EntityType>("companies");
+  const [data, setData] = useState<OrganizationEntity[]>([]);
+  const [companies, setCompanies] = useState<OrganizationEntity[]>([]);
+  const [branches, setBranches] = useState<OrganizationEntity[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  
-  // Dashboard Summary metrics
-  const [summaryStats, setSummaryStats] = useState({
-    companies: 0,
-    branches: 0,
-    projects: 0,
-    activeUsers: 0
-  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [modalMode, setModalMode] = useState<ModalMode>(null);
+  const [selected, setSelected] = useState<OrganizationEntity | null>(null);
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
 
-  useEffect(() => {
-    fetchData(activeTab);
-  }, [activeTab]);
+  const fetchReferenceData = useCallback(async () => {
+    const [companyResponse, branchResponse] = await Promise.all([
+      api.get("/organization/companies", { params: { size: 200 } }),
+      api.get("/organization/branches", { params: { size: 200 } }),
+    ]);
+    setCompanies(companyResponse.data);
+    setBranches(branchResponse.data);
+  }, []);
 
-  const fetchData = async (tab: string) => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
+    setError("");
     try {
-      const res = await api.get(`/organization/${tab}`);
-      setData(res.data);
-    } catch (err) {
-      console.error(err);
+      const response = await api.get(`/organization/${activeTab}`, {
+        params: { size: 200 },
+      });
+      setData(response.data);
+      await fetchReferenceData();
+    } catch (requestError) {
+      setError(getApiErrorMessage(requestError, "Unable to load organization data."));
     } finally {
       setLoading(false);
     }
+  }, [activeTab, fetchReferenceData]);
+
+  useEffect(() => {
+    void fetchData();
+  }, [fetchData]);
+
+  const filteredData = useMemo(() => {
+    const term = searchQuery.trim().toLowerCase();
+    if (!term) return data;
+    return data.filter((item) =>
+      [item.name, item.location, item.status].some((value) =>
+        String(value ?? "").toLowerCase().includes(term),
+      ),
+    );
+  }, [data, searchQuery]);
+
+  const openCreate = () => {
+    setSelected(null);
+    setForm(EMPTY_FORM);
+    setError("");
+    setModalMode("create");
   };
 
-  const fetchSummaryStats = async () => {
+  const openEntity = (item: OrganizationEntity, mode: "view" | "edit") => {
+    setSelected(item);
+    setForm({
+      name: item.name,
+      company_id: item.company_id?.toString() ?? "",
+      branch_id: item.branch_id?.toString() ?? "",
+      logo_url: item.logo_url ?? "",
+      location: item.location ?? "",
+      description: item.description ?? "",
+      status: item.status ?? "ACTIVE",
+    });
+    setError("");
+    setModalMode(mode);
+  };
+
+  const closeModal = () => {
+    if (saving) return;
+    setModalMode(null);
+    setSelected(null);
+    setForm(EMPTY_FORM);
+  };
+
+  const buildPayload = () => {
+    if (activeTab === "companies") {
+      return {
+        name: form.name.trim(),
+        logo_url: form.logo_url.trim() || null,
+      };
+    }
+    if (activeTab === "branches") {
+      return {
+        name: form.name.trim(),
+        company_id: Number(form.company_id),
+      };
+    }
+    return {
+      name: form.name.trim(),
+      branch_id: Number(form.branch_id),
+      location: form.location.trim() || null,
+      description: form.description.trim() || null,
+      status: form.status.trim() || null,
+    };
+  };
+
+  const submitForm = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!form.name.trim()) {
+      setError("Name is required.");
+      return;
+    }
+    if (activeTab === "branches" && !form.company_id) {
+      setError("Company is required.");
+      return;
+    }
+    if (activeTab === "projects" && !form.branch_id) {
+      setError("Branch is required.");
+      return;
+    }
+    setSaving(true);
+    setError("");
     try {
-      const [companiesRes, branchesRes, projectsRes, usersRes] = await Promise.all([
-        api.get("/organization/companies"),
-        api.get("/organization/branches"),
-        api.get("/organization/projects"),
-        api.get("/users")
-      ]);
-      setSummaryStats({
-        companies: companiesRes.data.length,
-        branches: branchesRes.data.length,
-        projects: projectsRes.data.length,
-        activeUsers: usersRes.data.length
-      });
-    } catch (err) {
-      console.error("Failed to load dashboard summary metrics", err);
+      if (modalMode === "edit" && selected) {
+        await api.patch(`/organization/${activeTab}/${selected.id}`, buildPayload());
+        setSuccess(`${LABELS[activeTab].singular} updated.`);
+        notify({
+          title: `${LABELS[activeTab].singular} updated`,
+          message: `${form.name.trim()} was saved successfully.`,
+        });
+      } else {
+        await api.post(`/organization/${activeTab}`, buildPayload());
+        setSuccess(`${LABELS[activeTab].singular} created.`);
+        notify({
+          title: `${LABELS[activeTab].singular} created`,
+          message: `${form.name.trim()} is now available.`,
+        });
+      }
+      closeModal();
+      await fetchData();
+    } catch (requestError) {
+      setError(getApiErrorMessage(requestError, "Unable to save this record."));
+    } finally {
+      setSaving(false);
     }
   };
 
-  useEffect(() => {
-    fetchSummaryStats();
-  }, [data]);
+  const deleteEntity = async (item: OrganizationEntity) => {
+    const confirmed = await confirmAction({
+      title: `Delete ${LABELS[activeTab].singular.toLowerCase()}?`,
+      message: `${item.name} will be permanently removed. This action cannot be undone.`,
+      confirmLabel: `Delete ${LABELS[activeTab].singular.toLowerCase()}`,
+      tone: "danger",
+    });
+    if (!confirmed) return;
+    setError("");
+    try {
+      await api.delete(`/organization/${activeTab}/${item.id}`);
+      setSuccess(`${LABELS[activeTab].singular} deleted.`);
+      notify({
+        title: `${LABELS[activeTab].singular} deleted`,
+        message: `${item.name} was removed.`,
+      });
+      await fetchData();
+    } catch (requestError) {
+      setError(getApiErrorMessage(requestError, "Unable to delete this record."));
+    }
+  };
 
-  const filteredData = data.filter((item: any) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const exportCsv = () => {
+    const rows = [
+      ["ID", "Name", "Parent ID", "Location", "Status"],
+      ...filteredData.map((item) => [
+        item.id,
+        item.name,
+        item.company_id ?? item.branch_id ?? "",
+        item.location ?? "",
+        item.status ?? "",
+      ]),
+    ];
+    const blob = new Blob(
+      [rows.map((row) => row.map(csvCell).join(",")).join("\n")],
+      { type: "text/csv;charset=utf-8" },
+    );
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${activeTab}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
 
-  const organizationTypeOptions = [
-    { value: "companies", label: "Companies" },
-    { value: "branches", label: "Branches" },
-    { value: "projects", label: "Projects" }
-  ];
+  const parentLabel = (item: OrganizationEntity) => {
+    if (activeTab === "branches") {
+      return companies.find((company) => company.id === item.company_id)?.name ?? "—";
+    }
+    if (activeTab === "projects") {
+      return branches.find((branch) => branch.id === item.branch_id)?.name ?? "—";
+    }
+    return "—";
+  };
 
   return (
-    <div className="space-y-6 animate-settings-entrance relative pb-12">
-      {/* Radial decorative gradients */}
-      <div className="absolute top-10 right-10 w-72 h-72 rounded-full bg-blue-500/5 blur-[90px] pointer-events-none animate-pulse-glow" style={{ animationDelay: '0s' }} />
-      <div className="absolute bottom-20 left-10 w-80 h-80 rounded-full bg-purple-500/5 blur-[100px] pointer-events-none animate-pulse-glow" style={{ animationDelay: '1.5s' }} />
-
-      {/* HEADER SECTION */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 relative z-10">
+    <div className="space-y-6 pb-12">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-[36px] font-black text-slate-900 tracking-tight leading-none">Organization Setup</h2>
-          <p className="text-[16px] text-slate-500 mt-1.5 font-medium">Manage companies, branches, layouts, and projects.</p>
+          <h1 className="text-3xl font-black tracking-tight text-slate-900">
+            Organization Setup
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Manage companies, branches, and projects.
+          </p>
         </div>
-        <button className="relative overflow-hidden group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-600 via-indigo-650 to-purple-650 text-white rounded-[14px] text-xs font-black shadow-md shadow-purple-500/15 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer shrink-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-          <span className="relative z-10">+ Add {activeTab === "companies" ? "Company" : activeTab === "branches" ? "Branch" : "Project"}</span>
+        <button
+          type="button"
+          onClick={openCreate}
+          className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow hover:bg-blue-700"
+        >
+          + Add {LABELS[activeTab].singular}
         </button>
       </div>
 
-      {/* DASHBOARD SUMMARY CARDS ROW */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 relative z-10">
-        
-        {/* Companies Summary Card */}
-        <div className="relative overflow-hidden bg-white/70 backdrop-blur-xl border border-white/40 rounded-[24px] p-5 shadow-[0_8px_32px_0_rgba(31,38,135,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(31,38,135,0.08)] group flex justify-between items-center">
-          <div className="space-y-1">
-            <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider block">Companies</span>
-            <h4 className="text-[30px] font-black text-slate-900 tracking-tight leading-none">{summaryStats.companies}</h4>
-            <div className="flex items-center gap-1.5 mt-2">
-              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
-                ↑ 2.4%
-              </span>
-              <span className="text-[10px] text-slate-400 font-semibold">vs last month</span>
-            </div>
-          </div>
-          <div className="p-3.5 bg-blue-500/10 rounded-2xl text-blue-600 shadow-sm transition-transform duration-300 group-hover:scale-110">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9m4 0V7m0 0h4m-4 0H9" />
-            </svg>
-          </div>
+      {(error || success) && (
+        <div
+          role="alert"
+          className={`rounded-xl border px-4 py-3 text-sm ${
+            error
+              ? "border-rose-200 bg-rose-50 text-rose-700"
+              : "border-emerald-200 bg-emerald-50 text-emerald-700"
+          }`}
+        >
+          {error || success}
         </div>
+      )}
 
-        {/* Branches Summary Card */}
-        <div className="relative overflow-hidden bg-white/70 backdrop-blur-xl border border-white/40 rounded-[24px] p-5 shadow-[0_8px_32px_0_rgba(31,38,135,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(31,38,135,0.08)] group flex justify-between items-center">
-          <div className="space-y-1">
-            <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider block">Branches</span>
-            <h4 className="text-[30px] font-black text-slate-900 tracking-tight leading-none">{summaryStats.branches}</h4>
-            <div className="flex items-center gap-1.5 mt-2">
-              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
-                ↑ 4.1%
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {(["companies", "branches", "projects"] as EntityType[]).map((type) => {
+          const count =
+            type === activeTab
+              ? data.length
+              : type === "companies"
+                ? companies.length
+                : type === "branches"
+                  ? branches.length
+                  : "View";
+          return (
+            <button
+              key={type}
+              type="button"
+              onClick={() => {
+                setActiveTab(type);
+                setSearchQuery("");
+                setSuccess("");
+              }}
+              className={`rounded-2xl border p-5 text-left transition ${
+                activeTab === type
+                  ? "border-blue-300 bg-blue-50 shadow-sm"
+                  : "border-slate-200 bg-white hover:border-blue-200"
+              }`}
+            >
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                {LABELS[type].plural}
               </span>
-              <span className="text-[10px] text-slate-400 font-semibold">vs last month</span>
-            </div>
-          </div>
-          <div className="p-3.5 bg-purple-500/10 rounded-2xl text-purple-600 shadow-sm transition-transform duration-300 group-hover:scale-110">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Projects Summary Card */}
-        <div className="relative overflow-hidden bg-white/70 backdrop-blur-xl border border-white/40 rounded-[24px] p-5 shadow-[0_8px_32px_0_rgba(31,38,135,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(31,38,135,0.08)] group flex justify-between items-center">
-          <div className="space-y-1">
-            <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider block">Projects</span>
-            <h4 className="text-[30px] font-black text-slate-900 tracking-tight leading-none">{summaryStats.projects}</h4>
-            <div className="flex items-center gap-1.5 mt-2">
-              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
-                ↑ 8.2%
-              </span>
-              <span className="text-[10px] text-slate-400 font-semibold">vs last month</span>
-            </div>
-          </div>
-          <div className="p-3.5 bg-emerald-500/10 rounded-2xl text-emerald-600 shadow-sm transition-transform duration-300 group-hover:scale-110">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Active Users Summary Card */}
-        <div className="relative overflow-hidden bg-white/70 backdrop-blur-xl border border-white/40 rounded-[24px] p-5 shadow-[0_8px_32px_0_rgba(31,38,135,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(31,38,135,0.08)] group flex justify-between items-center">
-          <div className="space-y-1">
-            <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider block">Active Users</span>
-            <h4 className="text-[30px] font-black text-slate-900 tracking-tight leading-none">{summaryStats.activeUsers}</h4>
-            <div className="flex items-center gap-1.5 mt-2">
-              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
-                ↑ 5.7%
-              </span>
-              <span className="text-[10px] text-slate-400 font-semibold">vs last month</span>
-            </div>
-          </div>
-          <div className="p-3.5 bg-rose-500/10 rounded-2xl text-rose-600 shadow-sm transition-transform duration-300 group-hover:scale-110">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </div>
-        </div>
-
+              <span className="mt-2 block text-2xl font-black text-slate-900">{count}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* SELECT TYPE CARD SECTION */}
-      <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-[24px] p-6 shadow-[0_8px_32px_0_rgba(31,38,135,0.04)] relative z-10">
-        <CustomSelector
-          value={activeTab}
-          onChange={(val) => setActiveTab(val)}
-          options={organizationTypeOptions}
-        />
-        <p className="text-xs text-slate-450 mt-2 ml-1">
-          Switch between Companies, Branches, and Projects schemas to administer organizational layout configurations.
-        </p>
-      </div>
-
-      {/* DIRECTORY TABLE / LIST SECTION */}
-      <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-[24px] shadow-[0_8px_32px_0_rgba(31,38,135,0.04)] overflow-hidden relative z-10 hover:shadow-[0_12px_40px_0_rgba(31,38,135,0.08)] transition-all duration-300">
-        
-        {/* Table directory actions header */}
-        <div className="p-6 border-b border-slate-200/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-3 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h4 className="text-[14px] uppercase font-bold tracking-wider text-slate-800">Organization Directory</h4>
-            <p className="text-xs text-slate-500 mt-0.5 font-medium">Directory of all registered entities in your organization</p>
+            <h2 className="font-bold text-slate-900">{LABELS[activeTab].plural}</h2>
+            <p className="text-xs text-slate-500">{filteredData.length} matching records</p>
           </div>
-          
-          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-            {/* Search Input Box */}
-            <div className="relative flex-1 sm:flex-none sm:w-64">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </span>
-              <input
-                type="text"
-                placeholder="Search organizations..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300 placeholder-slate-400"
-              />
-            </div>
-            
-            {/* Filter button */}
-            <button className="h-11 px-4 bg-white border border-slate-200/85 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all flex items-center gap-1.5 shadow-sm cursor-pointer select-none">
-              <svg className="w-[18px] h-[18px] text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              id="organization-search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder={`Search ${LABELS[activeTab].plural.toLowerCase()}...`}
+              className="h-10 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-blue-500"
+            />
+            <button
+              type="button"
+              onClick={() => document.getElementById("organization-search")?.focus()}
+              className="h-10 rounded-xl border border-slate-200 px-4 text-sm font-bold text-slate-700 hover:bg-slate-50"
+            >
               Filter
             </button>
-
-            {/* Export button */}
-            <button className="h-11 px-4 bg-white border border-slate-200/85 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all flex items-center gap-1.5 shadow-sm cursor-pointer select-none">
-              <svg className="w-[18px] h-[18px] text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              Export
+            <button
+              type="button"
+              onClick={exportCsv}
+              disabled={!filteredData.length}
+              className="h-10 rounded-xl border border-slate-200 px-4 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Export CSV
             </button>
           </div>
         </div>
 
-        {/* Data list table */}
         {loading ? (
-          <div className="p-12 text-center text-slate-500 font-semibold text-xs flex flex-col items-center justify-center">
-            <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3" />
-            Syncing database records...
+          <div className="p-12 text-center text-sm text-slate-500">Loading…</div>
+        ) : filteredData.length === 0 ? (
+          <div className="p-12 text-center">
+            <p className="font-bold text-slate-800">No records found</p>
+            <button
+              type="button"
+              onClick={openCreate}
+              className="mt-4 rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white"
+            >
+              + Add {LABELS[activeTab].singular}
+            </button>
           </div>
         ) : (
-          <div className="overflow-x-auto scrollbar-hide">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50/60 border-b border-slate-200/50 text-[13px] font-extrabold text-slate-400 uppercase tracking-widest">
-                  <th className="px-6 py-4 w-[8%]">ID</th>
-                  <th className="px-6 py-4 w-[24%]">Organization Name</th>
-                  <th className="px-6 py-4 w-[16%]">Organization Type</th>
-                  <th className="px-6 py-4 w-[12%]">Branches</th>
-                  <th className="px-6 py-4 w-[12%]">Projects</th>
-                  <th className="px-6 py-4 w-[12%]">Status</th>
-                  <th className="px-6 py-4 w-[12%]">Created Date</th>
-                  <th className="px-6 py-4 w-[4%] text-right">Actions</th>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[720px] text-left text-sm">
+              <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-5 py-3">ID</th>
+                  <th className="px-5 py-3">Name</th>
+                  <th className="px-5 py-3">Parent</th>
+                  <th className="px-5 py-3">Location</th>
+                  <th className="px-5 py-3">Status</th>
+                  <th className="px-5 py-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-[15px]">
-                {filteredData.map((item: any) => {
-                  const typeLabel = activeTab === "companies" ? "Company" : activeTab === "branches" ? "Branch" : "Project";
-                  
-                  // Formulate branches/projects counts based on types
-                  const branchesCount = activeTab === "companies" ? `${(item.id * 2) % 3 + 1} Branches` : "—";
-                  const projectsCount = activeTab === "companies" 
-                    ? `${(item.id * 3) % 4 + 1} Projects` 
-                    : activeTab === "branches" 
-                      ? `${(item.id % 2) + 1} Projects` 
-                      : "—";
-                  
-                  // Status badges (Active, Pending, Inactive, Suspended)
-                  let status = "Active";
-                  if (activeTab === "projects") {
-                    status = item.status || (item.id % 2 === 0 ? "Active" : "Pending");
-                  } else {
-                    status = item.id % 5 === 0 ? "Inactive" : item.id % 7 === 0 ? "Pending" : "Active";
-                  }
-                  
-                  // Created Date
-                  const createdDate = `Jul ${10 + (item.id % 15)}, 2026`;
-
-                  return (
-                    <tr key={item.id} className="hover:bg-slate-50/40 transition-colors group border-b border-slate-100 last:border-0">
-                      {/* ID column */}
-                      <td className="px-6 py-4">
-                        <span className="px-2 py-0.5 bg-slate-50 border border-slate-200/50 rounded-lg text-xs font-bold text-slate-400">
-                          #{item.id}
-                        </span>
-                      </td>
-                      
-                      {/* Name column */}
-                      <td className="px-6 py-4 font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
-                        {item.name}
-                      </td>
-
-                      {/* Type column */}
-                      <td className="px-6 py-4 text-slate-500 font-semibold text-xs uppercase tracking-wider">
-                        {typeLabel}
-                      </td>
-
-                      {/* Branches count */}
-                      <td className="px-6 py-4 text-slate-500 font-medium">
-                        {branchesCount}
-                      </td>
-
-                      {/* Projects count */}
-                      <td className="px-6 py-4 text-slate-500 font-medium">
-                        {projectsCount}
-                      </td>
-
-                      {/* Status Badges */}
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
-                          status === "Active" 
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-100" 
-                            : status === "Pending" 
-                              ? "bg-amber-50 text-amber-700 border-amber-100" 
-                              : status === "Inactive"
-                                ? "bg-slate-100 text-slate-650 border-slate-200"
-                                : "bg-rose-50 text-rose-700 border-rose-100" // Suspended
-                        }`}>
-                          {status}
-                        </span>
-                      </td>
-
-                      {/* Created Date */}
-                      <td className="px-6 py-4 text-slate-400 font-medium text-xs">
-                        {createdDate}
-                      </td>
-
-                      {/* Action buttons */}
-                      <td className="px-6 py-4 text-right whitespace-nowrap">
-                        <div className="inline-flex items-center gap-1.5">
-                          {/* View Pill Button */}
-                          <button className="p-2 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-lg text-blue-600 transition-all duration-200 cursor-pointer" title="View details">
-                            <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                          </button>
-
-                          {/* Edit Pill Button */}
-                          <button className="p-2 hover:bg-amber-50 border border-transparent hover:border-amber-100 rounded-lg text-amber-600 transition-all duration-200 cursor-pointer" title="Edit details">
-                            <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
-                          </button>
-
-                          {/* Delete Pill Button */}
-                          <button className="p-2 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-lg text-rose-600 transition-all duration-200 cursor-pointer" title="Delete record">
-                            <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-
-                {/* Empty State mapping */}
-                {filteredData.length === 0 && (
-                  <tr>
-                    <td colSpan={8} className="px-6 py-12 text-center text-slate-500">
-                      <div className="py-12 text-center flex flex-col items-center justify-center animate-settings-tab-fade">
-                        <div className="w-40 h-40 mb-4 text-slate-350">
-                          <svg viewBox="0 0 200 200" fill="none" className="w-full h-full mx-auto opacity-80">
-                            <circle cx="100" cy="100" r="80" fill="url(#grad)" opacity="0.1" />
-                            <rect x="70" y="60" width="60" height="80" rx="6" fill="#E5E7EB" stroke="#9CA3AF" strokeWidth="1.5" />
-                            <rect x="85" y="72" width="30" height="12" rx="2" fill="#F9FAFB" stroke="#9CA3AF" strokeWidth="1.5" />
-                            <line x1="80" y1="100" x2="120" y2="100" stroke="#9CA3AF" strokeWidth="1.5" />
-                            <line x1="80" y1="112" x2="110" y2="112" stroke="#9CA3AF" strokeWidth="1.5" />
-                            <line x1="80" y1="124" x2="100" y2="124" stroke="#9CA3AF" strokeWidth="1.5" />
-                            <circle cx="140" cy="140" r="22" fill="#2563EB" opacity="0.95" className="animate-bounce" style={{ animationDuration: '3s' }} />
-                            <path d="M135 140h10M140 135v10" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-                            <defs>
-                              <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
-                                <stop offset="0%" stopColor="#2563EB" />
-                                <stop offset="100%" stopColor="#7C3AED" />
-                              </linearGradient>
-                            </defs>
-                          </svg>
-                        </div>
-                        <h4 className="text-base font-extrabold text-slate-800">No organizations found</h4>
-                        <p className="text-xs text-slate-500 mt-1.5 max-w-sm font-medium">
-                          It looks like you don't have any registered records matching your search query. Get started by adding one.
-                        </p>
-                        <button className="mt-4 inline-flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-xs font-black shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
-                          + Add {activeTab === "companies" ? "Company" : activeTab === "branches" ? "Branch" : "Project"}
+              <tbody className="divide-y divide-slate-100">
+                {filteredData.map((item) => (
+                  <tr key={item.id} className="hover:bg-slate-50">
+                    <td className="px-5 py-4 text-slate-500">#{item.id}</td>
+                    <td className="px-5 py-4 font-bold text-slate-900">{item.name}</td>
+                    <td className="px-5 py-4 text-slate-600">{parentLabel(item)}</td>
+                    <td className="px-5 py-4 text-slate-600">{item.location || "—"}</td>
+                    <td className="px-5 py-4 text-slate-600">{item.status || "Active"}</td>
+                    <td className="px-5 py-4">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openEntity(item, "view")}
+                          className="rounded-lg px-3 py-2 font-bold text-blue-600 hover:bg-blue-50"
+                        >
+                          View
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => openEntity(item, "edit")}
+                          className="rounded-lg px-3 py-2 font-bold text-amber-600 hover:bg-amber-50"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void deleteEntity(item)}
+                          className="rounded-lg px-3 py-2 font-bold text-rose-600 hover:bg-rose-50"
+                        >
+                          Delete
                         </button>
                       </div>
                     </td>
                   </tr>
-                )}
+                ))}
               </tbody>
             </table>
           </div>
         )}
-      </div>
+      </section>
 
+      {modalMode && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${modalMode} ${LABELS[activeTab].singular}`}
+        >
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-black capitalize text-slate-900">
+                {modalMode} {LABELS[activeTab].singular}
+              </h2>
+              <button
+                type="button"
+                onClick={closeModal}
+                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            {modalMode === "view" && selected ? (
+              <dl className="mt-6 space-y-4 text-sm">
+                {Object.entries(selected).map(([key, value]) => (
+                  <div key={key} className="grid grid-cols-3 gap-4 border-b border-slate-100 pb-3">
+                    <dt className="font-bold capitalize text-slate-500">
+                      {key.replaceAll("_", " ")}
+                    </dt>
+                    <dd className="col-span-2 break-words text-slate-900">
+                      {typeof value === "object" ? JSON.stringify(value) : String(value ?? "—")}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            ) : (
+              <form className="mt-6 space-y-4" onSubmit={submitForm}>
+                <label className="block text-sm font-bold text-slate-700">
+                  Name
+                  <input
+                    autoFocus
+                    required
+                    maxLength={100}
+                    value={form.name}
+                    onChange={(event) => setForm({ ...form, name: event.target.value })}
+                    className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-blue-500"
+                  />
+                </label>
+
+                {activeTab === "companies" && (
+                  <label className="block text-sm font-bold text-slate-700">
+                    Logo URL
+                    <input
+                      type="url"
+                      maxLength={255}
+                      value={form.logo_url}
+                      onChange={(event) => setForm({ ...form, logo_url: event.target.value })}
+                      className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-blue-500"
+                    />
+                  </label>
+                )}
+
+                {activeTab === "branches" && (
+                  <label className="block text-sm font-bold text-slate-700">
+                    Company
+                    <select
+                      required
+                      value={form.company_id}
+                      onChange={(event) => setForm({ ...form, company_id: event.target.value })}
+                      className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-blue-500"
+                    >
+                      <option value="">Select company</option>
+                      {companies.map((company) => (
+                        <option key={company.id} value={company.id}>{company.name}</option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+
+                {activeTab === "projects" && (
+                  <>
+                    <label className="block text-sm font-bold text-slate-700">
+                      Branch
+                      <select
+                        required
+                        value={form.branch_id}
+                        onChange={(event) => setForm({ ...form, branch_id: event.target.value })}
+                        className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-blue-500"
+                      >
+                        <option value="">Select branch</option>
+                        {branches.map((branch) => (
+                          <option key={branch.id} value={branch.id}>{branch.name}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="block text-sm font-bold text-slate-700">
+                      Location
+                      <input
+                        maxLength={255}
+                        value={form.location}
+                        onChange={(event) => setForm({ ...form, location: event.target.value })}
+                        className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-blue-500"
+                      />
+                    </label>
+                    <label className="block text-sm font-bold text-slate-700">
+                      Status
+                      <select
+                        value={form.status}
+                        onChange={(event) => setForm({ ...form, status: event.target.value })}
+                        className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-blue-500"
+                      >
+                        <option value="ACTIVE">Active</option>
+                        <option value="PLANNING">Planning</option>
+                        <option value="ON_HOLD">On hold</option>
+                        <option value="COMPLETED">Completed</option>
+                      </select>
+                    </label>
+                    <label className="block text-sm font-bold text-slate-700">
+                      Description
+                      <textarea
+                        maxLength={1000}
+                        rows={4}
+                        value={form.description}
+                        onChange={(event) => setForm({ ...form, description: event.target.value })}
+                        className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-blue-500"
+                      />
+                    </label>
+                  </>
+                )}
+
+                {error && <p className="text-sm font-semibold text-rose-600">{error}</p>}
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-60"
+                  >
+                    {saving ? "Saving…" : "Save"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

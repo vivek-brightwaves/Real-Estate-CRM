@@ -13,6 +13,7 @@ interface LeadSectionProps {
   badgeClass: string;
   onAdd: () => void;
   onStatusChange: (leadId: number, status: string) => void;
+  onLeadClick: (leadId: number) => void;
   onViewAll: () => void;
 }
 
@@ -24,6 +25,7 @@ export default function LeadSection({
   badgeClass,
   onAdd,
   onStatusChange,
+  onLeadClick,
   onViewAll,
 }: LeadSectionProps) {
   return (
@@ -41,7 +43,13 @@ export default function LeadSection({
           />
         ) : (
           leads.map((lead) => (
-            <LeadCard key={lead.id} lead={lead} statusOptions={statusOptions} onStatusChange={onStatusChange} />
+            <LeadCard
+              key={lead.id}
+              lead={lead}
+              statusOptions={statusOptions}
+              onClick={() => onLeadClick(lead.id)}
+              onStatusChange={onStatusChange}
+            />
           ))
         )}
       </div>

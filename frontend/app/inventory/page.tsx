@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../../lib/axios";
 import { useAuthStore } from "../../store/authStore";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import StatsCard from "../../components/dashboard/StatsCard";
+import { useFeedback } from "../../components/ui/FeedbackProvider";
+import { useSectionSearch } from "../../hooks/useSectionSearch";
 
 interface Unit {
   id: string;
@@ -42,13 +44,17 @@ interface Project {
 export default function InventoryPage() {
   const { user, accessToken, clearAuth } = useAuthStore();
   const router = useRouter();
+  const { notify, requestText } = useFeedback();
+  const bulkInputRef = useRef<HTMLInputElement>(null);
+  const demoModeAvailable =
+    process.env.NEXT_PUBLIC_ENABLE_DEMO_DATA === "true";
 
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Filter mode (Live vs Demo Data) to showcase both Empty State & Full State
-  const [useDemoData, setUseDemoData] = useState(true);
+  // Production always starts with persisted backend data. Demo data is opt-in.
+  const [useDemoData, setUseDemoData] = useState(demoModeAvailable);
   const [liveProjects, setLiveProjects] = useState<Project[]>([]);
 
   // Tree toggle states
@@ -68,6 +74,7 @@ export default function InventoryPage() {
 
   // Table parameters
   const [searchTerm, setSearchTerm] = useState("");
+  useSectionSearch("inventory", setSearchTerm);
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
   const unitsPerPage = 5;
@@ -146,6 +153,9 @@ export default function InventoryPage() {
   const projectsToDisplay = useDemoData ? demoProjects : liveProjects;
 
   useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("action") === "project") {
+      setShowProjectModal(true);
+    }
     if (!accessToken) {
       router.push("/login");
       return;
@@ -196,6 +206,63 @@ export default function InventoryPage() {
   const handleLogout = () => {
     clearAuth();
     router.push("/login");
+  };
+
+  const openBulkUpload = () => {
+    if (selectedNode.type !== "floor" || !selectedNode.id) {
+      alert("Select a floor in the inventory tree before uploading units.");
+      return;
+    }
+    if (useDemoData) {
+      alert("Switch to Live Data before importing units.");
+      return;
+    }
+    bulkInputRef.current?.click();
+  };
+
+  const handleBulkUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    try {
+      const rows = (await file.text())
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+      if (rows.length < 2) {
+        throw new Error("CSV must contain a header and at least one unit.");
+      }
+      const headers = rows[0].split(",").map((value) => value.trim().toLowerCase());
+      const requiredIndex = headers.indexOf("unit_number");
+      if (requiredIndex < 0) {
+        throw new Error("CSV header must include unit_number.");
+      }
+      const fieldIndex = (field: string) => headers.indexOf(field);
+      const units = rows.slice(1).map((line, rowIndex) => {
+        const values = line.split(",").map((value) => value.trim());
+        const unitNumber = values[requiredIndex];
+        if (!unitNumber) throw new Error(`Missing unit_number on row ${rowIndex + 2}.`);
+        const areaValue = values[fieldIndex("area")];
+        const priceValue = values[fieldIndex("price")];
+        return {
+          block_id: Number(selectedNode.id),
+          unit_number: unitNumber,
+          type: values[fieldIndex("type")] || null,
+          area: areaValue ? Number(areaValue) : null,
+          price: priceValue ? Number(priceValue) : null,
+        };
+      });
+      await api.post("/inventory/units/bulk", units);
+      alert(`${units.length} units imported successfully.`);
+      await fetchInventory();
+    } catch (requestError: any) {
+      alert(
+        requestError.response?.data?.error?.message ||
+        requestError.response?.data?.detail ||
+        requestError.message ||
+        "Unable to import units.",
+      );
+    }
   };
 
   const toggleNode = (nodeId: string) => {
@@ -584,8 +651,8 @@ export default function InventoryPage() {
 
     return {
       projects: totalProjects,
-      available: availUnits || 245,
-      booked: bookedUnits || 82
+      available: availUnits,
+      booked: bookedUnits
     };
   };
 
@@ -612,28 +679,31 @@ export default function InventoryPage() {
             <p className="text-xs text-slate-500 mt-1">Explore projects, towers, floors, units, availability and pricing.</p>
           </div>
           <div className="flex flex-wrap gap-2.5 items-center">
-            {/* Live vs Demo Toggle */}
-            <button
-              onClick={() => setUseDemoData(!useDemoData)}
-              className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${
-                useDemoData 
-                  ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm" 
-                  : "bg-blue-50 text-blue-700 border-blue-200 shadow-sm"
-              }`}
-            >
-              Mode: {useDemoData ? "Demo Data" : "Live Backend"}
-            </button>
-            <button 
-              onClick={() => {
-                setDemoProjects([]);
-                setLiveProjects([]);
-                setSelectedNode({ type: "project", id: "", data: null });
-              }}
-              className="px-3 py-2 bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 rounded-xl text-xs font-bold transition-all shadow-sm"
-              title="Clear all projects to showcase the Empty State layout"
-            >
-              Simulate Empty State
-            </button>
+            {demoModeAvailable && (
+              <>
+                <button
+                  onClick={() => setUseDemoData(!useDemoData)}
+                  className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${
+                    useDemoData
+                      ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm"
+                      : "bg-blue-50 text-blue-700 border-blue-200 shadow-sm"
+                  }`}
+                >
+                  Mode: {useDemoData ? "Demo Data" : "Live Backend"}
+                </button>
+                <button
+                  onClick={() => {
+                    setDemoProjects([]);
+                    setLiveProjects([]);
+                    setSelectedNode({ type: "project", id: "", data: null });
+                  }}
+                  className="px-3 py-2 bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 rounded-xl text-xs font-bold transition-all shadow-sm"
+                  title="Clear the optional demo view"
+                >
+                  Clear Demo View
+                </button>
+              </>
+            )}
             <button 
               onClick={() => setShowProjectModal(true)}
               className="btn-premium-action btn-new-project"
@@ -641,13 +711,13 @@ export default function InventoryPage() {
               + New Project
             </button>
             <button 
-              onClick={() => alert("Excel Import simulated successfully!")}
+              onClick={openBulkUpload}
               className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm cursor-pointer"
             >
               Import
             </button>
             <button 
-              onClick={() => alert("Filter drawer toggle")}
+              onClick={() => document.getElementById("inventory-filters")?.scrollIntoView({ behavior: "smooth" })}
               className="px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm cursor-pointer"
             >
               Filter
@@ -1119,7 +1189,7 @@ export default function InventoryPage() {
                     <span>🚪</span> Add Unit
                   </button>
                   <button 
-                    onClick={() => alert("Bulk Excel CSV upload process initiated.")}
+                    onClick={openBulkUpload}
                     className="p-3 bg-gradient-to-br from-orange-50 to-orange-100/50 border border-orange-200 text-orange-700 hover:from-orange-100 hover:to-orange-200 text-center rounded-xl text-xs font-bold transition duration-200 shadow-sm flex flex-col items-center gap-1 cursor-pointer"
                   >
                     <span>📤</span> Bulk Upload
@@ -1141,7 +1211,7 @@ export default function InventoryPage() {
                 <p className="text-[10px] text-slate-450 font-bold mt-0.5">Filter, search and execute pricing/hold overrides</p>
               </div>
               
-              <div className="flex flex-wrap gap-3 items-center w-full sm:w-auto">
+              <div id="inventory-filters" className="flex flex-wrap gap-3 items-center w-full sm:w-auto">
                 <input 
                   type="text" 
                   placeholder="Search by Unit / Project / Agent..."
@@ -1224,9 +1294,26 @@ export default function InventoryPage() {
                               </button>
                             )}
                             <button 
-                              onClick={() => {
-                                const p = prompt("Enter new price (₹):", String(unit.price));
-                                if (p) handlePriceUpdate(unit.id, Number(p));
+                              onClick={async () => {
+                                const price = await requestText({
+                                  title: "Update unit price",
+                                  message: `Enter the revised price for unit ${unit.unit_number}.`,
+                                  inputLabel: "New price (₹)",
+                                  initialValue: String(unit.price),
+                                  placeholder: "Enter amount",
+                                  confirmLabel: "Update price",
+                                });
+                                if (price === null) return;
+                                const amount = Number(price);
+                                if (!Number.isFinite(amount) || amount <= 0) {
+                                  notify({
+                                    title: "Invalid price",
+                                    message: "Enter a positive numeric amount.",
+                                    tone: "error",
+                                  });
+                                  return;
+                                }
+                                await handlePriceUpdate(unit.id, amount);
                               }}
                               className="px-3 py-1.5 bg-slate-50 border border-[#E8EDF7] rounded-lg text-slate-700 text-xs font-bold hover:bg-slate-100 transition shadow-sm cursor-pointer"
                             >
@@ -1270,6 +1357,15 @@ export default function InventoryPage() {
             )}
           </div>
         )}
+
+        <input
+          ref={bulkInputRef}
+          type="file"
+          accept=".csv,text/csv"
+          onChange={handleBulkUpload}
+          className="hidden"
+          aria-label="Upload unit CSV"
+        />
 
         {/* MODALS */}
 

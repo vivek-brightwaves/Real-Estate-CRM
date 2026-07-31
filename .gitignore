@@ -48,3 +48,14 @@ venv.bak/
 # OS
 .DS_Store
 Thumbs.db
+
+# Test and coverage artifacts
+.pytest_cache/
+.coverage
+coverage*.json
+coverage.xml
+htmlcov/
+
+# Runtime uploads
+backend/uploads/*
+!backend/uploads/.gitkeep

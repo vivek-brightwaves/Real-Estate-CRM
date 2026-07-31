@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface LeadItem {
   id: number;
@@ -20,33 +21,18 @@ interface RecentLeadsTableProps {
 }
 
 export default function RecentLeadsTable({ leads, onRefresh }: RecentLeadsTableProps) {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // Fallback high-quality mock data if API list is empty
-  const defaultLeads: LeadItem[] = [
-    { id: 1001, name: "Siddharth Malhotra", phone: "+91 98765 43210", email: "siddharth@gmail.com", status: "NEW", source: "Website Form", assigned_to_id: 3, budget: 8500000, created_at: "2 hours ago" },
-    { id: 1002, name: "Anjali Patil", phone: "+91 99887 76655", email: "anjali.patil@outlook.com", status: "CONTACTED", source: "Social Media", assigned_to_id: 3, budget: 12500000, created_at: "1 day ago" },
-    { id: 1003, name: "Kabir Mehra", phone: "+91 91234 56789", email: "kabir.mehra@yahoo.com", status: "VISIT_SCHEDULED", source: "Direct Walk-in", assigned_to_id: 4, budget: 35000000, created_at: "2 days ago" },
-    { id: 1004, name: "Neha Deshmukh", phone: "+91 90000 11111", email: "neha.d@deshmukh.in", status: "NEGOTIATION", source: "Property Portal", assigned_to_id: 5, budget: 18000000, created_at: "3 days ago" },
-    { id: 1005, name: "Aravind Sharma", phone: "+91 98888 77777", email: "aravind@sharmagroup.com", status: "CONVERTED", source: "Referral", assigned_to_id: 3, budget: 52000000, created_at: "4 days ago" },
-    { id: 1006, name: "Riya Kapoor", phone: "+91 97777 66666", email: "riya.k@gmail.com", status: "LOST", source: "Google Ads", assigned_to_id: 4, budget: 9500000, created_at: "5 days ago" },
-    { id: 1007, name: "Manish Pandey", phone: "+91 96666 55555", email: "manish.p@outlook.com", status: "NEW", source: "Website Form", assigned_to_id: 5, budget: 14000000, created_at: "6 days ago" }
-  ];
-
-  const activeLeads = leads && leads.length > 0 ? leads.map((lead, idx) => ({
+  const activeLeads = (leads ?? []).map((lead) => ({
     ...lead,
-    created_at: lead.created_at || `${idx + 1} day${idx > 0 ? 's' : ''} ago`
-  })) : defaultLeads;
-
-  // Formatting utility
-  const formatCurrency = (val?: number) => {
-    if (!val) return "₹1.2Cr";
-    if (val >= 10000000) return `₹${(val / 10000000).toFixed(2)} Cr`;
-    return `₹${(val / 100000).toFixed(1)} L`;
-  };
+    created_at: lead.created_at
+      ? new Date(lead.created_at).toLocaleString()
+      : "Not available",
+  }));
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -184,7 +170,9 @@ export default function RecentLeadsTable({ leads, onRefresh }: RecentLeadsTableP
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                    <span className="text-xs font-semibold text-slate-600">Agent {lead.assigned_to_id || 3}</span>
+                    <span className="text-xs font-semibold text-slate-600">
+                      {lead.assigned_to_id ? `Agent ${lead.assigned_to_id}` : "Unassigned"}
+                    </span>
                   </div>
                 </td>
                 <td className="px-6 py-4 text-xs font-semibold text-slate-500">
@@ -192,7 +180,7 @@ export default function RecentLeadsTable({ leads, onRefresh }: RecentLeadsTableP
                 </td>
                 <td className="px-6 py-4 text-right">
                   <button 
-                    onClick={() => alert(`Opening Lead Detail view for: ${lead.name}`)}
+                    onClick={() => router.push(`/leads/${lead.id}`)}
                     className="px-3 py-1.5 bg-slate-50/50 border border-[#E8EDF7] rounded-lg text-slate-700 text-xs font-bold hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
                   >
                     Manage

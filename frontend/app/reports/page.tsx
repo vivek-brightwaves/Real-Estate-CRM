@@ -5,13 +5,16 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "../../store/authStore";
 import api from "../../lib/axios";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import { useFeedback } from "../../components/ui/FeedbackProvider";
 
 export default function ReportsPage() {
   const router = useRouter();
+  const { notify } = useFeedback();
   const { user, accessToken, clearAuth } = useAuthStore();
-  const [reportType, setReportType] = useState("sales");
+  const [reportType, setReportType] = useState("bookings");
   const [preview, setPreview] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState<"excel" | "pdf" | null>(null);
 
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -71,8 +74,40 @@ export default function ReportsPage() {
     router.push("/login");
   };
 
-  const downloadReport = (format: "excel" | "pdf") => {
-    window.open(`http://localhost:8000/reports/${reportType}/export?format=${format}`, "_blank");
+  const downloadReport = async (format: "excel" | "pdf") => {
+    setDownloading(format);
+    try {
+      const response = await api.get(
+        `/reports/${reportType}/export?format=${format}`,
+        { responseType: "blob" },
+      );
+      const extension = format === "excel" ? "xlsx" : "pdf";
+      const mime =
+        format === "excel"
+          ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          : "application/pdf";
+      const blob = new Blob([response.data], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${reportType}_report.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      notify({
+        title: `${format === "excel" ? "Excel" : "PDF"} report downloaded`,
+        message: `${reportType.replaceAll("_", " ")} report is ready.`,
+      });
+    } catch {
+      notify({
+        title: "Report export failed",
+        message: "The authenticated report could not be generated. Please try again.",
+        tone: "error",
+      });
+    } finally {
+      setDownloading(null);
+    }
   };
 
   if (!user || user.role === "EMPLOYEE") return null;
@@ -101,7 +136,7 @@ export default function ReportsPage() {
               onChange={(e) => setReportType(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
             >
-              <option value="sales">Sales & Bookings</option>
+              <option value="bookings">Sales & Bookings</option>
               <option value="finance">Finance & Collections</option>
               <option value="inventory">Inventory Status</option>
             </select>
@@ -110,17 +145,19 @@ export default function ReportsPage() {
           <div className="flex gap-3 w-full md:w-auto shrink-0 justify-end">
             <button 
               onClick={() => downloadReport("excel")}
+              disabled={downloading !== null}
               className="btn-premium-action btn-export-excel flex items-center gap-1.5"
             >
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-              Export Excel
+              {downloading === "excel" ? "Preparing..." : "Export Excel"}
             </button>
             <button 
               onClick={() => downloadReport("pdf")}
+              disabled={downloading !== null}
               className="btn-premium-action btn-export-pdf flex items-center gap-1.5"
             >
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-              Export PDF
+              {downloading === "pdf" ? "Preparing..." : "Export PDF"}
             </button>
           </div>
         </div>

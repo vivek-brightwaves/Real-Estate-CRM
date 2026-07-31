@@ -1,8 +1,10 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 
 export default function ActivityTimeline() {
+  const router = useRouter();
   const activities = [
     {
       title: "Booking Approved",
@@ -74,7 +76,7 @@ export default function ActivityTimeline() {
           <p className="text-xs text-slate-500 mt-0.5">Audit log of corporate transactions</p>
         </div>
         <button 
-          onClick={() => alert("Redirecting to detailed System Audit Logs")}
+          onClick={() => router.push("/admin/audit")}
           className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
         >
           View Full Audit

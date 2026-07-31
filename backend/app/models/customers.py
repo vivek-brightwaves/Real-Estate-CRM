@@ -1,7 +1,7 @@
 import enum
-from datetime import datetime
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from app.db.base import Base
 
 class DocStatusEnum(str, enum.Enum):
@@ -22,8 +22,20 @@ class Customer(Base):
     name = Column(String(100), nullable=False)
     phone = Column(String(20), nullable=True)
     email = Column(String(100), nullable=True)
-    lead_id = Column(Integer, ForeignKey("leads.id"), nullable=True, index=True)
+    lead_id = Column(
+        Integer,
+        ForeignKey("leads.id"),
+        nullable=True,
+        unique=True,
+        index=True,
+    )
     assigned_to_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+        index=True,
+    )
 
     lead = relationship("Lead")
     assigned_to = relationship("User", foreign_keys=[assigned_to_id])
@@ -36,7 +48,7 @@ class CustomerDocument(Base):
     doc_type = Column(String(50), nullable=False)
     file_url = Column(String(255), nullable=False)
     status = Column(Enum(DocStatusEnum), default=DocStatusEnum.UPLOADED, index=True)
-    verified_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    verified_by_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
     verified_at = Column(DateTime, nullable=True)
 
     customer = relationship("Customer", back_populates="documents")

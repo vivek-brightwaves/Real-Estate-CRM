@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import { ThemeProvider } from "../components/theme-provider";
+import { FeedbackProvider } from "../components/ui/FeedbackProvider";
 
 export const metadata: Metadata = {
   title: "Real Estate CRM",
@@ -22,7 +23,7 @@ export default function RootLayout({
           enableSystem={false}
           storageKey="crm-theme"
         >
-          {children}
+          <FeedbackProvider>{children}</FeedbackProvider>
         </ThemeProvider>
       </body>
     </html>

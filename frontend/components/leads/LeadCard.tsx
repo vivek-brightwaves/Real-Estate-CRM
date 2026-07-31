@@ -11,12 +11,23 @@ export type Lead = {
   id: number;
   name: string;
   phone?: string;
+  email?: string;
+  source?: string;
   budget?: string | number;
   assigned?: string;
   priority?: string;
   status: string;
   created_at?: string;
   avatar?: string;
+};
+
+const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+  NEW: ["CONTACTED", "LOST"],
+  CONTACTED: ["VISIT_SCHEDULED", "LOST"],
+  VISIT_SCHEDULED: ["NEGOTIATION", "LOST"],
+  NEGOTIATION: ["CONVERTED", "LOST"],
+  CONVERTED: [],
+  LOST: [],
 };
 
 export default function LeadCard({
@@ -38,6 +49,13 @@ export default function LeadCard({
         .join("")
         .toUpperCase()
     : "LD";
+  const allowedStatuses = new Set([
+    lead.status,
+    ...(ALLOWED_TRANSITIONS[lead.status] ?? []),
+  ]);
+  const availableStatusOptions = statusOptions.filter((option) =>
+    allowedStatuses.has(option.value),
+  );
 
   return (
     <div
@@ -56,9 +74,9 @@ export default function LeadCard({
             </div>
             <div className="flex items-center gap-2">
               <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
-                lead.priority === "High"
+                lead.priority === "HIGH"
                   ? "bg-rose-50 text-rose-700 border-rose-100"
-                  : lead.priority === "Medium"
+                  : lead.priority === "MEDIUM"
                   ? "bg-amber-50 text-amber-700 border-amber-100"
                   : "bg-emerald-50 text-emerald-700 border-emerald-100"
               }`}>
@@ -66,6 +84,10 @@ export default function LeadCard({
               </span>
               <button
                 type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onClick?.();
+                }}
                 className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
                 aria-label="Open lead actions"
               >
@@ -98,14 +120,20 @@ export default function LeadCard({
             </div>
             <select
               value={lead.status}
+              disabled={availableStatusOptions.length <= 1}
+              title={
+                availableStatusOptions.length <= 1
+                  ? "This lead is in a final status"
+                  : "Move lead to an allowed next status"
+              }
               onClick={(e) => e.stopPropagation()}
               onChange={(e) => {
                 e.stopPropagation();
                 onStatusChange?.(lead.id, e.target.value);
               }}
-              className="w-full sm:w-auto rounded-lg border border-[#E8EDF7] bg-white px-2.5 py-1 text-xs font-bold text-slate-700 outline-none transition focus:border-blue-650 focus:ring-4 focus:ring-blue-600/10 cursor-pointer shadow-sm"
+              className="w-full sm:w-auto rounded-lg border border-[#E8EDF7] bg-white px-2.5 py-1 text-xs font-bold text-slate-700 outline-none transition focus:border-blue-650 focus:ring-4 focus:ring-blue-600/10 cursor-pointer shadow-sm disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
             >
-              {statusOptions.map((option) => (
+              {availableStatusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
