@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../../../store/authStore";
 import api from "../../../lib/axios";
+import PageHeader from "../../../components/ui/PageHeader";
 
 export default function ApprovalsPage() {
   const router = useRouter();
@@ -45,18 +46,19 @@ export default function ApprovalsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Approvals Inbox</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Manage system admin validation and approval requests</p>
-        </div>
-        <button 
-          onClick={() => router.push("/")}
-          className="px-3.5 py-2 bg-slate-50/50 border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
-        >
-          &larr; Back to Dashboard
-        </button>
-      </div>
+      <PageHeader
+        breadcrumb="Dashboard / Administration / Approvals Inbox"
+        title="Approvals Inbox"
+        subtitle="Manage system admin validation and approval requests"
+        actions={
+          <button 
+            onClick={() => router.push("/")}
+            className="px-3.5 py-2 bg-slate-50/50 border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm shrink-0 cursor-pointer"
+          >
+            &larr; Back to Dashboard
+          </button>
+        }
+      />
 
       {loading ? (
         <div className="p-8 text-center text-slate-500 font-semibold text-xs bg-white rounded-[20px] border border-[#E8EDF7] shadow-sm">Loading requests...</div>

@@ -5,6 +5,7 @@ import api from "../../../lib/axios";
 import { useParams, useRouter } from "next/navigation";
 import { useAuthStore } from "../../../store/authStore";
 import DashboardLayout from "../../../components/dashboard/DashboardLayout";
+import PageHeader from "../../../components/ui/PageHeader";
 
 export default function LeadDetailPage() {
   const params = useParams<{ id: string }>();
@@ -107,18 +108,19 @@ export default function LeadDetailPage() {
       onLogout={handleLogout}
     >
       <div className="space-y-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Lead Profiles</h2>
-            <p className="text-xs text-slate-500 mt-0.5">View and update detailed pipeline status for {lead.name}</p>
-          </div>
-          <button 
-            onClick={() => router.back()}
-            className="px-3.5 py-2 bg-slate-50/50 border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-100 transition shadow-sm"
-          >
-            &larr; Back
-          </button>
-        </div>
+        <PageHeader
+          breadcrumb="Dashboard / Leads / Details"
+          title="Lead Profile"
+          subtitle={`View and update detailed pipeline status for ${lead.name}`}
+          actions={
+            <button 
+              onClick={() => router.back()}
+              className="px-3.5 py-2 bg-slate-50/50 border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-100 transition shadow-sm"
+            >
+              &larr; Back
+            </button>
+          }
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "../../store/authStore";
 import api from "../../lib/axios";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import PageHeader from "../../components/ui/PageHeader";
 import { useFeedback } from "../../components/ui/FeedbackProvider";
 
 export default function ReportsPage() {
@@ -121,12 +122,11 @@ export default function ReportsPage() {
       onLogout={handleLogout}
     >
       <div className="space-y-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Reports Center</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Generate, filter, preview and export business performance and sales sheets</p>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumb="Dashboard / Reports"
+          title="Reports Center"
+          subtitle="Generate, filter, preview and export business performance and sales sheets"
+        />
 
         <div className="bg-gradient-to-br from-white via-white to-slate-50/30 p-6 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-md transition-all duration-300 mb-8 flex flex-col md:flex-row gap-6 items-end">
           <div className="flex-1 w-full">

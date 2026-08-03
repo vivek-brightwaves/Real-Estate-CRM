@@ -5,20 +5,21 @@ import api from "../../lib/axios";
 import { useAuthStore } from "../../store/authStore";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import PageHeader from "../../components/ui/PageHeader";
 
 export default function VisitsPage() {
   const [visits, setVisits] = useState([]);
   const [loading, setLoading] = useState(false);
   const { user, accessToken, clearAuth } = useAuthStore();
   const router = useRouter();
-  
+
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
 
   // Modals state
   const [showCheckIn, setShowCheckIn] = useState<number | null>(null);
   const [photo, setPhoto] = useState<File | null>(null);
-  
+
   const [showFeedback, setShowFeedback] = useState<number | null>(null);
   const [feedbackText, setFeedbackText] = useState("");
   const [rating, setRating] = useState(5);
@@ -76,17 +77,17 @@ export default function VisitsPage() {
   const handleCheckIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!showCheckIn) return;
-    
+
     try {
       const formData = new FormData();
       if (photo) {
         formData.append("photo", photo);
       }
-      
+
       await api.post(`/site-visits/${showCheckIn}/check-in`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
-      
+
       alert("Checked in successfully!");
       setShowCheckIn(null);
       setPhoto(null);
@@ -99,13 +100,13 @@ export default function VisitsPage() {
   const handleFeedback = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!showFeedback) return;
-    
+
     try {
       await api.post(`/site-visits/${showFeedback}/feedback`, {
         feedback: feedbackText,
         rating
       });
-      
+
       alert("Feedback submitted!");
       setShowFeedback(null);
       setFeedbackText("");
@@ -144,12 +145,11 @@ export default function VisitsPage() {
       onLogout={handleLogout}
     >
       <div className="space-y-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Site Visits</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Track, check-in, and approve on-site real estate tours</p>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumb="Dashboard / Visits"
+          title="Site Visits"
+          subtitle="Track, check-in, and approve on-site real estate tours"
+        />
 
         {loading ? (
           <div className="p-8 text-center text-slate-500 font-semibold text-xs bg-white rounded-[20px] border border-[#E8EDF7] shadow-sm">Loading scheduled visits...</div>
@@ -171,14 +171,13 @@ export default function VisitsPage() {
                           <p className="font-bold text-slate-900 text-sm">Lead ID: #{visit.lead_id}</p>
                           <p className="text-xs text-slate-450 font-semibold mt-0.5">Scheduled: {new Date(visit.scheduled_at).toLocaleTimeString()}</p>
                         </div>
-                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
-                          visit.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                          visit.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-slate-50 text-slate-700 border-slate-100'
-                        }`}>
+                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${visit.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                            visit.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-slate-50 text-slate-700 border-slate-100'
+                          }`}>
                           {visit.status}
                         </span>
                       </div>
-                      
+
                       {visit.photo_url && (
                         <div className="mb-4 space-y-1.5">
                           <img src={`http://localhost:8000${visit.photo_url}`} alt="Check-in" className="h-32 object-cover rounded-xl border border-[#E8EDF7] shadow-inner" />
@@ -232,22 +231,31 @@ export default function VisitsPage() {
 
         {/* Check-In Modal */}
         {showCheckIn && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 rounded-[20px] border border-[#E8EDF7] shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 border-b border-slate-100 pb-2">Check In</h3>
-              <form onSubmit={handleCheckIn} className="space-y-4">
+          <div className="fixed inset-0 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 z-50 transition-opacity duration-200">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-border rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-md p-8 relative overflow-hidden transition-all transform scale-100 translate-y-0 duration-250 ease-out">
+              <button
+                type="button"
+                onClick={() => setShowCheckIn(null)}
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-655 transition-all duration-200 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 leading-none">Check In</h3>
+              <form onSubmit={handleCheckIn} className="space-y-5">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Upload Photo (Optional)</label>
-                  <input 
-                    type="file" 
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Upload Photo (Optional)</label>
+                  <input
+                    type="file"
                     accept="image/*"
                     onChange={(e) => setPhoto(e.target.files ? e.target.files[0] : null)}
-                    className="w-full px-3.5 py-2 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+                    className="w-full px-4 py-2.5 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer"
                   />
                 </div>
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                  <button type="button" onClick={() => setShowCheckIn(null)} className="px-4 py-2 border border-[#E8EDF7] rounded-xl hover:bg-slate-50 transition text-slate-650 text-xs font-bold shadow-sm cursor-pointer">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Submit</button>
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-800 mt-6">
+                  <button type="button" onClick={() => setShowCheckIn(null)} className="h-11 px-5 border border-[#CBD5E1] dark:border-[#334155] rounded-xl bg-white dark:bg-[#1E293B] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:border-[#94A3B8] transition-all duration-200 text-[#334155] dark:text-slate-300 text-xs font-semibold cursor-pointer">Cancel</button>
+                  <button type="submit" className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer">Submit</button>
                 </div>
               </form>
             </div>
@@ -256,30 +264,39 @@ export default function VisitsPage() {
 
         {/* Feedback Modal */}
         {showFeedback && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 rounded-[20px] border border-[#E8EDF7] shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 border-b border-slate-100 pb-2">Leave Feedback</h3>
-              <form onSubmit={handleFeedback} className="space-y-4">
+          <div className="fixed inset-0 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 z-50 transition-opacity duration-200">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-border rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-md p-8 relative overflow-hidden transition-all transform scale-100 translate-y-0 duration-250 ease-out">
+              <button
+                type="button"
+                onClick={() => setShowFeedback(null)}
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-655 transition-all duration-200 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 leading-none">Leave Feedback</h3>
+              <form onSubmit={handleFeedback} className="space-y-5">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Rating (1-5)</label>
-                  <input 
-                    type="number" min="1" max="5" 
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Rating (1-5)</label>
+                  <input
+                    type="number" min="1" max="5"
                     value={rating} onChange={(e) => setRating(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm" required
+                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm" required
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Outcome / Feedback</label>
-                  <textarea 
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Outcome / Feedback</label>
+                  <textarea
                     value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm min-h-[100px] resize-none" required
+                    className="w-full px-4 py-3 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm min-h-[100px] resize-none" required
                   />
                 </div>
-                
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                  <button type="button" onClick={() => setShowFeedback(null)} className="px-4 py-2 border border-[#E8EDF7] rounded-xl hover:bg-slate-50 transition text-slate-650 text-xs font-bold shadow-sm cursor-pointer">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Submit</button>
+
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-800 mt-6">
+                  <button type="button" onClick={() => setShowFeedback(null)} className="h-11 px-5 border border-[#CBD5E1] dark:border-[#334155] rounded-xl bg-white dark:bg-[#1E293B] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:border-[#94A3B8] transition-all duration-200 text-[#334155] dark:text-slate-300 text-xs font-semibold cursor-pointer">Cancel</button>
+                  <button type="submit" className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer">Submit</button>
                 </div>
               </form>
             </div>

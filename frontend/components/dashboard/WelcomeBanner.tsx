@@ -36,7 +36,7 @@ export default function WelcomeBanner({ userName, userRole }: WelcomeBannerProps
   };
 
   return (
-    <div 
+    <div
       className="relative overflow-hidden rounded-[18px] p-6 sm:p-8 bg-white/75 dark:bg-[#1E293B]/75 backdrop-blur-[18px] border border-white/60 dark:border-slate-700/50 shadow-[0_10px_30px_rgba(15,23,42,0.08)] dark:shadow-none hover:shadow-[0_20px_50px_rgba(59,130,246,0.15)] dark:hover:shadow-none mb-6 transition-all duration-300 animate-header-load"
       style={{
         background: 'linear-gradient(135deg, var(--welcome-bg-start, rgba(255, 255, 255, 0.95)) 0%, var(--welcome-bg-mid, rgba(239, 246, 255, 0.07)) 50%, var(--welcome-bg-end, rgba(250, 245, 255, 0.07)) 100%)'

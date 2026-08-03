@@ -75,7 +75,7 @@ export default function ActivityTimeline() {
           <h3 className="text-lg font-bold text-slate-900">Activity Timeline</h3>
           <p className="text-xs text-slate-500 mt-0.5">Audit log of corporate transactions</p>
         </div>
-        <button 
+        <button
           onClick={() => router.push("/admin/audit")}
           className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
         >
@@ -90,7 +90,7 @@ export default function ActivityTimeline() {
             <span className={`absolute -left-[33px] top-1 flex h-7 w-7 items-center justify-center rounded-full ring-4 ${act.color}`}>
               {act.icon}
             </span>
-            
+
             <div className="space-y-1">
               <div className="flex items-center justify-between gap-4">
                 <h4 className="text-sm font-bold text-slate-900">{act.title}</h4>

@@ -6,6 +6,7 @@ import { useAuthStore } from "../../store/authStore";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import StatsCard from "../../components/dashboard/StatsCard";
+import PageHeader from "../../components/ui/PageHeader";
 import { useFeedback } from "../../components/ui/FeedbackProvider";
 import { useSectionSearch } from "../../hooks/useSectionSearch";
 
@@ -456,7 +457,7 @@ export default function InventoryPage() {
   const handleCreateFloor = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newFloorName) return;
-    
+
     // Find parent project and selected tower
     let targetProject: Project | null = null;
     let targetTowerId = "";
@@ -668,116 +669,113 @@ export default function InventoryPage() {
       onMarkRead={markRead}
       onLogout={handleLogout}
     >
-      <div className="space-y-8 bg-gradient-to-br from-[#F5F8FC] to-[#EEF4FF] dark:from-transparent dark:to-transparent min-h-[calc(100vh-120px)] p-1 rounded-3xl">
-        
-        {/* HEADER SECTION */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-2 border-b border-slate-200/50 dark:border-border/50">
-          <div>
-            <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-[#F8FAFC] tracking-tight flex items-center gap-2">
-              <span className="text-2xl">🏢</span> Property Inventory
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Explore projects, towers, floors, units, availability and pricing.</p>
-          </div>
-          <div className="flex flex-wrap gap-2.5 items-center">
-            {demoModeAvailable && (
-              <>
-                <button
-                  onClick={() => setUseDemoData(!useDemoData)}
-                  className={`h-10 px-3.5 rounded-2xl text-xs font-bold border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    useDemoData
-                      ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800/30 shadow-sm"
-                      : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800/30 shadow-sm"
-                  }`}
-                >
-                  Mode: {useDemoData ? "Demo Data" : "Live Backend"}
-                </button>
-                <button
-                  onClick={() => {
-                    setDemoProjects([]);
-                    setLiveProjects([]);
-                    setSelectedNode({ type: "project", id: "", data: null });
-                  }}
-                  className="h-10 px-3.5 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-2xl text-xs font-bold transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  title="Clear the optional demo view"
-                >
-                  Clear Demo View
-                </button>
-              </>
-            )}
-            <button 
-              onClick={() => setShowProjectModal(true)}
-              className="h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-xs font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
-            >
-              + New Project
-            </button>
-            <button 
-              onClick={openBulkUpload}
-              className="h-10 px-4 bg-white dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-border rounded-2xl text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 dark:hover:bg-[#273449] transition-all duration-200 hover:scale-[1.02] shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
-            >
-              Import
-            </button>
-            <button 
-              onClick={() => document.getElementById("inventory-filters")?.scrollIntoView({ behavior: "smooth" })}
-              className="h-10 px-4 bg-white dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-border rounded-2xl text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 dark:hover:bg-[#273449] transition-all duration-200 hover:scale-[1.02] shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
-            >
-              Filter
-            </button>
-          </div>
-        </div>
+      <div className="properties-page-container space-y-8 bg-gradient-to-br from-[#F5F8FC] to-[#EEF4FF] dark:from-transparent dark:to-transparent min-h-[calc(100vh-120px)] p-1 rounded-3xl">
+
+        <PageHeader
+          breadcrumb="Dashboard / Properties"
+          title="Property Inventory"
+          subtitle="Explore projects, towers, floors, units, availability and pricing."
+          actions={
+            <div className="flex flex-wrap gap-2.5 items-center">
+              {demoModeAvailable && (
+                <>
+                  <button
+                    onClick={() => setUseDemoData(!useDemoData)}
+                    className={`h-10 px-3.5 rounded-2xl text-xs font-bold border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${useDemoData
+                        ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800/30 shadow-sm"
+                        : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800/30 shadow-sm"
+                      }`}
+                  >
+                    Mode: {useDemoData ? "Demo Data" : "Live Backend"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDemoProjects([]);
+                      setLiveProjects([]);
+                      setSelectedNode({ type: "project", id: "", data: null });
+                    }}
+                    className="h-10 px-3.5 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-2xl text-xs font-bold transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    title="Clear the optional demo view"
+                  >
+                    Clear Demo View
+                  </button>
+                </>
+              )}
+              <button
+                onClick={() => setShowProjectModal(true)}
+                className="h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-xs font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
+              >
+                + New Project
+              </button>
+              <button
+                onClick={openBulkUpload}
+                className="h-10 px-4 bg-white dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-border rounded-2xl text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 dark:hover:bg-[#273449] transition-all duration-200 hover:scale-[1.02] shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
+              >
+                Import
+              </button>
+              <button
+                onClick={() => document.getElementById("inventory-filters")?.scrollIntoView({ behavior: "smooth" })}
+                className="h-10 px-4 bg-white dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-border rounded-2xl text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 dark:hover:bg-[#273449] transition-all duration-200 hover:scale-[1.02] shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
+              >
+                Filter
+              </button>
+            </div>
+          }
+        />
 
         {/* SUMMARY CARDS SECTION */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard 
-            label="Projects" 
-            value={kpiStats.projects} 
-            growth="8.4" 
-            isPositive={true} 
-            color="blue" 
+          <StatsCard
+            label="Projects"
+            value={kpiStats.projects}
+            growth="8.4"
+            isPositive={true}
+            color="blue"
             sparklineData={sparkData.projects}
             icon={
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9m4 0V7m0 0h4m-4 0H9" />
               </svg>
-            } 
+            }
           />
-          <StatsCard 
-            label="Available Units" 
-            value={kpiStats.available} 
-            growth="12.1" 
-            isPositive={true} 
-            color="green" 
+          <StatsCard
+            label="Available Units"
+            value={kpiStats.available}
+            growth="12.1"
+            isPositive={true}
+            color="green"
             sparklineData={sparkData.available}
             icon={
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-            } 
+            }
           />
-          <StatsCard 
-            label="Booked Units" 
-            value={kpiStats.booked} 
-            growth="5.8" 
-            isPositive={true} 
-            color="purple" 
+          <StatsCard
+            label="Booked Units"
+            value={kpiStats.booked}
+            growth="5.8"
+            isPositive={true}
+            color="purple"
             sparklineData={sparkData.booked}
             icon={
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
-            } 
+            }
           />
-          <StatsCard 
-            label="Revenue" 
-            value="₹4.8 Cr" 
-            growth="15.2" 
-            isPositive={true} 
-            color="orange" 
+          <StatsCard
+            label="Revenue"
+            value="₹4.8 Cr"
+            growth="15.2"
+            isPositive={true}
+            color="orange"
             sparklineData={sparkData.revenue}
             icon={
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-            } 
+            }
           />
         </div>
 
@@ -791,7 +789,7 @@ export default function InventoryPage() {
             </div>
             <h3 className="text-lg font-bold text-slate-800 dark:text-[#F8FAFC] tracking-tight mb-2">No active projects found</h3>
             <p className="text-xs text-slate-400 dark:text-[#94A3B8] font-semibold max-w-xs mb-6">Get started by creating your first real estate project or building pipeline units.</p>
-            <button 
+            <button
               onClick={() => setShowProjectModal(true)}
               className="h-10 px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-xs font-bold shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer flex items-center justify-center"
             >
@@ -800,7 +798,7 @@ export default function InventoryPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-6 items-start">
-            
+
             {/* LEFT (70%): INVENTORY TREE CARD */}
             <div className="bg-white dark:bg-[#111827] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[20px] shadow-sm p-6 overflow-hidden">
               <div className="flex justify-between items-center mb-6 pb-2 border-b border-slate-100 dark:border-border">
@@ -821,16 +819,15 @@ export default function InventoryPage() {
                   return (
                     <div key={proj.id} className="space-y-1">
                       {/* Project Row */}
-                      <div 
+                      <div
                         onClick={() => {
                           setSelectedNode({ type: "project", id: proj.id, data: proj });
                           toggleNode(proj.id);
                         }}
-                        className={`flex justify-between items-center px-4 py-2.5 rounded-xl cursor-pointer transition-all border ${
-                          isProjSelected 
-                            ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950/30 dark:border-blue-800/40 dark:text-blue-400 shadow-sm" 
+                        className={`flex justify-between items-center px-4 py-2.5 rounded-xl cursor-pointer transition-all border ${isProjSelected
+                            ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950/30 dark:border-blue-800/40 dark:text-blue-400 shadow-sm"
                             : "bg-slate-50/50 dark:bg-[#1E293B] hover:bg-slate-100/50 dark:hover:bg-[#273449] border-transparent dark:border-[rgba(255,255,255,0.04)] text-slate-800 dark:text-slate-200"
-                        }`}
+                          }`}
                       >
                         <span className="flex items-center gap-2">
                           <span className="text-base">🏢</span>
@@ -848,17 +845,16 @@ export default function InventoryPage() {
                             return (
                               <div key={tower.id} className="space-y-1">
                                 {/* Tower Row */}
-                                <div 
+                                <div
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedNode({ type: "tower", id: tower.id, data: tower });
                                     toggleNode(tower.id);
                                   }}
-                                  className={`flex justify-between items-center px-3.5 py-2 rounded-lg cursor-pointer transition-all border ${
-                                    isTowerSelected 
-                                      ? "bg-blue-50/70 border-blue-150 text-blue-650 dark:bg-blue-950/20 dark:border-blue-800/30 dark:text-blue-400" 
+                                  className={`flex justify-between items-center px-3.5 py-2 rounded-lg cursor-pointer transition-all border ${isTowerSelected
+                                      ? "bg-blue-50/70 border-blue-150 text-blue-650 dark:bg-blue-950/20 dark:border-blue-800/30 dark:text-blue-400"
                                       : "hover:bg-slate-100/40 dark:hover:bg-[#1E293B] border-transparent text-slate-700 dark:text-slate-300"
-                                  }`}
+                                    }`}
                                 >
                                   <span className="flex items-center gap-2">
                                     <span className="text-sm">🗼</span>
@@ -882,11 +878,10 @@ export default function InventoryPage() {
                                               setSelectedNode({ type: "floor", id: floor.id, data: floor });
                                               toggleNode(floor.id);
                                             }}
-                                            className={`flex justify-between items-center px-3 py-1.5 rounded-lg cursor-pointer transition-all border ${
-                                              isFloorSelected 
-                                                ? "bg-blue-50/50 border-blue-100 text-blue-600 dark:bg-blue-950/10 dark:border-blue-800/20 dark:text-blue-400" 
+                                            className={`flex justify-between items-center px-3 py-1.5 rounded-lg cursor-pointer transition-all border ${isFloorSelected
+                                                ? "bg-blue-50/50 border-blue-100 text-blue-600 dark:bg-blue-950/10 dark:border-blue-800/20 dark:text-blue-400"
                                                 : "hover:bg-slate-100/30 dark:hover:bg-[#1E293B] border-transparent text-slate-655 dark:text-slate-350"
-                                            }`}
+                                              }`}
                                           >
                                             <span className="flex items-center gap-2">
                                               <span className="text-slate-400">📊</span>
@@ -913,11 +908,10 @@ export default function InventoryPage() {
                                                       e.stopPropagation();
                                                       setSelectedNode({ type: "unit", id: unit.id, data: unit });
                                                     }}
-                                                    className={`px-2.5 py-1.5 rounded-lg border text-center cursor-pointer transition-all shadow-sm ${
-                                                      isUnitSelected
+                                                    className={`px-2.5 py-1.5 rounded-lg border text-center cursor-pointer transition-all shadow-sm ${isUnitSelected
                                                         ? "ring-2 ring-blue-500 border-blue-500 font-black scale-105"
                                                         : statusColors[unit.status] || "bg-white dark:bg-[#111827] border-slate-200 dark:border-border text-slate-700 dark:text-slate-355"
-                                                    }`}
+                                                      }`}
                                                   >
                                                     <div className="text-[10px] uppercase font-black">{unit.unit_number}</div>
                                                     <div className="text-[8px] opacity-75 font-semibold mt-0.5">{unit.status}</div>
@@ -950,7 +944,7 @@ export default function InventoryPage() {
 
             {/* RIGHT (30%): DETAILS & QUICK ACTIONS PANELS */}
             <div className="space-y-6 w-full shrink-0">
-              
+
               {/* CARD 1: PROJECT / NODE DETAILS */}
               <div className="bg-white dark:bg-[#111827] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[20px] shadow-sm p-6">
                 <h3 className="font-bold text-slate-900 dark:text-[#F8FAFC] text-sm uppercase tracking-wider mb-4 pb-2 border-b border-slate-100 dark:border-border">
@@ -986,8 +980,8 @@ export default function InventoryPage() {
                             <span>{selectedNode.data.completion}%</span>
                           </div>
                           <div className="w-full bg-slate-100 dark:bg-[#0F172A] rounded-full h-2 overflow-hidden shadow-inner">
-                            <div 
-                              className="bg-gradient-to-r from-blue-500 to-indigo-650 h-full rounded-full transition-all duration-500" 
+                            <div
+                              className="bg-gradient-to-r from-blue-500 to-indigo-650 h-full rounded-full transition-all duration-500"
                               style={{ width: `${selectedNode.data.completion}%` }}
                             />
                           </div>
@@ -1023,7 +1017,7 @@ export default function InventoryPage() {
                         {user?.role === "SUPER_ADMIN" && (
                           <div className="pt-2">
                             <label className="block text-[9px] font-bold text-slate-400 dark:text-[#64748B] uppercase tracking-widest mb-1">Update Price (₹)</label>
-                            <input 
+                            <input
                               type="number"
                               className="w-full px-3 py-1.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
                               defaultValue={selectedNode.data.price}
@@ -1036,14 +1030,14 @@ export default function InventoryPage() {
                         {(user?.role === "SUPER_ADMIN" || user?.role === "MANAGER") && (
                           <div className="flex gap-2 pt-2 border-t border-slate-100 dark:border-border">
                             {selectedNode.data.status === "AVAILABLE" ? (
-                              <button 
+                              <button
                                 onClick={() => handleHold(selectedNode.data.id)}
                                 className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white py-2.5 rounded-xl text-xs font-bold shadow-md shadow-amber-500/10 hover:shadow-lg transition cursor-pointer"
                               >
                                 Hold Unit
                               </button>
                             ) : selectedNode.data.status === "HOLD" ? (
-                              <button 
+                              <button
                                 onClick={() => handleRelease(selectedNode.data.id)}
                                 className="w-full bg-gradient-to-r from-emerald-500 to-teal-650 text-white py-2.5 rounded-xl text-xs font-bold shadow-md shadow-emerald-500/10 hover:shadow-lg transition cursor-pointer"
                               >
@@ -1086,18 +1080,18 @@ export default function InventoryPage() {
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                       <circle cx="50" cy="50" r="40" stroke="#f1f5f9" className="stroke-[#f1f5f9] dark:stroke-[#1E293B]" strokeWidth="8" fill="transparent" />
                       {/* Available segment circle */}
-                      <circle 
-                        cx="50" cy="50" r="40" 
-                        stroke="#10b981" strokeWidth="8" fill="transparent" 
+                      <circle
+                        cx="50" cy="50" r="40"
+                        stroke="#10b981" strokeWidth="8" fill="transparent"
                         strokeDasharray={251.2}
                         strokeDashoffset={251.2 - (251.2 * availRingPercent) / 100}
                         strokeLinecap="round"
                         className="transition-all duration-500"
                       />
                       {/* Booked segment circle */}
-                      <circle 
-                        cx="50" cy="50" r="40" 
-                        stroke="#3b82f6" strokeWidth="8" fill="transparent" 
+                      <circle
+                        cx="50" cy="50" r="40"
+                        stroke="#3b82f6" strokeWidth="8" fill="transparent"
                         strokeDasharray={251.2}
                         strokeDashoffset={251.2 - (251.2 * bookedRingPercent) / 100}
                         strokeLinecap="round"
@@ -1152,7 +1146,7 @@ export default function InventoryPage() {
                   Quick Actions
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
-                  <button 
+                  <button
                     onClick={() => {
                       if (selectedNode.type !== "project") {
                         alert("Please select a project node in the tree first.");
@@ -1164,7 +1158,7 @@ export default function InventoryPage() {
                   >
                     <span>🗼</span> Add Tower
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
                       if (selectedNode.type !== "tower") {
                         alert("Please select a Tower node in the tree first.");
@@ -1176,7 +1170,7 @@ export default function InventoryPage() {
                   >
                     <span>📊</span> Add Floor
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
                       if (selectedNode.type !== "floor") {
                         alert("Please select a Floor node in the tree first.");
@@ -1188,7 +1182,7 @@ export default function InventoryPage() {
                   >
                     <span>🚪</span> Add Unit
                   </button>
-                  <button 
+                  <button
                     onClick={openBulkUpload}
                     className="p-3 bg-gradient-to-br from-orange-50 to-orange-100/50 border border-orange-200 text-orange-700 dark:from-orange-950/20 dark:to-orange-950/5 dark:border-orange-900/30 dark:text-orange-400 hover:from-orange-100 hover:to-orange-200 dark:hover:from-orange-900/30 dark:hover:to-orange-955/10 text-center rounded-xl text-xs font-bold transition duration-205 shadow-sm flex flex-col items-center gap-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
@@ -1209,10 +1203,10 @@ export default function InventoryPage() {
                 <h3 className="font-bold text-slate-900 dark:text-[#F8FAFC] text-sm uppercase tracking-wider">All Units Directory</h3>
                 <p className="text-[10px] text-slate-450 dark:text-[#94A3B8] font-bold mt-0.5">Filter, search and execute pricing/hold overrides</p>
               </div>
-              
+
               <div id="inventory-filters" className="flex flex-wrap gap-3 items-center w-full sm:w-auto">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   placeholder="Search by Unit / Project / Agent..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -1257,7 +1251,7 @@ export default function InventoryPage() {
                       HOLD: "bg-amber-50 text-amber-750 border-amber-100 dark:bg-amber-950/20 dark:text-amber-450 dark:border-amber-900/30"
                     };
                     return (
-                      <tr 
+                      <tr
                         key={unit.id}
                         className="hover:bg-slate-50/60 dark:hover:bg-[#1E293B]/60 transition-colors group cursor-pointer"
                         onClick={() => setSelectedNode({ type: "unit", id: unit.id, data: unit })}
@@ -1277,7 +1271,7 @@ export default function InventoryPage() {
                         <td className="px-6 py-4 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                           <div className="inline-flex gap-2">
                             {unit.status === "AVAILABLE" && (user?.role === "SUPER_ADMIN" || user?.role === "MANAGER") && (
-                              <button 
+                              <button
                                 onClick={() => handleHold(unit.id)}
                                 className="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/40 transition shadow-sm cursor-pointer"
                               >
@@ -1285,14 +1279,14 @@ export default function InventoryPage() {
                               </button>
                             )}
                             {unit.status === "HOLD" && (user?.role === "SUPER_ADMIN" || user?.role === "MANAGER") && (
-                              <button 
+                              <button
                                 onClick={() => handleRelease(unit.id)}
                                 className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition shadow-sm cursor-pointer"
                               >
                                 Release
                               </button>
                             )}
-                            <button 
+                            <button
                               onClick={async () => {
                                 const price = await requestText({
                                   title: "Update unit price",
@@ -1337,14 +1331,14 @@ export default function InventoryPage() {
               <div className="flex justify-between items-center border-t border-slate-100 dark:border-border pt-6 mt-6 text-xs font-bold text-slate-455 dark:text-slate-400 uppercase">
                 <span>Showing {Math.min(filteredUnits.length, (currentPage - 1) * unitsPerPage + 1)} to {Math.min(filteredUnits.length, currentPage * unitsPerPage)} of {filteredUnits.length} Units</span>
                 <div className="flex gap-2">
-                  <button 
+                  <button
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     className="px-3.5 py-2 border border-[#E8EDF7] dark:border-[#334155] rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-700 dark:text-slate-350 shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
-                  <button 
+                  <button
                     disabled={currentPage === totalPages}
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     className="px-3.5 py-2 border border-[#E8EDF7] dark:border-[#334155] rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-700 dark:text-slate-350 shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1368,34 +1362,46 @@ export default function InventoryPage() {
 
         {/* Create Project Modal */}
         {showProjectModal && (
-          <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 dark:from-[#111827] dark:via-[#111827] dark:to-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98 dark:bg-[#111827]/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 dark:text-white border-b border-slate-100 dark:border-border pb-2">Create New Project</h3>
-              <form onSubmit={handleCreateProject} className="space-y-4">
+          <div className="fixed inset-0 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 z-50 transition-opacity duration-200 project-modal-overlay">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-border rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-md p-8 relative overflow-hidden transition-all transform scale-100 translate-y-0 duration-250 ease-out project-modal-content">
+              {/* Close Button in top-right corner */}
+              <button
+                type="button"
+                onClick={() => setShowProjectModal(false)}
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-650 transition-all duration-200 cursor-pointer"
+                aria-label="Close"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 leading-none">Create New Project</h3>
+              <form onSubmit={handleCreateProject} className="space-y-5">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest mb-1.5">Project Name</label>
-                  <input 
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Project Name</label>
+                  <input
                     type="text" required
                     value={newProjectName} onChange={(e) => setNewProjectName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                     placeholder="e.g. Project C"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-455 dark:text-slate-500 uppercase tracking-widest mb-1.5">Location</label>
-                  <input 
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Location</label>
+                  <input
                     type="text" required
                     value={newProjectLoc} onChange={(e) => setNewProjectLoc(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                     placeholder="e.g. Sector 5, Uptown"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-455 dark:text-slate-500 uppercase tracking-widest mb-1.5">Status</label>
-                    <select 
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Status</label>
+                    <select
                       value={newProjectStatus} onChange={(e) => setNewProjectStatus(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+                      className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8] dark:hover:border-slate-500"
                     >
                       <option value="Under Construction">Under Construction</option>
                       <option value="Planning">Planning</option>
@@ -1403,17 +1409,17 @@ export default function InventoryPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-455 dark:text-slate-500 uppercase tracking-widest mb-1.5">Completion %</label>
-                    <input 
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Completion %</label>
+                    <input
                       type="number" min="0" max="100"
                       value={newProjectCompletion} onChange={(e) => setNewProjectCompletion(Number(e.target.value))}
-                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                      className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                     />
                   </div>
                 </div>
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
-                  <button type="button" onClick={() => setShowProjectModal(false)} className="px-4 py-2 border border-[#E8EDF7] dark:border-border rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-655 dark:text-slate-300 text-xs font-bold cursor-pointer">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-655 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Create</button>
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-800 mt-6 project-modal-footer">
+                  <button type="button" onClick={() => setShowProjectModal(false)} className="h-11 px-5 border border-[#CBD5E1] dark:border-[#334155] rounded-xl bg-white dark:bg-[#1E293B] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:border-[#94A3B8] transition-all duration-200 text-[#334155] dark:text-slate-300 text-xs font-semibold cursor-pointer project-cancel-btn">Cancel</button>
+                  <button type="submit" className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer project-create-btn">Create</button>
                 </div>
               </form>
             </div>
@@ -1422,22 +1428,31 @@ export default function InventoryPage() {
 
         {/* Add Tower Modal */}
         {showTowerModal && (
-          <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 dark:from-[#111827] dark:via-[#111827] dark:to-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98 dark:bg-[#111827]/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 dark:text-white border-b border-slate-100 dark:border-border pb-2">Add Tower to {selectedNode.data?.name}</h3>
-              <form onSubmit={handleCreateTower} className="space-y-4">
+          <div className="fixed inset-0 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 z-50 transition-opacity duration-200">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-border rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-md p-8 relative overflow-hidden transition-all transform scale-100 translate-y-0 duration-250 ease-out">
+              <button
+                type="button"
+                onClick={() => setShowTowerModal(false)}
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-655 transition-all duration-200 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 leading-none">Add Tower</h3>
+              <form onSubmit={handleCreateTower} className="space-y-5">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest mb-1.5">Tower Name</label>
-                  <input 
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Tower Name</label>
+                  <input
                     type="text" required
                     value={newTowerName} onChange={(e) => setNewTowerName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                     placeholder="e.g. Tower C"
                   />
                 </div>
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
-                  <button type="button" onClick={() => setShowTowerModal(false)} className="px-4 py-2 border border-[#E8EDF7] dark:border-border rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-650 dark:text-slate-300 text-xs font-bold cursor-pointer">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Add Tower</button>
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-800 mt-6">
+                  <button type="button" onClick={() => setShowTowerModal(false)} className="h-11 px-5 border border-[#CBD5E1] dark:border-[#334155] rounded-xl bg-white dark:bg-[#1E293B] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:border-[#94A3B8] transition-all duration-200 text-[#334155] dark:text-slate-300 text-xs font-semibold cursor-pointer">Cancel</button>
+                  <button type="submit" className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer">Add Tower</button>
                 </div>
               </form>
             </div>
@@ -1446,22 +1461,31 @@ export default function InventoryPage() {
 
         {/* Add Floor Modal */}
         {showFloorModal && (
-          <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 dark:from-[#111827] dark:via-[#111827] dark:to-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98 dark:bg-[#111827]/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 dark:text-white border-b border-slate-100 dark:border-border pb-2">Add Floor to {selectedNode.data?.name}</h3>
-              <form onSubmit={handleCreateFloor} className="space-y-4">
+          <div className="fixed inset-0 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 z-50 transition-opacity duration-200">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-border rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-md p-8 relative overflow-hidden transition-all transform scale-100 translate-y-0 duration-250 ease-out">
+              <button
+                type="button"
+                onClick={() => setShowFloorModal(false)}
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-655 transition-all duration-200 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 leading-none">Add Floor</h3>
+              <form onSubmit={handleCreateFloor} className="space-y-5">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-455 dark:text-slate-500 uppercase tracking-widest mb-1.5">Floor Name</label>
-                  <input 
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Floor Name</label>
+                  <input
                     type="text" required
                     value={newFloorName} onChange={(e) => setNewFloorName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                     placeholder="e.g. Floor 2"
                   />
                 </div>
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
-                  <button type="button" onClick={() => setShowFloorModal(false)} className="px-4 py-2 border border-[#E8EDF7] dark:border-border rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-650 dark:text-slate-300 text-xs font-bold cursor-pointer">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Add Floor</button>
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-800 mt-6">
+                  <button type="button" onClick={() => setShowFloorModal(false)} className="h-11 px-5 border border-[#CBD5E1] dark:border-[#334155] rounded-xl bg-white dark:bg-[#1E293B] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:border-[#94A3B8] transition-all duration-200 text-[#334155] dark:text-slate-300 text-xs font-semibold cursor-pointer">Cancel</button>
+                  <button type="submit" className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer">Add Floor</button>
                 </div>
               </form>
             </div>
@@ -1470,25 +1494,34 @@ export default function InventoryPage() {
 
         {/* Add Unit Modal */}
         {showUnitModal && (
-          <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 dark:from-[#111827] dark:via-[#111827] dark:to-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98 dark:bg-[#111827]/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 dark:text-white border-b border-slate-100 dark:border-border pb-2">Add Unit to {selectedNode.data?.name}</h3>
-              <form onSubmit={handleCreateUnit} className="space-y-4">
+          <div className="fixed inset-0 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 z-50 transition-opacity duration-200">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-border rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-md p-8 relative overflow-hidden transition-all transform scale-100 translate-y-0 duration-250 ease-out">
+              <button
+                type="button"
+                onClick={() => setShowUnitModal(false)}
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-655 transition-all duration-200 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 leading-none">Add Unit</h3>
+              <form onSubmit={handleCreateUnit} className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest mb-1.5">Unit Number</label>
-                    <input 
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Unit Number</label>
+                    <input
                       type="text" required
                       value={newUnitNumber} onChange={(e) => setNewUnitNumber(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                      className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                       placeholder="e.g. 104"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest mb-1.5">Initial Status</label>
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Initial Status</label>
                     <select
                       value={newUnitStatus} onChange={(e: any) => setNewUnitStatus(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+                      className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8] dark:hover:border-slate-500"
                     >
                       <option value="AVAILABLE">AVAILABLE</option>
                       <option value="BOOKED">BOOKED</option>
@@ -1499,42 +1532,41 @@ export default function InventoryPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-455 dark:text-slate-500 uppercase tracking-widest mb-1.5">Area Size (Sq.Ft)</label>
-                    <input 
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Area Size (Sq.Ft)</label>
+                    <input
                       type="number" required
                       value={newUnitArea} onChange={(e) => setNewUnitArea(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                      className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                       placeholder="e.g. 1250"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-455 dark:text-slate-500 uppercase tracking-widest mb-1.5">Price (₹)</label>
-                    <input 
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Price (₹)</label>
+                    <input
                       type="number" required
                       value={newUnitPrice} onChange={(e) => setNewUnitPrice(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                      className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                       placeholder="e.g. 6500000"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest mb-1.5">Assigned Agent</label>
-                  <input 
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Assigned Agent</label>
+                  <input
                     type="text"
                     value={newUnitAgent} onChange={(e) => setNewUnitAgent(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                     placeholder="e.g. Sarah Connor"
                   />
                 </div>
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
-                  <button type="button" onClick={() => setShowUnitModal(false)} className="px-4 py-2 border border-[#E8EDF7] dark:border-border rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-655 dark:text-slate-300 text-xs font-bold cursor-pointer">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Add Unit</button>
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-800 mt-6">
+                  <button type="button" onClick={() => setShowUnitModal(false)} className="h-11 px-5 border border-[#CBD5E1] dark:border-[#334155] rounded-xl bg-white dark:bg-[#1E293B] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:border-[#94A3B8] transition-all duration-200 text-[#334155] dark:text-slate-300 text-xs font-semibold cursor-pointer">Cancel</button>
+                  <button type="submit" className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer">Add Unit</button>
                 </div>
               </form>
             </div>
           </div>
         )}
-
       </div>
     </DashboardLayout>
   );

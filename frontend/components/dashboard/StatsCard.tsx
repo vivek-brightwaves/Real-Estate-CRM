@@ -59,13 +59,13 @@ const formatLargeValue = (val: string | number, label: string): string => {
   const hasSuffix = /^(Cr|L|K|M|B)$/i.test(remainderClean);
   if (hasSuffix) return str;
 
-  const isCurrency = cleanStr.includes("₹") || 
-                     label.toLowerCase().includes("revenue") || 
-                     label.toLowerCase().includes("sales") || 
-                     label.toLowerCase().includes("collection") || 
-                     label.toLowerCase().includes("payment") || 
-                     label.toLowerCase().includes("price") || 
-                     label.toLowerCase().includes("amount");
+  const isCurrency = cleanStr.includes("₹") ||
+    label.toLowerCase().includes("revenue") ||
+    label.toLowerCase().includes("sales") ||
+    label.toLowerCase().includes("collection") ||
+    label.toLowerCase().includes("payment") ||
+    label.toLowerCase().includes("price") ||
+    label.toLowerCase().includes("amount");
 
   const finalPrefix = isCurrency ? "₹" : prefix;
   const finalSuffix = hasSuffix ? "" : remainder;
@@ -153,7 +153,7 @@ export default function StatsCard({ label, value, growth = 0, isPositive = true,
     let active = true;
     const startTimeout = setTimeout(() => {
       if (!active) return;
-      
+
       const rawValStr = String(value);
       const numericMatch = rawValStr.replace(/,/g, '').match(/[\d.]+/);
       if (!numericMatch) {
@@ -175,7 +175,7 @@ export default function StatsCard({ label, value, growth = 0, isPositive = true,
         const progress = Math.min(elapsed / duration, 1);
         const easeProgress = progress * (2 - progress);
         const currentVal = start + easeProgress * (targetVal - start);
-        
+
         const frameFormatted = formatLargeValue(`${prefix}${currentVal}${suffix}`, label);
         setDisplayValue(frameFormatted);
 
@@ -228,7 +228,7 @@ export default function StatsCard({ label, value, growth = 0, isPositive = true,
   }
 
   return (
-    <div 
+    <div
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
@@ -239,13 +239,13 @@ export default function StatsCard({ label, value, growth = 0, isPositive = true,
         animation: loaded ? "none" : "statsCardLoad 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards",
         animationDelay: `${delay}ms`,
         opacity: loaded ? 1 : 0,
-        transform: loaded 
+        transform: loaded
           ? `translateY(${isClicked ? 0 : isHovered ? -8 : 0}px) scale(${isClicked ? 0.96 : isHovered ? 1.03 : 1})`
           : undefined,
         boxShadow: isHovered
           ? `0 24px 60px ${currentTheme.glowColor}`
           : "0 10px 30px rgba(15,23,42,0.08)",
-        transition: isHovered 
+        transition: isHovered
           ? "transform 350ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 350ms cubic-bezier(0.22, 1, 0.36, 1), border-color 350ms cubic-bezier(0.22, 1, 0.36, 1)"
           : "transform 350ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 350ms cubic-bezier(0.22, 1, 0.36, 1), border-color 350ms cubic-bezier(0.22, 1, 0.36, 1)",
         willChange: "transform, opacity, box-shadow",
@@ -253,7 +253,7 @@ export default function StatsCard({ label, value, growth = 0, isPositive = true,
       title={`Metric value: ${value}`}
     >
       {/* 8-second slow animated floating radial background glow at 6% opacity */}
-      <div 
+      <div
         className="animate-float-glow"
         style={{
           background: `radial-gradient(circle, ${currentTheme.sparkColor} 0%, transparent 65%)`
@@ -261,7 +261,7 @@ export default function StatsCard({ label, value, growth = 0, isPositive = true,
       />
 
       {/* Mouse hover tracking radial glow */}
-      <div 
+      <div
         className="absolute inset-0 opacity-0 group-hover:opacity-[0.05] transition-opacity duration-355 pointer-events-none"
         style={{
           background: `radial-gradient(circle at ${(coords.x + 1) * 50}% ${(coords.y + 1) * 50}%, ${currentTheme.sparkColor} 0%, transparent 70%)`
@@ -270,17 +270,17 @@ export default function StatsCard({ label, value, growth = 0, isPositive = true,
 
       {/* Top Header: KPI Details & Icon */}
       <div className="flex justify-between items-start relative z-10 w-full min-w-0">
-        <div 
+        <div
           className="space-y-1 transition-transform duration-355 ease-out flex-1 min-w-0 pr-2"
           style={{
             transform: isHovered ? `translate(${coords.x * 2}px, ${coords.y * 2}px)` : "none"
           }}
         >
           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block truncate">{label}</span>
-          <h3 
+          <h3
             className="font-bold text-slate-900 dark:text-[#F8FAFC] tracking-tight mt-0.5"
-            style={{ 
-              fontSize, 
+            style={{
+              fontSize,
               whiteSpace: 'nowrap',
             }}
             title={`Full value: ${value}`}
@@ -290,11 +290,11 @@ export default function StatsCard({ label, value, growth = 0, isPositive = true,
         </div>
 
         {/* Icon Container with Parallax, Floating, Rotation and Soft glow animation */}
-        <div 
+        <div
           className={`p-2 rounded-xl border transition-all duration-400 ${currentTheme.bgLight} shrink-0`}
           style={{
-            transform: isHovered 
-              ? `translate(${coords.x * 5}px, ${coords.y * 5 - 4}px) rotate(5deg)` 
+            transform: isHovered
+              ? `translate(${coords.x * 5}px, ${coords.y * 5 - 4}px) rotate(5deg)`
               : "none",
             boxShadow: isHovered ? `0 0 15px ${currentTheme.glowColor}` : "none"
           }}
@@ -307,18 +307,17 @@ export default function StatsCard({ label, value, growth = 0, isPositive = true,
 
       {/* Spacing & Growth Percentage Info Badge */}
       <div className="flex items-center justify-between mt-3 relative z-10 w-full">
-        <div 
+        <div
           className="flex items-center gap-1.5 transition-transform duration-355 ease-out min-w-0"
           style={{
             transform: isHovered ? `translate(${coords.x * 1.5}px, ${coords.y * 1.5}px)` : "none"
           }}
         >
-          <span 
-            className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold border transition-all duration-500 shrink-0 ${
-              isPositive 
-                ? "bg-emerald-50 text-emerald-700 border-emerald-100/60 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/30" 
+          <span
+            className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold border transition-all duration-500 shrink-0 ${isPositive
+                ? "bg-emerald-50 text-emerald-700 border-emerald-100/60 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/30"
                 : "bg-rose-50 text-rose-700 border-rose-100/60 dark:bg-rose-950/30 dark:text-rose-450 dark:border-rose-900/30"
-            } ${displayValue !== "0" ? "scale-100 opacity-100" : "scale-80 opacity-0"}`}
+              } ${displayValue !== "0" ? "scale-100 opacity-100" : "scale-80 opacity-0"}`}
           >
             <span>{isPositive ? "↑" : "↓"}</span>
             {growth}%
@@ -331,31 +330,31 @@ export default function StatsCard({ label, value, growth = 0, isPositive = true,
       <div className="w-full h-11 mt-3 overflow-hidden relative rounded-xl px-1 z-10">
         {/* Glow Sweep Dot Animation - duration 1.5s */}
         {displayValue !== "0" && (
-          <div 
-            className="animate-sweep-dot" 
-            style={{ 
+          <div
+            className="animate-sweep-dot"
+            style={{
               backgroundColor: currentTheme.sparkColor,
               boxShadow: `0 0 8px ${currentTheme.sparkColor}`,
               animationDuration: "1.5s"
-            }} 
+            }}
           />
         )}
-        
+
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={sparkData} margin={{ top: 2, left: 2, right: 2, bottom: 2 }}>
             <defs>
               <linearGradient id={`grad-${color}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={currentTheme.sparkColor} stopOpacity={0.15}/>
-                <stop offset="95%" stopColor={currentTheme.sparkColor} stopOpacity={0}/>
+                <stop offset="5%" stopColor={currentTheme.sparkColor} stopOpacity={0.15} />
+                <stop offset="95%" stopColor={currentTheme.sparkColor} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <Area 
-              type="monotone" 
-              dataKey="value" 
-              stroke={currentTheme.sparkColor} 
-              strokeWidth={2} 
-              fillOpacity={displayValue !== "0" ? 1 : 0} 
-              fill={`url(#grad-${color})`} 
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke={currentTheme.sparkColor}
+              strokeWidth={2}
+              fillOpacity={displayValue !== "0" ? 1 : 0}
+              fill={`url(#grad-${color})`}
               dot={false}
               isAnimationActive={true}
               animationDuration={1500}

@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import LeadsToolbar from "./LeadsToolbar";
+import React, { useMemo } from "react";
 import LeadSection from "./LeadSection";
 import { Lead, StatusOption } from "./LeadCard";
 
@@ -58,76 +57,23 @@ const iconMap: Record<string, React.ReactNode> = {
 interface LeadsBoardProps {
   leads: Lead[];
   loading: boolean;
-  onSearch: (query: string) => void;
-  searchValue: string;
-  onAdd: () => void;
   onStatusChange: (leadId: number, status: string) => void;
   onLeadClick: (leadId: number) => void;
   onViewAll: () => void;
 }
 
-export default function LeadsBoard({ leads, loading, onSearch, searchValue, onAdd, onStatusChange, onLeadClick, onViewAll }: LeadsBoardProps) {
-  const [priority, setPriority] = useState("");
-  const [sortOrder, setSortOrder] = useState("newest");
+export default function LeadsBoard({ leads, loading, onStatusChange, onLeadClick, onViewAll }: LeadsBoardProps) {
   const statusOptions: StatusOption[] = SECTIONS.map((section) => ({ value: section.key, label: section.label }));
-
-  const visibleLeads = useMemo(() => {
-    const filtered = priority
-      ? leads.filter((lead) => lead.priority === priority)
-      : [...leads];
-    return filtered.sort((left, right) => {
-      if (sortOrder === "name") return left.name.localeCompare(right.name);
-      const difference =
-        new Date(left.created_at ?? 0).getTime() -
-        new Date(right.created_at ?? 0).getTime();
-      return sortOrder === "oldest" ? difference : -difference;
-    });
-  }, [leads, priority, sortOrder]);
 
   const groupedLeads = useMemo(() => {
     return SECTIONS.reduce((acc, section) => {
-      acc[section.key] = visibleLeads.filter((lead) => lead.status === section.key);
+      acc[section.key] = leads.filter((lead) => lead.status === section.key);
       return acc;
     }, {} as Record<string, Lead[]>);
-  }, [visibleLeads]);
-
-  const exportLeads = () => {
-    const escape = (value: unknown) =>
-      `"${String(value ?? "").replaceAll('"', '""')}"`;
-    const rows = [
-      ["Name", "Phone", "Email", "Source", "Priority", "Status"],
-      ...visibleLeads.map((lead) => [
-        lead.name,
-        lead.phone,
-        lead.email,
-        lead.source,
-        lead.priority,
-        lead.status,
-      ]),
-    ];
-    const blob = new Blob(
-      [rows.map((row) => row.map(escape).join(",")).join("\n")],
-      { type: "text/csv;charset=utf-8" },
-    );
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "leads.csv";
-    link.click();
-    URL.revokeObjectURL(url);
-  };
+  }, [leads]);
 
   return (
     <div className="space-y-6 pb-4">
-      <LeadsToolbar
-        searchValue={searchValue}
-        onSearch={onSearch}
-        onAdd={onAdd}
-        onPriorityChange={setPriority}
-        onSortChange={setSortOrder}
-        onExport={exportLeads}
-      />
-
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {SECTIONS.map((section) => (
           <LeadSection
@@ -137,7 +83,7 @@ export default function LeadsBoard({ leads, loading, onSearch, searchValue, onAd
             statusOptions={statusOptions}
             icon={iconMap[section.key]}
             badgeClass={section.badgeClass}
-            onAdd={onAdd}
+            onAdd={onViewAll}
             onStatusChange={onStatusChange}
             onLeadClick={onLeadClick}
             onViewAll={onViewAll}

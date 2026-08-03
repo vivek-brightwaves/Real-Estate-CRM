@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
 import AuthenticatedDashboard from "../../components/dashboard/AuthenticatedDashboard";
+import PageHeader from "../../components/ui/PageHeader";
 import api from "../../lib/axios";
 import { getApiErrorMessage } from "../../lib/errors";
 import { useAuthStore } from "../../store/authStore";
@@ -161,18 +162,22 @@ export default function MessagesPage() {
 
   return (
     <AuthenticatedDashboard>
-      <div className="mx-auto w-full py-3">
-        <section className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm">
-          <header className="flex flex-col gap-4 border-b border-slate-100 p-6 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-indigo-600">Team Communication</p>
-              <h1 className="mt-1 text-2xl font-black text-slate-900">Messages</h1>
-              <p className="mt-1 text-sm text-slate-500">Secure internal conversations with your branch team.</p>
-            </div>
-            <button type="button" onClick={() => setShowCompose(true)} className="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md hover:bg-indigo-700">
-              + Compose
-            </button>
-          </header>
+      <PageHeader
+        breadcrumb="Dashboard / Messages"
+        title="Messages"
+        subtitle="Secure internal conversations with your branch team."
+        actions={
+          <button
+            type="button"
+            onClick={() => setShowCompose(true)}
+            className="rounded-xl bg-indigo-650 hover:bg-indigo-700 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-500/10 hover:shadow-lg transition-all duration-200 hover:scale-[1.02] flex items-center justify-center shrink-0 cursor-pointer"
+          >
+            + Compose
+          </button>
+        }
+      />
+      <div className="mx-auto w-full">
+        <section className="overflow-hidden rounded-[22px] border border-slate-200 bg-white dark:bg-[#1E293B] shadow-sm dark:border-slate-800">
 
           {error && <div role="alert" className="m-4 rounded-xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</div>}
 
@@ -254,24 +259,44 @@ export default function MessagesPage() {
       </div>
 
       {showCompose && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
-          <form onSubmit={sendMessage} className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl">
-            <h2 className="text-lg font-black text-slate-900">New Message</h2>
-            <div className="mt-5 space-y-4">
-              <select required value={draft.recipient_id} onChange={(event) => setDraft({ ...draft, recipient_id: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none">
-                <option value="">Select recipient</option>
-                {staff.map((person) => <option key={person.id} value={person.id}>{person.name} · {person.role}</option>)}
-              </select>
-              <input required maxLength={255} value={draft.subject} onChange={(event) => setDraft({ ...draft, subject: event.target.value })} placeholder="Subject" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500" />
-              <textarea required rows={7} maxLength={10000} value={draft.body} onChange={(event) => setDraft({ ...draft, body: event.target.value })} placeholder="Write your message..." className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-indigo-500" />
-            </div>
-            <div className="mt-6 flex justify-end gap-3">
-              <button type="button" onClick={() => setShowCompose(false)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600">Cancel</button>
-              <button type="submit" disabled={sending || staff.length === 0} className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-60">
-                {sending ? "Sending..." : "Send Message"}
-              </button>
-            </div>
-          </form>
+        <div className="fixed inset-0 z-[80] bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 transition-opacity duration-200">
+          <div className="bg-white border border-slate-200 rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-xl p-8 relative overflow-hidden transition-all transform scale-100 translate-y-0 duration-250 ease-out">
+            <button
+              type="button"
+              onClick={() => setShowCompose(false)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] flex items-center justify-center text-slate-400 hover:text-slate-650 transition-all duration-200 cursor-pointer"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <h2 className="text-[28px] font-bold text-[#0F172A] border-b border-slate-200 pb-4 mb-6 leading-none">New Message</h2>
+            <form onSubmit={sendMessage}>
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#334155] mb-2">Recipient</label>
+                  <select required value={draft.recipient_id} onChange={(event) => setDraft({ ...draft, recipient_id: event.target.value })} className="w-full h-12 px-4 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-[#0F172A] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8]">
+                    <option value="">Select recipient</option>
+                    {staff.map((person) => <option key={person.id} value={person.id}>{person.name} · {person.role}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#334155] mb-2">Subject</label>
+                  <input required maxLength={255} value={draft.subject} onChange={(event) => setDraft({ ...draft, subject: event.target.value })} placeholder="Subject" className="w-full h-12 px-4 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-[#0F172A] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm" />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#334155] mb-2">Message Content</label>
+                  <textarea required rows={7} maxLength={10000} value={draft.body} onChange={(event) => setDraft({ ...draft, body: event.target.value })} placeholder="Write your message..." className="w-full px-4 py-3 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-[#0F172A] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm min-h-[140px] resize-none" />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 mt-6">
+                <button type="button" onClick={() => setShowCompose(false)} className="h-11 px-5 border border-[#CBD5E1] rounded-xl bg-white hover:bg-[#F8FAFC] hover:border-[#94A3B8] transition-all duration-200 text-[#334155] text-xs font-semibold cursor-pointer">Cancel</button>
+                <button type="submit" disabled={sending || staff.length === 0} className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer disabled:opacity-60">
+                  {sending ? "Sending..." : "Send Message"}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </AuthenticatedDashboard>

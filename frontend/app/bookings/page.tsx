@@ -5,6 +5,7 @@ import api from "../../lib/axios";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../../store/authStore";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import PageHeader from "../../components/ui/PageHeader";
 import { AreaChart, Area, ResponsiveContainer } from "recharts";
 import { useSectionSearch } from "../../hooks/useSectionSearch";
 
@@ -176,47 +177,46 @@ export default function BookingsBoardPage() {
     >
       <div className="space-y-6 flex flex-col h-full min-h-[calc(100vh-140px)] bg-gradient-to-br from-[#F6F9FF] via-[#EEF5FF] to-[#F8FAFC] dark:from-transparent dark:to-transparent p-1 rounded-3xl">
         
-        {/* HEADER */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-4 border-b border-slate-200/50 dark:border-border/50 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-32 bg-[radial-gradient(circle_at_right,rgba(59,130,246,0.06),transparent_70%)] pointer-events-none" />
-          <div className="z-10">
-            <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Bookings</h2>
-            <p className="text-xs text-slate-500 dark:text-[#94A3B8] mt-1 font-medium">Manage and track booking cycles and approvals.</p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full lg:w-auto shrink-0 z-10">
+        <PageHeader
+          breadcrumb="Dashboard / Bookings"
+          title="Bookings"
+          subtitle="Manage and track booking cycles and approvals."
+          searchFilter={
             <input 
               type="text" 
               placeholder="Search Booking ID / Client..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-10 px-3.5 py-2 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm w-full sm:w-48 placeholder-slate-400 dark:placeholder-slate-500"
+              className="h-10 px-3.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm w-full sm:w-48 placeholder-slate-400 dark:placeholder-slate-500"
             />
+          }
+          actions={
+            <div className="flex flex-wrap gap-2.5 items-center">
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="h-10 px-3.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+              >
+                <option value="ALL">All Statuses</option>
+                <option value="PENDING">PENDING</option>
+                <option value="DOCS_VERIFIED">DOCS VERIFIED</option>
+                <option value="APPROVED">APPROVED</option>
+                <option value="CONFIRMED">CONFIRMED</option>
+                <option value="CANCELLED">CANCELLED</option>
+              </select>
 
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="h-10 px-3.5 py-2 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
-            >
-              <option value="ALL">All Statuses</option>
-              <option value="PENDING">PENDING</option>
-              <option value="DOCS_VERIFIED">DOCS VERIFIED</option>
-              <option value="APPROVED">APPROVED</option>
-              <option value="CONFIRMED">CONFIRMED</option>
-              <option value="CANCELLED">CANCELLED</option>
-            </select>
-
-            <button 
-              onClick={() => setShowNew(true)} 
-              className="h-10 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 hover:opacity-90 active:scale-95 transition-all text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 flex items-center justify-center shrink-0 cursor-pointer"
-            >
-              + New Booking
-            </button>
-          </div>
-        </div>
+              <button 
+                onClick={() => setShowNew(true)} 
+                className="h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center shrink-0 cursor-pointer"
+              >
+                + New Booking
+              </button>
+            </div>
+          }
+        />
 
         {/* STATUS CARDS SECTION */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -548,33 +548,42 @@ export default function BookingsBoardPage() {
 
         {/* CREATE BOOKING MODAL */}
         {showNew && (
-          <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 dark:from-[#111827] dark:via-[#111827] dark:to-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-2xl w-full max-w-md p-6 relative overflow-hidden backdrop-blur-md bg-white/98 dark:bg-[#111827]/98">
-              <h3 className="text-lg font-bold mb-4 text-slate-900 dark:text-white border-b border-slate-100 dark:border-border pb-2">New Booking</h3>
-              <form onSubmit={handleCreate} className="space-y-4">
+          <div className="fixed inset-0 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 z-50 transition-opacity duration-200">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-border rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-md p-8 relative overflow-hidden transition-all transform scale-100 translate-y-0 duration-250 ease-out">
+              <button
+                type="button"
+                onClick={() => setShowNew(false)}
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-650 transition-all duration-200 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 leading-none">New Booking</h3>
+              <form onSubmit={handleCreate} className="space-y-5">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">Unit ID</label>
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Unit ID</label>
                   <input 
                     type="number" required
                     value={newUnitId} onChange={(e) => setNewUnitId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                     placeholder="e.g. 1"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">Customer ID</label>
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Customer ID</label>
                   <input 
                     type="number" required
                     value={newCustId} onChange={(e) => setNewCustId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                     placeholder="e.g. 1"
                   />
                 </div>
                 
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
-                  <button type="button" onClick={() => setShowNew(false)} className="px-4 py-2 border border-[#E8EDF7] dark:border-[#334155] rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-655 dark:text-slate-300 text-xs font-bold cursor-pointer">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Create</button>
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-800 mt-6">
+                  <button type="button" onClick={() => setShowNew(false)} className="h-11 px-5 border border-[#CBD5E1] dark:border-[#334155] rounded-xl bg-white dark:bg-[#1E293B] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:border-[#94A3B8] transition-all duration-200 text-[#334155] dark:text-slate-300 text-xs font-semibold cursor-pointer">Cancel</button>
+                  <button type="submit" className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer">Create</button>
                 </div>
               </form>
             </div>

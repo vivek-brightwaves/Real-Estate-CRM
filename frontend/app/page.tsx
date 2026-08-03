@@ -28,7 +28,7 @@ export default function DashboardPage() {
   const [trendData, setTrendData] = useState([]);
   const [leadsData, setLeadsData] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
 
@@ -195,7 +195,7 @@ export default function DashboardPage() {
       onLogout={handleLogout}
     >
       <div className="space-y-6">
-        
+
         {/* Welcome Section */}
         <WelcomeBanner userName={user.name} userRole={user.role} />
 
@@ -211,52 +211,52 @@ export default function DashboardPage() {
           <>
             {/* KPI 6-Stats Card Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-              <StatsCard 
-                label="Total Leads" 
-                value={leadsCount} 
-                color="blue" 
+              <StatsCard
+                label="Total Leads"
+                value={leadsCount}
+                color="blue"
                 sparklineData={sparkData.leads}
-                icon={icons.leads} 
+                icon={icons.leads}
                 delay={100}
               />
-              <StatsCard 
-                label="Active Properties" 
+              <StatsCard
+                label="Active Properties"
                 value={propertiesCount}
-                color="green" 
+                color="green"
                 sparklineData={sparkData.properties}
-                icon={icons.properties} 
+                icon={icons.properties}
                 delay={150}
               />
-              <StatsCard 
-                label="Bookings" 
-                value={bookingsCount} 
-                color="purple" 
+              <StatsCard
+                label="Bookings"
+                value={bookingsCount}
+                color="purple"
                 sparklineData={sparkData.bookings}
-                icon={icons.bookings} 
+                icon={icons.bookings}
                 delay={200}
               />
-              <StatsCard 
-                label="Revenue" 
+              <StatsCard
+                label="Revenue"
                 value={`₹${Number(totalRevenue).toLocaleString("en-IN")}`}
-                color="orange" 
+                color="orange"
                 sparklineData={sparkData.revenue}
-                icon={icons.revenue} 
+                icon={icons.revenue}
                 delay={250}
               />
-              <StatsCard 
-                label="Customers" 
+              <StatsCard
+                label="Customers"
                 value={customersCount}
-                color="pink" 
+                color="pink"
                 sparklineData={sparkData.customers}
-                icon={icons.customers} 
+                icon={icons.customers}
                 delay={300}
               />
-              <StatsCard 
-                label="Site Visits" 
-                value={visitsCount} 
-                color="cyan" 
+              <StatsCard
+                label="Site Visits"
+                value={visitsCount}
+                color="cyan"
                 sparklineData={sparkData.visits}
-                icon={icons.visits} 
+                icon={icons.visits}
                 delay={350}
               />
             </div>

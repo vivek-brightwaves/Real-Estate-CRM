@@ -5,6 +5,7 @@ import api from "../../../lib/axios";
 import { useParams, useRouter } from "next/navigation";
 import { useAuthStore } from "../../../store/authStore";
 import DashboardLayout from "../../../components/dashboard/DashboardLayout";
+import PageHeader from "../../../components/ui/PageHeader";
 
 export default function CustomerDetailPage() {
   const params = useParams<{ id: string }>();
@@ -127,18 +128,19 @@ export default function CustomerDetailPage() {
       onLogout={handleLogout}
     >
       <div className="space-y-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Customer Profiles</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Manage customer identity verification, KYC, and history updates</p>
-          </div>
-          <button 
-            onClick={() => router.back()}
-            className="px-3.5 py-2 bg-slate-50/50 border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-100 transition shadow-sm"
-          >
-            &larr; Back
-          </button>
-        </div>
+        <PageHeader
+          breadcrumb="Dashboard / Customers / Details"
+          title="Customer Profile"
+          subtitle="Manage customer identity verification, KYC, and history updates"
+          actions={
+            <button 
+              onClick={() => router.back()}
+              className="px-3.5 py-2 bg-slate-50/50 border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-100 transition shadow-sm"
+            >
+              &larr; Back
+            </button>
+          }
+        />
         
         {/* Top Info Card */}
         <div className="bg-gradient-to-br from-white via-white to-slate-50/30 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 p-6 backdrop-blur-md bg-white/95">

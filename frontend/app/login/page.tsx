@@ -39,7 +39,7 @@ export default function LoginPage() {
 
       setIsSuccess(true);
       setAuth(res.data.access_token, res.data.refresh_token, res.data.user);
-      
+
       setTimeout(() => {
         router.push("/");
       }, 500);
@@ -52,10 +52,10 @@ export default function LoginPage() {
 
   return (
     <div className="h-screen w-full relative font-sans selection:bg-blue-600 selection:text-white animate-in fade-in duration-500 p-6 flex flex-col justify-center overflow-hidden">
-      
+
       {/* Background Image Layer (Cover, Center, No-repeat, Fixed, blurred 24px and scaled to prevent border bleed) */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed blur-[24px] scale-110 pointer-events-none" 
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed blur-[24px] scale-110 pointer-events-none"
         style={{ backgroundImage: "url('/real_estate_skyline_bg.png')" }}
       />
 
@@ -70,12 +70,12 @@ export default function LoginPage() {
 
       {/* Outer Card Grid Container (Touch each other, rounded-3xl, overflow-hidden, border) */}
       <div className="w-full max-w-[1440px] mx-auto h-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[55%_45%] gap-0 rounded-3xl overflow-hidden shadow-2xl border border-white/10 z-10 relative bg-transparent">
-        
+
         {/* ============================================================ */}
         {/* LEFT COLUMN: Enterprise Features & Visuals (55%)             */}
         {/* ============================================================ */}
         <div className="hidden md:flex flex-col justify-between p-[24px] bg-gradient-to-br from-[#0B122B]/90 via-[#121B3D]/95 to-[#1B214A]/90 backdrop-blur-md relative overflow-hidden shrink-0 h-full">
-          
+
           {/* Subtle square grid pattern overlay (6%) */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-[0.06] pointer-events-none" />
           <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
@@ -109,7 +109,7 @@ export default function LoginPage() {
 
             {/* Feature Grid: 2 Columns, Gap 16px (Height 96px, bg-white/5, hover bg-white/8 and -translate-y-1) */}
             <div className="grid grid-cols-2 gap-4 mt-6">
-              
+
               {/* Card 1 */}
               <div className="h-[96px] p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur hover:bg-white/8 hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
                 <div className="flex items-center gap-2.5">
@@ -185,10 +185,10 @@ export default function LoginPage() {
         {/* RIGHT PANEL: Glassmorphism Login Card Centered Container     */}
         {/* ============================================================ */}
         <div className="w-full flex items-center justify-center p-6 sm:p-8 h-full relative bg-transparent">
-          
+
           {/* Centered Glassmorphic Login Card (Width 400px [max-w-md], p-10, frosted glass parameters) */}
           <div className="relative w-full max-w-md bg-white/10 backdrop-blur-2xl backdrop-saturate-150 border border-white/20 ring-1 ring-white/10 shadow-[0_20px_60px_rgba(15,23,42,0.18)] p-10 z-10 rounded-3xl transition-all duration-300 max-h-[500px] flex flex-col justify-between overflow-hidden">
-            
+
             <div>
               {/* Logo Header inside login card (Visible on mobile/tablet only) */}
               <div className="flex md:hidden items-center gap-2 mb-4">
@@ -231,7 +231,7 @@ export default function LoginPage() {
 
               {/* Login Form: Spacing between inputs 16px (space-y-4) */}
               <form onSubmit={handleLogin} className="space-y-4">
-                
+
                 {/* Email Address */}
                 <div>
                   <label className="block text-xs font-semibold tracking-wide text-slate-800 mb-1.5">
@@ -277,7 +277,7 @@ export default function LoginPage() {
                       onKeyDown={handleKeyUp}
                       placeholder="••••••••"
                     />
-                    
+
                     {/* Toggle View Password Icon */}
                     <button
                       type="button"
@@ -355,7 +355,7 @@ export default function LoginPage() {
 
             {/* Bottom Secure Information (Margin top 20px) */}
             <div className="mt-5">
-              
+
               {/* Divider */}
               <div className="relative flex items-center justify-center my-4">
                 <div className="absolute inset-0 flex items-center">

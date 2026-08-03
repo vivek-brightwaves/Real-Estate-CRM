@@ -5,6 +5,7 @@ import api from "../../../lib/axios";
 import { useParams, useRouter } from "next/navigation";
 import { useAuthStore } from "../../../store/authStore";
 import DashboardLayout from "../../../components/dashboard/DashboardLayout";
+import PageHeader from "../../../components/ui/PageHeader";
 
 export default function BookingDetailPage() {
   const params = useParams<{ id: string }>();
@@ -118,18 +119,19 @@ export default function BookingDetailPage() {
       onLogout={handleLogout}
     >
       <div className="space-y-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Booking Profiles</h2>
-            <p className="text-xs text-slate-500 mt-0.5">View and update detailed pipeline status for Booking #{booking.id}</p>
-          </div>
-          <button 
-            onClick={() => router.back()}
-            className="px-3.5 py-2 bg-slate-50/50 border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-100 transition shadow-sm"
-          >
-            &larr; Back to Pipeline
-          </button>
-        </div>
+        <PageHeader
+          breadcrumb="Dashboard / Bookings / Details"
+          title="Booking Profile"
+          subtitle={`View and update detailed pipeline status for Booking #${booking.id}`}
+          actions={
+            <button 
+              onClick={() => router.back()}
+              className="px-3.5 py-2 bg-slate-50/50 border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-slate-100 transition shadow-sm"
+            >
+              &larr; Back to Pipeline
+            </button>
+          }
+        />
         
         <div className="bg-gradient-to-br from-white via-white to-slate-50/30 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-lg transition-all duration-300 p-8 backdrop-blur-md bg-white/95">
           <div className="flex justify-between items-center mb-8 border-b border-slate-100 pb-4">
@@ -245,25 +247,33 @@ export default function BookingDetailPage() {
             )}
           </div>
         </div>
-
         {/* Discount Modal */}
         {showDiscount && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 rounded-[20px] border border-[#E8EDF7] shadow-2xl w-full max-w-sm p-6 relative overflow-hidden backdrop-blur-md bg-white/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 border-b border-slate-100 pb-2">Request Discount</h3>
-              <form onSubmit={handleRequestDiscount} className="space-y-4">
+          <div className="fixed inset-0 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 z-50 transition-opacity duration-200">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-border rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-sm p-8 relative overflow-hidden transition-all transform scale-100 translate-y-0 duration-250 ease-out">
+              <button
+                type="button"
+                onClick={() => setShowDiscount(false)}
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-650 transition-all duration-200 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 leading-none">Request Discount</h3>
+              <form onSubmit={handleRequestDiscount} className="space-y-5">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Amount (₹)</label>
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Amount (₹)</label>
                   <input 
                     type="number" required min="1"
                     value={discountAmount} onChange={(e) => setDiscountAmount(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                     placeholder="e.g. 5000"
                   />
                 </div>
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                  <button type="button" onClick={() => setShowDiscount(false)} className="px-4 py-2 border border-[#E8EDF7] rounded-xl hover:bg-slate-50 transition text-slate-650 text-xs font-bold shadow-sm cursor-pointer">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Submit Request</button>
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-800 mt-6">
+                  <button type="button" onClick={() => setShowDiscount(false)} className="h-11 px-5 border border-[#CBD5E1] dark:border-[#334155] rounded-xl bg-white dark:bg-[#1E293B] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:border-[#94A3B8] transition-all duration-200 text-[#334155] dark:text-slate-300 text-xs font-semibold cursor-pointer">Cancel</button>
+                  <button type="submit" className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer">Submit Request</button>
                 </div>
               </form>
             </div>

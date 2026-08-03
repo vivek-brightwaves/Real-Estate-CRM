@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import AuthenticatedDashboard from "../../../components/dashboard/AuthenticatedDashboard";
+import PageHeader from "../../../components/ui/PageHeader";
 import api from "../../../lib/axios";
 import { getApiErrorMessage } from "../../../lib/errors";
 import { useFeedback } from "../../../components/ui/FeedbackProvider";
@@ -63,26 +64,22 @@ export default function NewLeadPage() {
 
   return (
     <AuthenticatedDashboard>
-      <div className="mx-auto w-full max-w-4xl py-3">
-        <div className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <div className="mb-7 flex items-start justify-between gap-4 border-b border-slate-100 pb-5">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-blue-600">
-                Lead Management
-              </p>
-              <h1 className="mt-1 text-2xl font-black text-slate-900">Add Lead</h1>
-              <p className="mt-1 text-sm text-slate-500">
-                Capture contact details and the next follow-up action.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => router.push("/leads")}
-              className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50"
-            >
-              Back to Leads
-            </button>
-          </div>
+      <PageHeader
+        breadcrumb="Dashboard / Leads / Add Lead"
+        title="Add Lead"
+        subtitle="Capture contact details and the next follow-up action."
+        actions={
+          <button
+            type="button"
+            onClick={() => router.push("/leads")}
+            className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1E293B] px-4 py-2 text-xs font-bold text-slate-655 dark:text-[#CBD5E1] hover:bg-slate-50 dark:hover:bg-[#273449] shadow-sm transition-all"
+          >
+            Back to Leads
+          </button>
+        }
+      />
+      <div className="mx-auto w-full max-w-4xl">
+        <div className="rounded-[22px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#1E293B] p-6 shadow-sm md:p-8">
 
           {error && (
             <div role="alert" className="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">

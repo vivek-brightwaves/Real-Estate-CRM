@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../../../store/authStore";
 import api from "../../../lib/axios";
+import PageHeader from "../../../components/ui/PageHeader";
 
 export default function AuditLogPage() {
   const router = useRouter();
@@ -42,18 +43,19 @@ export default function AuditLogPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">System Audit Logs</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Audit log of system actions and entity payload histories</p>
-        </div>
-        <button 
-          onClick={() => router.push("/")}
-          className="px-3.5 py-2 bg-slate-50/50 border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
-        >
-          &larr; Back to Dashboard
-        </button>
-      </div>
+      <PageHeader
+        breadcrumb="Dashboard / Administration / Audit Logs"
+        title="System Audit Logs"
+        subtitle="Audit log of system actions and entity payload histories"
+        actions={
+          <button 
+            onClick={() => router.push("/")}
+            className="px-3.5 py-2 bg-slate-50/50 border border-[#E8EDF7] rounded-xl text-slate-700 text-xs font-bold hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm shrink-0 cursor-pointer"
+          >
+            &larr; Back to Dashboard
+          </button>
+        }
+      />
 
       <div className="bg-gradient-to-br from-white via-white to-slate-50/30 p-5 rounded-[20px] border border-[#E8EDF7] shadow-sm hover:shadow-md transition-all duration-300 flex flex-wrap gap-4 items-center">
         <div>

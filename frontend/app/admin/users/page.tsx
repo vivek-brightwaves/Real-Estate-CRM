@@ -752,7 +752,7 @@ export default function UsersPage() {
       </div>
 
       {showCreateUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] p-4">
           <form onSubmit={createUser} className="w-full max-w-lg space-y-4 rounded-[24px] border border-white/40 bg-white p-6 shadow-2xl">
             <h3 className="border-b border-slate-100 pb-3 text-lg font-black text-slate-900">Add User</h3>
             <input required value={newUser.name} onChange={(event) => setNewUser({ ...newUser, name: event.target.value })} placeholder="Full name" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
@@ -808,67 +808,76 @@ export default function UsersPage() {
       )}
 
       {showCreateRole && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[24px] border border-white/40 bg-white p-6 shadow-2xl">
-            <div className="mb-4 flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
-              <div>
-                <h3 className="text-lg font-black text-slate-900">Add Role</h3>
-                <p className="mt-1 text-xs leading-5 text-slate-500">
-                  Business roles map to a secure system access level. The catalogue below includes every primary role from the attached specification.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowCreateRole(false)}
-                className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
-                aria-label="Close role dialog"
-              >
-                {"\u00d7"}
-              </button>
+        <div className="fixed inset-0 z-50 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 transition-opacity duration-200">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto bg-white border border-slate-200 rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] p-8 relative overflow-hidden text-left">
+            <button
+              type="button"
+              onClick={() => setShowCreateRole(false)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] flex items-center justify-center text-slate-400 hover:text-slate-650 transition-all duration-200 cursor-pointer"
+              aria-label="Close role dialog"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="mb-6 border-b border-slate-200 pb-4 pr-10">
+              <h3 className="text-[28px] font-bold text-[#0F172A] leading-none mb-2">Add Role</h3>
+              <p className="text-[15px] text-[#64748B]">
+                Business roles map to a secure system access level. The catalogue below includes every primary role from the attached specification.
+              </p>
             </div>
 
-            <form onSubmit={createRole} className="grid gap-3 rounded-2xl bg-slate-50 p-4 md:grid-cols-2">
-              <input
-                required
-                value={newRole.name}
-                onChange={(event) => setNewRole({ ...newRole, name: event.target.value })}
-                placeholder="Custom business role name"
-                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
-              />
-              <select
-                value={newRole.base_role}
-                onChange={(event) => setNewRole({ ...newRole, base_role: event.target.value })}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
-              >
-                {roleOptions.map((role) => (
-                  <option key={role.value} value={role.value}>
-                    Base access: {role.label}
-                  </option>
-                ))}
-              </select>
-              <textarea
-                value={newRole.description}
-                onChange={(event) => setNewRole({ ...newRole, description: event.target.value })}
-                placeholder="Responsibilities and scope"
-                className="min-h-20 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm md:col-span-2"
-              />
+            <form onSubmit={createRole} className="grid gap-4 rounded-xl border border-slate-200 bg-[#F8FAFC] p-6 md:grid-cols-2">
+              <div>
+                <label className="block text-[13px] font-semibold text-[#334155] mb-2">Role Name</label>
+                <input
+                  required
+                  value={newRole.name}
+                  onChange={(event) => setNewRole({ ...newRole, name: event.target.value })}
+                  placeholder="Custom business role name"
+                  className="w-full h-12 px-4 bg-white border border-[#CBD5E1] rounded-xl text-[#0F172A] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-[13px] font-semibold text-[#334155] mb-2">Base Access Level</label>
+                <select
+                  value={newRole.base_role}
+                  onChange={(event) => setNewRole({ ...newRole, base_role: event.target.value })}
+                  className="w-full h-12 px-4 bg-white border border-[#CBD5E1] rounded-xl text-[#0F172A] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8]"
+                >
+                  {roleOptions.map((role) => (
+                    <option key={role.value} value={role.value}>
+                      Base access: {role.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-[13px] font-semibold text-[#334155] mb-2">Role Description</label>
+                <textarea
+                  value={newRole.description}
+                  onChange={(event) => setNewRole({ ...newRole, description: event.target.value })}
+                  placeholder="Responsibilities and scope"
+                  className="w-full px-4 py-3 bg-white border border-[#CBD5E1] rounded-xl text-[#0F172A] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm min-h-[80px] resize-none"
+                />
+              </div>
               <div className="flex justify-end md:col-span-2">
-                <button type="submit" className="rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white">
+                <button type="submit" className="h-11 px-6 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer">
                   Save Role
                 </button>
               </div>
             </form>
 
-            <div className="mt-5 grid gap-3 md:grid-cols-2">
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
               {roleProfiles.map((role) => (
-                <div key={role.id} className="rounded-2xl border border-slate-200 p-4">
+                <div key={role.id} className="rounded-xl border border-slate-200 p-4 bg-white">
                   <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-black text-slate-800">{role.name}</p>
-                    <span className="shrink-0 rounded-full bg-indigo-50 px-2 py-1 text-[9px] font-black text-indigo-700">
+                    <p className="text-sm font-bold text-slate-800">{role.name}</p>
+                    <span className="shrink-0 rounded-full bg-indigo-50 px-2.5 py-1 text-[9px] font-bold text-indigo-700 uppercase tracking-wider">
                       {role.base_role.replaceAll("_", " ")}
                     </span>
                   </div>
-                  <p className="mt-2 text-xs leading-5 text-slate-500">
+                  <p className="mt-2 text-xs leading-5 text-[#64748B]">
                     {role.description || "Custom organization role profile."}
                   </p>
                 </div>
@@ -880,18 +889,26 @@ export default function UsersPage() {
 
       {/* EDIT MODAL OVERLAY */}
       {editUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm animate-settings-tab-fade">
-          <div className="bg-white/95 backdrop-blur-xl border border-white/40 rounded-[24px] shadow-2xl w-full max-w-md p-6 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 via-purple-500 to-transparent" />
-            <h3 className="text-lg font-black text-slate-900 mb-4 tracking-tight border-b border-slate-100 pb-2">Edit User Details</h3>
+        <div className="fixed inset-0 z-50 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 transition-opacity duration-200">
+          <div className="bg-white border border-slate-200 rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-md p-8 relative overflow-hidden text-left transform scale-100 translate-y-0 transition-all duration-250 ease-out">
+            <button
+              type="button"
+              onClick={() => setEditUser(null)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] flex items-center justify-center text-slate-400 hover:text-slate-655 transition-all duration-200 cursor-pointer"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <h3 className="text-[28px] font-bold text-[#0F172A] border-b border-slate-200 pb-4 mb-6 leading-none">Edit User Details</h3>
             
-            <form onSubmit={handleEditSubmit} className="space-y-4">
+            <form onSubmit={handleEditSubmit} className="space-y-5">
               
               {/* Name */}
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Name</label>
+                <label className="block text-[13px] font-semibold text-[#334155] mb-2">Name</label>
                 <div className="relative group/input">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-blue-500 transition-colors">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-[#2563EB] transition-colors z-10 pointer-events-none">
                     <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
@@ -901,16 +918,16 @@ export default function UsersPage() {
                     required
                     value={editUser.name}
                     onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
-                    className="w-full h-12 pl-11 pr-4 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300"
+                    className="w-full h-12 pl-11 pr-4 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-[#0F172A] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                   />
                 </div>
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Email Address</label>
+                <label className="block text-[13px] font-semibold text-[#334155] mb-2">Email Address</label>
                 <div className="relative group/input">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-blue-500 transition-colors">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-[#2563EB] transition-colors z-10 pointer-events-none">
                     <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
                     </svg>
@@ -920,16 +937,16 @@ export default function UsersPage() {
                     required
                     value={editUser.email}
                     onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
-                    className="w-full h-12 pl-11 pr-4 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300"
+                    className="w-full h-12 pl-11 pr-4 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-[#0F172A] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                   />
                 </div>
               </div>
 
               {/* Phone */}
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Phone Number</label>
+                <label className="block text-[13px] font-semibold text-[#334155] mb-2">Phone Number</label>
                 <div className="relative group/input">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-blue-500 transition-colors">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-[#2563EB] transition-colors z-10 pointer-events-none">
                     <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
@@ -938,16 +955,16 @@ export default function UsersPage() {
                     type="text"
                     value={editUser.phone || ""}
                     onChange={(e) => setEditUser({ ...editUser, phone: e.target.value })}
-                    className="w-full h-12 pl-11 pr-4 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300"
+                    className="w-full h-12 pl-11 pr-4 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-[#0F172A] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                   />
                 </div>
               </div>
 
               {/* Branch Selection */}
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Branch / Office</label>
+                <label className="block text-[13px] font-semibold text-[#334155] mb-2">Branch / Office</label>
                 <div className="relative group/select">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/select:text-blue-500 transition-colors z-10 pointer-events-none">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/select:text-[#2563EB] transition-colors z-10 pointer-events-none">
                     <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9m4 0V7m0 0h4m-4 0H9" />
                     </svg>
@@ -960,7 +977,7 @@ export default function UsersPage() {
                         branch_id: e.target.value ? Number(e.target.value) : undefined,
                       })
                     }
-                    className="w-full h-12 pl-10 pr-8 bg-slate-50 border border-slate-200/80 rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all cursor-pointer appearance-none"
+                    className="w-full h-12 pl-10 pr-8 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-[#0F172A] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8]"
                   >
                     <option value="">No Branch assigned</option>
                     {branches.map((b) => (
@@ -969,19 +986,14 @@ export default function UsersPage() {
                       </option>
                     ))}
                   </select>
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </span>
                 </div>
               </div>
 
               {/* Manager Selection */}
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Supervisor / Manager</label>
+                <label className="block text-[13px] font-semibold text-[#334155] mb-2">Supervisor / Manager</label>
                 <div className="relative group/select">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/select:text-blue-500 transition-colors z-10 pointer-events-none">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/select:text-[#2563EB] transition-colors z-10 pointer-events-none">
                     <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
@@ -994,7 +1006,7 @@ export default function UsersPage() {
                         manager_id: e.target.value ? Number(e.target.value) : undefined,
                       })
                     }
-                    className="w-full h-12 pl-10 pr-8 bg-slate-50 border border-slate-200/80 rounded-xl text-slate-700 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all cursor-pointer appearance-none"
+                    className="w-full h-12 pl-10 pr-8 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-[#0F172A] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8]"
                   >
                     <option value="">No Manager assigned</option>
                     {managers
@@ -1005,26 +1017,21 @@ export default function UsersPage() {
                         </option>
                       ))}
                   </select>
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </span>
                 </div>
               </div>
 
               {/* Form Buttons */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 mt-4">
+              <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 mt-6">
                 <button
                   type="button"
                   onClick={() => setEditUser(null)}
-                  className="px-4.5 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 transition text-slate-650 text-xs font-bold shadow-sm cursor-pointer"
+                  className="h-11 px-5 border border-[#CBD5E1] rounded-xl bg-white hover:bg-[#F8FAFC] hover:border-[#94A3B8] transition-all duration-200 text-[#334155] text-xs font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl shadow-md text-xs font-bold hover:opacity-95 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                  className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer"
                 >
                   Save Changes
                 </button>
@@ -1037,20 +1044,31 @@ export default function UsersPage() {
 
       {/* RESET PASSWORD MODAL OVERLAY */}
       {resetUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm animate-settings-tab-fade">
-          <div className="bg-white/95 backdrop-blur-xl border border-white/40 rounded-[24px] shadow-2xl w-full max-w-sm p-6 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-500 via-orange-500 to-transparent" />
-            <h3 className="text-lg font-black text-slate-900 mb-1 tracking-tight">Reset Password</h3>
-            <p className="text-xs text-slate-500 mb-4">
-              Set a new password for <strong>{resetUser.name}</strong>.
+        <div className="fixed inset-0 z-50 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 transition-opacity duration-200">
+          <div className="bg-white border border-slate-200 rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-sm p-8 relative overflow-hidden text-left transform scale-100 translate-y-0 transition-all duration-250 ease-out">
+            <button
+              type="button"
+              onClick={() => {
+                setResetUser(null);
+                setNewPassword("");
+              }}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] flex items-center justify-center text-slate-400 hover:text-slate-655 transition-all duration-200 cursor-pointer"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <h3 className="text-[28px] font-bold text-[#0F172A] mb-1 leading-tight">Reset Password</h3>
+            <p className="text-[15px] text-[#64748B] mb-6">
+              Set a new password for <strong className="text-[#0F172A]">{resetUser.name}</strong>.
             </p>
             
-            <form onSubmit={handleResetPassword} className="space-y-4">
+            <form onSubmit={handleResetPassword} className="space-y-5">
               
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">New Password</label>
+                <label className="block text-[13px] font-semibold text-[#334155] mb-2">New Password</label>
                 <div className="relative group/input">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-amber-500 transition-colors">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-[#2563EB] transition-colors z-10 pointer-events-none">
                     <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
@@ -1061,26 +1079,26 @@ export default function UsersPage() {
                     minLength={8}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full h-12 pl-11 pr-4 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all duration-300"
+                    className="w-full h-12 pl-11 pr-4 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-[#0F172A] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                   />
                 </div>
               </div>
 
               {/* Form Buttons */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 mt-4">
+              <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 mt-6">
                 <button
                   type="button"
                   onClick={() => {
                     setResetUser(null);
                     setNewPassword("");
                   }}
-                  className="px-4.5 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 transition text-slate-650 text-xs font-bold shadow-sm cursor-pointer"
+                  className="h-11 px-5 border border-[#CBD5E1] rounded-xl bg-white hover:bg-[#F8FAFC] hover:border-[#94A3B8] transition-all duration-200 text-[#334155] text-xs font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl shadow-md text-xs font-bold hover:opacity-95 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                  className="h-11 px-5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl shadow-[0_10px_25px_rgba(245,158,11,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(245,158,11,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer"
                 >
                   Update Password
                 </button>
@@ -1093,18 +1111,26 @@ export default function UsersPage() {
 
       {/* VIEW PROFILE MODAL OVERLAY */}
       {viewUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm animate-settings-tab-fade">
-          <div className="bg-white/95 backdrop-blur-xl border border-white/40 rounded-[24px] shadow-2xl w-full max-w-md p-6 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 via-purple-500 to-transparent" />
+        <div className="fixed inset-0 z-50 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 transition-opacity duration-200">
+          <div className="bg-white border border-slate-200 rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-md p-8 relative overflow-hidden text-left transform scale-100 translate-y-0 transition-all duration-250 ease-out">
+            <button
+              type="button"
+              onClick={() => setViewUser(null)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] flex items-center justify-center text-slate-400 hover:text-[#0F172A] transition-all duration-200 cursor-pointer"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
             
             {/* Header info card */}
-            <div className="flex items-center gap-4 mb-6 pb-4 border-b border-slate-150">
-              <div className="h-14 w-14 rounded-full bg-gradient-to-tr from-blue-500/15 to-purple-500/15 border border-blue-500/20 text-blue-600 flex items-center justify-center text-xl font-black shadow-md">
+            <div className="flex items-center gap-4 mb-6 pb-5 border-b border-slate-200">
+              <div className="h-14 w-14 rounded-full bg-gradient-to-tr from-blue-500/10 to-purple-500/10 border border-blue-500/20 text-blue-600 flex items-center justify-center text-xl font-bold shadow-sm">
                 {viewUser.name.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h3 className="text-lg font-black text-slate-900 tracking-tight">{viewUser.name}</h3>
-                <p className="text-xs text-slate-400 font-semibold">{viewUser.email}</p>
+                <h3 className="text-xl font-bold text-[#0F172A] tracking-tight">{viewUser.name}</h3>
+                <p className="text-sm text-[#64748B]">{viewUser.email}</p>
               </div>
             </div>
 
@@ -1118,7 +1144,7 @@ export default function UsersPage() {
               
               <div className="flex justify-between border-b border-slate-100 pb-2.5">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Role</span>
-                <span className="font-extrabold text-[10px] text-purple-700 bg-purple-50 border border-purple-100 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                <span className="font-extrabold text-[10px] text-purple-700 bg-[#F3E8FF] border border-[#E9D5FF] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                   {viewUser.role.replace("_", " ")}
                 </span>
               </div>
@@ -1163,7 +1189,7 @@ export default function UsersPage() {
               <button
                 type="button"
                 onClick={() => setViewUser(null)}
-                className="px-5 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 transition text-slate-650 text-xs font-bold shadow-sm cursor-pointer"
+                className="h-11 px-5 border border-[#CBD5E1] rounded-xl bg-white hover:bg-[#F8FAFC] hover:border-[#94A3B8] transition-all duration-200 text-[#334155] text-xs font-semibold cursor-pointer"
               >
                 Close Profile
               </button>

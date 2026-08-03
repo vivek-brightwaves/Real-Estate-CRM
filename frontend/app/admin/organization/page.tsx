@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import api from "../../../lib/axios";
 import { getApiErrorMessage } from "../../../lib/errors";
 import { useFeedback } from "../../../components/ui/FeedbackProvider";
+import PageHeader from "../../../components/ui/PageHeader";
 import { AreaChart, Area, ResponsiveContainer } from "recharts";
 
 const sparkData = {
@@ -282,38 +283,33 @@ export default function OrganizationPage() {
   };
 
   return (
-    <div className="space-y-8 bg-gradient-to-br from-[#F8FAFF] via-[#EEF5FF] to-[#F7FAFC] dark:from-transparent dark:to-transparent min-h-[calc(100vh-120px)] p-1 rounded-3xl relative overflow-hidden">
-      
+    <div className="max-w-5xl space-y-6 bg-gradient-to-br from-[#F8FAFF] via-[#EEF5FF] to-[#F7FAFC] dark:from-transparent dark:to-transparent min-h-[calc(100vh-120px)] p-1 rounded-3xl relative overflow-visible">
+
       {/* Soft header background mesh gradient */}
       <div className="absolute top-0 left-0 right-0 h-40 bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.05),transparent_70%)] pointer-events-none" />
 
-      {/* HEADER SECTION */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2 border-b border-slate-200/50 dark:border-border/50 relative z-10">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-            <span className="text-2xl">🏢</span> Organization Setup
-          </h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-[#94A3B8] font-semibold">
-            Manage companies, branches and projects.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={openCreate}
-          className="h-12 px-5 bg-gradient-to-r from-blue-600 to-indigo-650 hover:opacity-90 active:scale-95 transition-all text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 flex items-center justify-center shrink-0 cursor-pointer"
-        >
-          + Add {LABELS[activeTab].singular}
-        </button>
-      </div>
+      <PageHeader
+        breadcrumb="Dashboard / Administration / Organization Setup"
+        title="Organization Setup"
+        subtitle="Manage companies, branches and projects."
+        actions={
+          <button
+            type="button"
+            onClick={openCreate}
+            className="h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition-all duration-200 hover:scale-[1.02] flex items-center justify-center shrink-0 cursor-pointer"
+          >
+            + Add {LABELS[activeTab].singular}
+          </button>
+        }
+      />
 
       {(error || success) && (
         <div
           role="alert"
-          className={`rounded-xl border px-4 py-3 text-sm relative z-10 font-bold ${
-            error
+          className={`rounded-xl border px-4 py-3 text-sm relative z-10 font-bold ${error
               ? "border-rose-200 dark:border-rose-900/30 bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-400"
               : "border-emerald-200 dark:border-emerald-900/30 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400"
-          }`}
+            }`}
         >
           {error || success}
         </div>
@@ -372,11 +368,10 @@ export default function OrganizationPage() {
                 setSearchQuery("");
                 setSuccess("");
               }}
-              className={`text-left transition-all duration-300 relative flex flex-col justify-between overflow-hidden rounded-[22px] p-5 shadow-sm border h-44 cursor-pointer focus:outline-none ${
-                isSelected
+              className={`text-left transition-all duration-300 relative flex flex-col justify-between overflow-hidden rounded-[22px] p-5 shadow-sm border h-44 cursor-pointer focus:outline-none ${isSelected
                   ? "bg-white dark:bg-[#1E293B] border-blue-500 dark:border-blue-500 shadow-md shadow-blue-500/5 ring-1 ring-blue-500/20"
                   : "bg-white dark:bg-[#1E293B] border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] hover:border-slate-350 dark:hover:border-slate-700"
-              }`}
+                }`}
             >
               {/* Colored top border accent line */}
               <div className={`absolute top-0 left-0 right-0 h-1 ${config.bg}`} />
@@ -402,15 +397,15 @@ export default function OrganizationPage() {
                   </span>
                   <span className="text-[9px] text-slate-450 dark:text-slate-500 font-bold uppercase">MoM</span>
                 </div>
-                
+
                 {/* Mini trend sparkline graph */}
                 <div className="w-24 h-8 overflow-hidden rounded-lg shrink-0">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={sparkData[type]}>
                       <defs>
                         <linearGradient id={config.gradientId} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor={config.color} stopOpacity={0.15}/>
-                          <stop offset="95%" stopColor={config.color} stopOpacity={0.01}/>
+                          <stop offset="5%" stopColor={config.color} stopOpacity={0.15} />
+                          <stop offset="95%" stopColor={config.color} stopOpacity={0.01} />
                         </linearGradient>
                       </defs>
                       <Area type="monotone" dataKey="value" stroke={config.color} strokeWidth={2} fillOpacity={1} fill={`url(#${config.gradientId})`} dot={false} />
@@ -425,26 +420,26 @@ export default function OrganizationPage() {
 
       {/* COMPANY DIRECTORY */}
       <section className="bg-white dark:bg-[#111827] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[24px] shadow-sm p-6 relative z-10 overflow-hidden">
-        
+
         {/* DIRECTORY HEADER & FILTERS BAR */}
         <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mb-6 pb-4 border-b border-slate-100 dark:border-border">
           <div>
             <h2 className="font-bold text-slate-900 dark:text-white text-base tracking-tight uppercase tracking-wider">{LABELS[activeTab].plural}</h2>
-            <p className="text-[10px] text-slate-455 dark:text-[#94A3B8] font-bold mt-0.5">Manage company records, branches and internal organizational nodes</p>
+            <p className="text-[11px] text-slate-500 dark:text-[#94A3B8] font-semibold mt-1">Manage company records, branches and internal organizational nodes</p>
           </div>
-          
-          <div className="flex flex-wrap gap-2.5 items-center w-full xl:w-auto">
+
+          <div className="flex flex-wrap gap-4 items-center w-full xl:w-auto">
             <input
               id="organization-search"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder={`Search ${LABELS[activeTab].plural.toLowerCase()}...`}
-              className="h-12 w-full sm:w-60 px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm placeholder-slate-400 dark:placeholder-slate-500"
+              className="h-12 w-full sm:w-72 px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm placeholder-slate-400 dark:placeholder-slate-500"
             />
             <button
               type="button"
               onClick={() => document.getElementById("organization-search")?.focus()}
-              className="h-12 px-4 py-2.5 bg-slate-50 dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[#334155] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold hover:bg-slate-100 dark:hover:bg-[#273449] rounded-xl transition shadow-sm cursor-pointer flex items-center justify-center"
+              className="h-12 px-4 py-2.5 bg-slate-50 dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[#334155] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold hover:bg-slate-100 dark:hover:bg-[#273449] rounded-xl transition shadow-sm cursor-pointer flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
             >
               Filter
             </button>
@@ -452,7 +447,8 @@ export default function OrganizationPage() {
               type="button"
               onClick={exportCsv}
               disabled={!filteredData.length}
-              className="h-12 px-4 py-2.5 bg-slate-50 dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[#334155] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold hover:bg-slate-100 dark:hover:bg-[#273449] rounded-xl transition shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center"
+              title={!filteredData.length ? "No data available to export" : "Export current list to CSV"}
+              className="h-12 px-4 py-2.5 bg-slate-50 dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[#334155] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold hover:bg-slate-100 dark:hover:bg-[#273449] rounded-xl transition shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-slate-50 disabled:dark:hover:bg-[#1E293B] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
             >
               Export CSV
             </button>
@@ -479,17 +475,17 @@ export default function OrganizationPage() {
             ))}
           </div>
         ) : filteredData.length === 0 ? (
-          <div className="px-6 py-16 text-center">
-            <div className="flex flex-col items-center justify-center text-center p-8 bg-[#0F172A] rounded-2xl border border-dashed border-[rgba(255,255,255,0.08)] max-w-lg mx-auto my-6 animate-fade-in">
-              <div className="w-16 h-16 rounded-full bg-blue-950/20 border border-blue-900/30 flex items-center justify-center text-blue-400 mb-4 shadow-sm shadow-blue-500/5">
-                <span className="text-2xl">🏢</span>
+          <div className="px-6 py-12 text-center flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center text-center p-10 bg-slate-50/65 dark:bg-[#0F172A] rounded-2xl border border-dashed border-slate-200 dark:border-[rgba(255,255,255,0.08)] max-w-md w-full mx-auto my-2 animate-fade-in shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-none">
+              <div className="w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 flex items-center justify-center text-blue-500 mb-6 shadow-sm shadow-blue-500/5">
+                <span className="text-3xl">🏢</span>
               </div>
-              <h4 className="text-sm font-bold text-white mb-1">No {LABELS[activeTab].plural} Found</h4>
-              <p className="text-xs text-[#94A3B8] max-w-sm mb-5 font-medium">Create your first {LABELS[activeTab].singular.toLowerCase()} to start managing your organization.</p>
-              <button 
+              <h4 className="text-base font-black text-slate-800 dark:text-white mb-2">No {LABELS[activeTab].plural} Found</h4>
+              <p className="text-xs text-slate-500 dark:text-[#94A3B8] max-w-xs mb-6 font-medium leading-relaxed">Create your first {LABELS[activeTab].singular.toLowerCase()} to start building your organization hierarchy.</p>
+              <button
                 type="button"
-                onClick={openCreate} 
-                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 hover:opacity-90 transition-all text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 cursor-pointer"
+                onClick={openCreate}
+                className="px-6 py-2.5 bg-[#2563EB] hover:bg-blue-600 transition-all text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/45"
               >
                 + Add {LABELS[activeTab].singular}
               </button>
@@ -510,8 +506,8 @@ export default function OrganizationPage() {
               </thead>
               <tbody className="divide-y divide-[#E8EDF7] dark:divide-border text-sm">
                 {filteredData.map((item) => (
-                  <tr 
-                    key={item.id} 
+                  <tr
+                    key={item.id}
                     className="hover:bg-slate-50/60 dark:hover:bg-[#273449] transition-all group rounded-xl cursor-pointer"
                     onClick={() => openEntity(item, "view")}
                   >
@@ -524,15 +520,14 @@ export default function OrganizationPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
-                        item.status === "ACTIVE" 
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30" 
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${item.status === "ACTIVE"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30"
                           : item.status === "PLANNING"
-                          ? "bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30"
-                          : item.status === "ON_HOLD"
-                          ? "bg-orange-50 text-orange-700 border-orange-100 dark:bg-orange-950/20 dark:text-orange-400 dark:border-orange-900/30"
-                          : "bg-slate-50 text-slate-700 border-slate-100 dark:bg-slate-800/30 dark:text-slate-400 dark:border-slate-700/30"
-                      }`}>
+                            ? "bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30"
+                            : item.status === "ON_HOLD"
+                              ? "bg-orange-50 text-orange-700 border-orange-100 dark:bg-orange-950/20 dark:text-orange-400 dark:border-orange-900/30"
+                              : "bg-slate-50 text-slate-700 border-slate-100 dark:bg-slate-800/30 dark:text-slate-400 dark:border-slate-700/30"
+                        }`}>
                         {item.status || "Active"}
                       </span>
                     </td>
@@ -571,31 +566,32 @@ export default function OrganizationPage() {
 
       {modalMode && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm p-4 animate-fade-in"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] p-4 transition-opacity duration-200"
           role="dialog"
           aria-modal="true"
           aria-label={`${modalMode} ${LABELS[activeTab].singular}`}
         >
-          <div className="bg-gradient-to-br from-white via-white to-slate-50/10 dark:from-[#111827] dark:via-[#111827] dark:to-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-2xl w-full max-w-lg p-6 relative overflow-hidden backdrop-blur-md bg-white/98 dark:bg-[#111827]/98 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-border pb-3">
-              <h2 className="text-base font-bold capitalize text-slate-900 dark:text-white">
-                {modalMode} {LABELS[activeTab].singular}
-              </h2>
-              <button
-                type="button"
-                onClick={closeModal}
-                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-[#1E293B] cursor-pointer"
-                aria-label="Close"
-              >
-                ✕
-              </button>
-            </div>
+          <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-border rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-lg p-8 relative overflow-hidden text-left max-h-[90vh] overflow-y-auto transform scale-100 translate-y-0 transition-all duration-250 ease-out">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-655 transition-all duration-200 cursor-pointer"
+              aria-label="Close"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <h2 className="text-[28px] font-bold capitalize text-[#0F172A] dark:text-[#F8FAFC] border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 leading-none">
+              {modalMode} {LABELS[activeTab].singular}
+            </h2>
 
             {modalMode === "view" && selected ? (
-              <dl className="mt-6 space-y-4 text-xs">
+              <dl className="space-y-4 text-xs">
                 {Object.entries(selected).map(([key, value]) => (
                   <div key={key} className="grid grid-cols-3 gap-4 border-b border-slate-100 dark:border-border pb-3">
-                    <dt className="font-bold capitalize text-slate-450 dark:text-[#94A3B8]">
+                    <dt className="font-bold capitalize text-[#64748B] dark:text-[#94A3B8]">
                       {key.replaceAll("_", " ")}
                     </dt>
                     <dd className="col-span-2 break-words text-slate-900 dark:text-white font-semibold">
@@ -605,9 +601,9 @@ export default function OrganizationPage() {
                 ))}
               </dl>
             ) : (
-              <form className="mt-6 space-y-4" onSubmit={submitForm}>
+              <form className="space-y-5" onSubmit={submitForm}>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">
                     Name
                   </label>
                   <input
@@ -616,13 +612,13 @@ export default function OrganizationPage() {
                     maxLength={100}
                     value={form.name}
                     onChange={(event) => setForm({ ...form, name: event.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                   />
                 </div>
 
                 {activeTab === "companies" && (
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">
                       Logo URL
                     </label>
                     <input
@@ -630,21 +626,21 @@ export default function OrganizationPage() {
                       maxLength={255}
                       value={form.logo_url}
                       onChange={(event) => setForm({ ...form, logo_url: event.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                      className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                     />
                   </div>
                 )}
 
                 {activeTab === "branches" && (
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">
                       Company
                     </label>
                     <select
                       required
                       value={form.company_id}
                       onChange={(event) => setForm({ ...form, company_id: event.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+                      className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8] dark:hover:border-slate-500"
                     >
                       <option value="">Select company</option>
                       {companies.map((company) => (
@@ -657,14 +653,14 @@ export default function OrganizationPage() {
                 {activeTab === "projects" && (
                   <>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">
+                      <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">
                         Branch
                       </label>
                       <select
                         required
                         value={form.branch_id}
                         onChange={(event) => setForm({ ...form, branch_id: event.target.value })}
-                        className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+                        className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8] dark:hover:border-slate-500"
                       >
                         <option value="">Select branch</option>
                         {branches.map((branch) => (
@@ -673,24 +669,24 @@ export default function OrganizationPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">
+                      <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">
                         Location
                       </label>
                       <input
                         maxLength={255}
                         value={form.location}
                         onChange={(event) => setForm({ ...form, location: event.target.value })}
-                        className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                        className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">
+                      <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">
                         Status
                       </label>
                       <select
                         value={form.status}
                         onChange={(event) => setForm({ ...form, status: event.target.value })}
-                        className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer"
+                        className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8] dark:hover:border-slate-500"
                       >
                         <option value="ACTIVE">Active</option>
                         <option value="PLANNING">Planning</option>
@@ -699,7 +695,7 @@ export default function OrganizationPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">
+                      <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">
                         Description
                       </label>
                       <textarea
@@ -707,25 +703,25 @@ export default function OrganizationPage() {
                         rows={4}
                         value={form.description}
                         onChange={(event) => setForm({ ...form, description: event.target.value })}
-                        className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm"
+                        className="w-full px-4 py-3 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm min-h-[100px] resize-none"
                       />
                     </div>
                   </>
                 )}
 
                 {error && <p className="text-sm font-semibold text-rose-600 dark:text-rose-400">{error}</p>}
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-800 mt-6">
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="px-4 py-2 border border-[#E8EDF7] dark:border-[#334155] rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-655 dark:text-slate-300 text-xs font-bold cursor-pointer"
+                    className="h-11 px-5 border border-[#CBD5E1] rounded-xl bg-white dark:bg-[#1E293B] hover:bg-[#F8FAFC] hover:border-[#94A3B8] transition-all duration-200 text-[#334155] dark:text-slate-300 text-xs font-semibold cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? "Saving…" : "Save"}
                   </button>

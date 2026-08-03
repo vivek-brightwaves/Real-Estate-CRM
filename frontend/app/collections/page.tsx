@@ -5,6 +5,7 @@ import api from "../../lib/axios";
 import { useAuthStore } from "../../store/authStore";
 import { useRouter, useSearchParams } from "next/navigation";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import PageHeader from "../../components/ui/PageHeader";
 import StatsCard from "../../components/dashboard/StatsCard";
 import { useFeedback } from "../../components/ui/FeedbackProvider";
 import { useSectionSearch } from "../../hooks/useSectionSearch";
@@ -26,7 +27,7 @@ function CollectionsDashboard() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"PENDING" | "OVERDUE" | "RECEIVED">("PENDING");
-  
+
   const { user, accessToken, clearAuth } = useAuthStore();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -329,46 +330,45 @@ function CollectionsDashboard() {
       onLogout={handleLogout}
     >
       <div className="space-y-8 bg-gradient-to-br from-[#F8FAFF] via-[#EEF5FF] to-[#F7FAFC] dark:from-transparent dark:to-transparent min-h-[calc(100vh-120px)] p-1 rounded-3xl relative overflow-hidden">
-        
+
         {/* Abstract fintech background meshes */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.06),transparent_70%)] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-[radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.04),transparent_70%)] pointer-events-none" />
 
-        {/* HEADER */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-2 border-b border-slate-200/50 dark:border-border/50 relative z-10">
-          <div>
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <span className="text-2xl">💳</span> Payment Tracker
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-[#94A3B8] mt-1 font-semibold">Manage and record collection schedules and receipt generation.</p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full lg:w-auto shrink-0">
-            <input 
-              type="text" 
+        <PageHeader
+          breadcrumb="Dashboard / Payments"
+          title="Payment Tracker"
+          subtitle="Manage and record collection schedules and receipt generation."
+          searchFilter={
+            <input
+              type="text"
               placeholder="Search ID / Booking..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-12 w-full sm:w-60 px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm placeholder-slate-400 dark:placeholder-slate-500"
+              className="h-10 w-full sm:w-60 px-3.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm placeholder-slate-400 dark:placeholder-slate-500"
             />
-            <button 
-              onClick={exportPayments}
-              className="h-12 px-4 py-2.5 bg-slate-50 dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[#334155] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold hover:bg-slate-100 dark:hover:bg-[#273449] rounded-xl transition shadow-sm cursor-pointer flex items-center justify-center shrink-0"
-            >
-              Export
-            </button>
-            <button 
-              onClick={() => setShowNew(true)} 
-              className="h-12 px-5 bg-gradient-to-r from-blue-600 to-indigo-650 hover:opacity-90 active:scale-95 transition-all text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 flex items-center justify-center shrink-0 cursor-pointer"
-            >
-              + Record Payment
-            </button>
-          </div>
-        </div>
+          }
+          actions={
+            <div className="flex flex-wrap gap-2.5 items-center">
+              <button
+                onClick={exportPayments}
+                className="h-10 px-4 bg-white dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[#334155] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold hover:bg-slate-100 dark:hover:bg-[#273449] rounded-xl transition shadow-sm cursor-pointer flex items-center justify-center shrink-0"
+              >
+                Export
+              </button>
+              <button
+                onClick={() => setShowNew(true)}
+                className="h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center shrink-0 cursor-pointer"
+              >
+                + Record Payment
+              </button>
+            </div>
+          }
+        />
 
         {/* METRICS STATS CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-          
+
           {/* Card 1 */}
           <div className="bg-white dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[22px] p-5 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 relative flex flex-col justify-between overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-orange-500 rounded-t-[22px]" />
@@ -392,8 +392,8 @@ function CollectionsDashboard() {
                 <AreaChart data={sparkData.pending}>
                   <defs>
                     <linearGradient id="pendingGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f97316" stopOpacity={0.15}/>
-                      <stop offset="95%" stopColor="#f97316" stopOpacity={0.01}/>
+                      <stop offset="5%" stopColor="#f97316" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#f97316" stopOpacity={0.01} />
                     </linearGradient>
                   </defs>
                   <Area type="monotone" dataKey="value" stroke="#f97316" strokeWidth={2} fillOpacity={1} fill="url(#pendingGrad)" dot={false} />
@@ -425,8 +425,8 @@ function CollectionsDashboard() {
                 <AreaChart data={sparkData.overdue}>
                   <defs>
                     <linearGradient id="overdueGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.15}/>
-                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0.01}/>
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0.01} />
                     </linearGradient>
                   </defs>
                   <Area type="monotone" dataKey="value" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#overdueGrad)" dot={false} />
@@ -458,8 +458,8 @@ function CollectionsDashboard() {
                 <AreaChart data={sparkData.received}>
                   <defs>
                     <linearGradient id="receivedGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.15}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.01}/>
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.01} />
                     </linearGradient>
                   </defs>
                   <Area type="monotone" dataKey="value" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#receivedGrad)" dot={false} />
@@ -491,8 +491,8 @@ function CollectionsDashboard() {
                 <AreaChart data={sparkData.pending}>
                   <defs>
                     <linearGradient id="activeGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15}/>
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.01}/>
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.01} />
                     </linearGradient>
                   </defs>
                   <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#activeGrad)" dot={false} />
@@ -518,11 +518,10 @@ function CollectionsDashboard() {
                   setActiveTab(tab.id as any);
                   setCurrentPage(1);
                 }}
-                className={`px-5 py-2.5 text-xs font-black rounded-xl transition-all duration-300 border uppercase tracking-wider cursor-pointer ${
-                  isTabActive 
-                    ? `shadow-sm ${tab.color} scale-102` 
-                    : "text-slate-505 dark:text-[#94A3B8] hover:text-slate-800 dark:hover:text-white border-transparent hover:bg-slate-50/50 dark:hover:bg-[#1E293B]/50"
-                }`}
+                className={`px-5 py-2.5 text-xs font-black rounded-xl transition-all duration-300 border uppercase tracking-wider cursor-pointer ${isTabActive
+                  ? `shadow-sm ${tab.color} scale-102`
+                  : "text-slate-505 dark:text-[#94A3B8] hover:text-slate-800 dark:hover:text-white border-transparent hover:bg-slate-50/50 dark:hover:bg-[#1E293B]/50"
+                  }`}
               >
                 {tab.label}
               </button>
@@ -532,12 +531,12 @@ function CollectionsDashboard() {
 
         {/* GLASS CARD WRAPPER */}
         <div className="bg-white dark:bg-[#111827] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[24px] shadow-sm p-6 relative z-10 overflow-hidden">
-          
+
           <div className="flex justify-between items-center mb-6 pb-2 border-b border-slate-100 dark:border-border">
             <h3 className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wider">
               {activeTab} Collections Queue
             </h3>
-            
+
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
@@ -571,11 +570,10 @@ function CollectionsDashboard() {
                       const daysOverdue = getDaysOverdue(p.due_date);
 
                       return (
-                        <tr 
-                          key={p.id} 
-                          className={`hover:bg-slate-50/60 dark:hover:bg-[#273449] transition-colors group cursor-pointer ${
-                            activeTab === "OVERDUE" ? "border-l-4 border-l-rose-500" : ""
-                          }`}
+                        <tr
+                          key={p.id}
+                          className={`hover:bg-slate-50/60 dark:hover:bg-[#273449] transition-colors group cursor-pointer ${activeTab === "OVERDUE" ? "border-l-4 border-l-rose-500" : ""
+                            }`}
                         >
                           {/* ID & BOOKING LINK */}
                           <td className="px-6 py-4">
@@ -643,8 +641,8 @@ function CollectionsDashboard() {
                           <td className="px-6 py-4 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                             <div className="inline-flex gap-2 justify-end">
                               {activeTab !== "RECEIVED" && (
-                                <button 
-                                  onClick={() => sendReminder(p.id)} 
+                                <button
+                                  onClick={() => sendReminder(p.id)}
                                   disabled={paymentAction?.id === p.id}
                                   className="px-3 py-1.5 bg-orange-50 dark:bg-orange-955/20 border border-orange-200 dark:border-orange-900/30 rounded-lg text-orange-700 dark:text-orange-400 text-xs font-bold hover:bg-orange-100 dark:hover:bg-orange-900/40 hover:scale-102 transition shadow-sm cursor-pointer"
                                 >
@@ -653,10 +651,10 @@ function CollectionsDashboard() {
                                     : "Send Reminder"}
                                 </button>
                               )}
-                              
+
                               {activeTab !== "RECEIVED" && ["ADMIN", "MANAGER", "SUPER_ADMIN"].includes(user?.role ?? "") && (
-                                <button 
-                                  onClick={() => setShowMarkReceived(p.id)} 
+                                <button
+                                  onClick={() => setShowMarkReceived(p.id)}
                                   disabled={paymentAction?.id === p.id}
                                   className="btn-premium-action btn-mark-received px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold shadow hover:bg-blue-750 transition cursor-pointer"
                                 >
@@ -665,8 +663,8 @@ function CollectionsDashboard() {
                               )}
 
                               {activeTab === "RECEIVED" && (
-                                <button 
-                                  onClick={() => generateReceipt(p.id)} 
+                                <button
+                                  onClick={() => generateReceipt(p.id)}
                                   disabled={paymentAction?.id === p.id}
                                   className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-lg text-xs font-bold shadow-md shadow-blue-500/10 hover:shadow-lg hover:scale-102 transition cursor-pointer"
                                 >
@@ -703,14 +701,14 @@ function CollectionsDashboard() {
                 <div className="flex justify-between items-center border-t border-slate-100 dark:border-border pt-6 mt-6 text-xs font-bold text-slate-455 dark:text-slate-400 uppercase">
                   <span>Showing {Math.min(filteredPayments.length, (currentPage - 1) * itemsPerPage + 1)} to {Math.min(filteredPayments.length, currentPage * itemsPerPage)} of {filteredPayments.length} Payments</span>
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                       className="px-3.5 py-2 border border-[#E8EDF7] dark:border-[#334155] rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-700 dark:text-[#CBD5E1] shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Previous
                     </button>
-                    <button 
+                    <button
                       disabled={currentPage === totalPages}
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                       className="px-3.5 py-2 border border-[#E8EDF7] dark:border-[#334155] rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-700 dark:text-[#CBD5E1] shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
@@ -723,34 +721,40 @@ function CollectionsDashboard() {
             </>
           )}
 
-        </div>
-
-        {/* MODALS */}
-
-        {/* Record Payment Modal */}
+        </div>        {/* Record Payment Modal */}
         {showNew && (
-          <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 dark:from-[#111827] dark:via-[#111827] dark:to-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-2xl w-full max-w-sm p-6 relative overflow-hidden backdrop-blur-md bg-white/98 dark:bg-[#111827]/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 dark:text-white border-b border-slate-100 dark:border-border pb-2">Record Scheduled Payment</h3>
-              <form onSubmit={handleRecordPayment} className="space-y-4">
+          <div className="fixed inset-0 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 z-50 transition-opacity duration-200">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-border rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-[520px] p-8 relative overflow-hidden transition-all transform scale-100 translate-y-0 duration-250 ease-out">
+              <button
+                type="button"
+                onClick={() => setShowNew(false)}
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-650 transition-all duration-200 cursor-pointer"
+                aria-label="Close modal"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 leading-none">Record Scheduled Payment</h3>
+              <form onSubmit={handleRecordPayment} className="space-y-5">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">Booking ID</label>
-                  <input type="number" required value={newBookingId} onChange={(e) => setNewBookingId(e.target.value)} className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm" placeholder="e.g. 1" />
-                </div>
-                
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-450 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">Amount (₹)</label>
-                  <input type="number" required value={newAmount} onChange={(e) => setNewAmount(e.target.value)} className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm" placeholder="e.g. 120000" />
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Booking ID</label>
+                  <input type="number" required value={newBookingId} onChange={(e) => setNewBookingId(e.target.value)} className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm" placeholder="e.g. 1" />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">Due Date</label>
-                  <input type="date" value={newDueDate} onChange={(e) => setNewDueDate(e.target.value)} className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer" />
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Amount (₹)</label>
+                  <input type="number" required value={newAmount} onChange={(e) => setNewAmount(e.target.value)} className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm" placeholder="e.g. 120000" />
                 </div>
-                
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
-                  <button type="button" onClick={() => setShowNew(false)} className="px-4 py-2 border border-[#E8EDF7] dark:border-[#334155] rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-655 dark:text-slate-300 text-xs font-bold cursor-pointer">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer">Record</button>
+
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Due Date</label>
+                  <input type="date" value={newDueDate} onChange={(e) => setNewDueDate(e.target.value)} className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer" />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-800 mt-6">
+                  <button type="button" onClick={() => setShowNew(false)} className="h-11 px-5 border border-[#CBD5E1] dark:border-[#334155] rounded-xl bg-white dark:bg-[#1E293B] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:border-[#94A3B8] transition-all duration-200 text-[#334155] dark:text-slate-300 text-xs font-semibold cursor-pointer">Cancel</button>
+                  <button type="submit" className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer">Record</button>
                 </div>
               </form>
             </div>
@@ -759,31 +763,41 @@ function CollectionsDashboard() {
 
         {/* Mark Received Modal */}
         {showMarkReceived && (
-          <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-            <div className="bg-gradient-to-br from-white via-white to-slate-50/10 dark:from-[#111827] dark:via-[#111827] dark:to-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-2xl w-full max-w-sm p-6 relative overflow-hidden backdrop-blur-md bg-white/98 dark:bg-[#111827]/98">
-              <h3 className="text-base font-bold mb-4 text-slate-900 dark:text-white border-b border-slate-100 dark:border-border pb-2">Mark Payment Received</h3>
-              <form onSubmit={handleMarkReceived} className="space-y-4">
+          <div className="fixed inset-0 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 z-50 transition-opacity duration-200">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-border rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-[520px] p-8 relative overflow-hidden transition-all transform scale-100 translate-y-0 duration-250 ease-out">
+              <button
+                type="button"
+                onClick={() => setShowMarkReceived(null)}
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-650 transition-all duration-200 cursor-pointer"
+                aria-label="Close modal"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 leading-none">Mark Payment Received</h3>
+              <form onSubmit={handleMarkReceived} className="space-y-5">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-450 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">Payment Mode</label>
-                  <select value={rcvMode} onChange={(e) => setRcvMode(e.target.value)} className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm cursor-pointer">
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Payment Mode</label>
+                  <select value={rcvMode} onChange={(e) => setRcvMode(e.target.value)} className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8] dark:hover:border-slate-500">
                     <option value="CASH">CASH</option>
                     <option value="CHEQUE">CHEQUE</option>
                     <option value="BANK_TRANSFER">BANK TRANSFER</option>
                     <option value="UPI_REFERENCE">UPI</option>
                   </select>
                 </div>
-                
+
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-455 dark:text-[#94A3B8] uppercase tracking-widest mb-1.5">Receipt / Reference No. (Optional)</label>
-                  <input type="text" value={rcvRef} onChange={(e) => setRcvRef(e.target.value)} className="w-full px-3.5 py-2.5 bg-white dark:bg-[#0F172A] border border-[#E8EDF7] dark:border-[#334155] rounded-xl text-slate-700 dark:text-white text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all shadow-sm" placeholder="e.g. UPI-92837" />
+                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Receipt / Reference No. (Optional)</label>
+                  <input type="text" value={rcvRef} onChange={(e) => setRcvRef(e.target.value)} className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm" placeholder="e.g. UPI-92837" />
                 </div>
-                
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
-                  <button type="button" onClick={() => setShowMarkReceived(null)} className="px-4 py-2 border border-[#E8EDF7] dark:border-[#334155] rounded-xl hover:bg-slate-50 dark:hover:bg-[#1E293B] transition text-slate-655 dark:text-slate-300 text-xs font-bold cursor-pointer">Cancel</button>
+
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-800 mt-6">
+                  <button type="button" onClick={() => setShowMarkReceived(null)} className="h-11 px-5 border border-[#CBD5E1] dark:border-[#334155] rounded-xl bg-white dark:bg-[#1E293B] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:border-[#94A3B8] transition-all duration-200 text-[#334155] dark:text-slate-300 text-xs font-semibold cursor-pointer">Cancel</button>
                   <button
                     type="submit"
                     disabled={paymentAction?.type === "received"}
-                    className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-650 text-white rounded-xl shadow hover:opacity-95 transition text-xs font-bold cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                    className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {paymentAction?.type === "received" ? "Saving..." : "Confirm Receipt"}
                   </button>

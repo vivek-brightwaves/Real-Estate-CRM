@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 type FeedbackTone = "success" | "error" | "warning" | "info";
 
@@ -172,138 +173,151 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
       {children}
 
       <div
-        className="pointer-events-none fixed right-4 top-4 z-[120] flex w-[min(92vw,390px)] flex-col gap-3"
+        className="pointer-events-none fixed right-6 bottom-6 z-[120] flex w-[min(92vw,390px)] flex-col gap-3 toast-container-wrapper"
         aria-live="polite"
         aria-atomic="true"
       >
-        {toasts.map((toast) => {
-          const style = toneStyles[toast.tone];
-          return (
-            <div
-              key={toast.id}
-              role={toast.tone === "error" ? "alert" : "status"}
-              className={`pointer-events-auto flex items-start gap-3 rounded-2xl border p-4 shadow-[0_18px_55px_rgba(15,23,42,0.18)] backdrop-blur-xl animate-header-load ${style.shell}`}
-            >
-              <span
-                className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm font-black shadow-sm ${style.icon}`}
+        <AnimatePresence>
+          {toasts.map((toast) => {
+            const style = toneStyles[toast.tone];
+            return (
+              <motion.div
+                key={toast.id}
+                role={toast.tone === "error" ? "alert" : "status"}
+                initial={{ x: 100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 100, opacity: 0 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+                className={`pointer-events-auto flex items-start gap-3 rounded-2xl border p-4 shadow-[0_18px_55px_rgba(15,23,42,0.18)] backdrop-blur-xl ${style.shell}`}
               >
-                {style.symbol}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-black text-slate-900">
-                  {toast.title}
-                </p>
-                {toast.message && (
-                  <p className="mt-1 text-xs font-medium leading-5 text-slate-600">
-                    {toast.message}
+                <span
+                  className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm font-black shadow-sm ${style.icon}`}
+                >
+                  {style.symbol}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-black text-slate-900">
+                    {toast.title}
                   </p>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={() => dismissToast(toast.id)}
-                className="rounded-lg p-1 text-slate-400 transition hover:bg-white/70 hover:text-slate-700"
-                aria-label="Dismiss notification"
-              >
-                {"\u00d7"}
-              </button>
-            </div>
-          );
-        })}
+                  {toast.message && (
+                    <p className="mt-1 text-xs font-medium leading-5 text-slate-600">
+                      {toast.message}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => dismissToast(toast.id)}
+                  className="rounded-lg p-1 text-slate-400 transition hover:bg-white/70 hover:text-slate-700"
+                  aria-label="Dismiss notification"
+                >
+                  {"\u00d7"}
+                </button>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
 
-      {dialog && dialogOptions && (
-        <div
-          className="fixed inset-0 z-[130] flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.currentTarget === event.target) closeDialog(null);
-          }}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="feedback-dialog-title"
-            className="w-full max-w-md overflow-hidden rounded-[24px] border border-white/60 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.3)] animate-header-load"
+      <AnimatePresence>
+        {dialog && dialogOptions && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[130] flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm"
+            role="presentation"
+            onMouseDown={(event) => {
+              if (event.currentTarget === event.target) closeDialog(null);
+            }}
           >
-            <div className="border-b border-slate-100 bg-gradient-to-br from-white to-slate-50 px-6 py-5">
-              <div className="flex items-start gap-4">
-                <span
-                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-xl font-black text-white shadow-lg ${
-                    isDanger
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="feedback-dialog-title"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="w-full max-w-md overflow-hidden rounded-[24px] border border-white/60 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.3)]"
+            >
+              <div className="border-b border-slate-100 bg-gradient-to-br from-white to-slate-50 px-6 py-5">
+                <div className="flex items-start gap-4">
+                  <span
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-xl font-black text-white shadow-lg ${isDanger
                       ? "bg-gradient-to-br from-rose-500 to-red-600"
                       : "bg-gradient-to-br from-blue-600 to-indigo-600"
-                  }`}
-                >
-                  {isDanger ? "!" : "\u2713"}
-                </span>
-                <div>
-                  <h2
-                    id="feedback-dialog-title"
-                    className="text-lg font-black text-slate-900"
+                      }`}
                   >
-                    {dialogOptions.title}
-                  </h2>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">
-                    {dialogOptions.message}
-                  </p>
+                    {isDanger ? "!" : "\u2713"}
+                  </span>
+                  <div>
+                    <h2
+                      id="feedback-dialog-title"
+                      className="text-lg font-black text-slate-900"
+                    >
+                      {dialogOptions.title}
+                    </h2>
+                    <p className="mt-1 text-sm leading-6 text-slate-600">
+                      {dialogOptions.message}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {dialog.mode === "prompt" && (
-              <div className="px-6 pt-5">
-                <label className="space-y-2 text-xs font-bold text-slate-600">
-                  {(dialogOptions as PromptOptions).inputLabel ?? "Value"}
-                  <input
-                    autoFocus
-                    value={promptValue}
-                    onChange={(event) => setPromptValue(event.target.value)}
-                    placeholder={(dialogOptions as PromptOptions).placeholder}
-                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" && promptValue.trim()) {
-                        closeDialog(promptValue.trim());
-                      }
-                    }}
-                  />
-                </label>
-              </div>
-            )}
+              {dialog.mode === "prompt" && (
+                <div className="px-6 pt-5">
+                  <label className="space-y-2 text-xs font-bold text-slate-600">
+                    {(dialogOptions as PromptOptions).inputLabel ?? "Value"}
+                    <input
+                      autoFocus
+                      value={promptValue}
+                      onChange={(event) => setPromptValue(event.target.value)}
+                      placeholder={(dialogOptions as PromptOptions).placeholder}
+                      className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" && promptValue.trim()) {
+                          closeDialog(promptValue.trim());
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+              )}
 
-            <div className="flex justify-end gap-3 px-6 py-5">
-              <button
-                type="button"
-                onClick={() => closeDialog(null)}
-                className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50"
-              >
-                {dialogOptions.cancelLabel ?? "Cancel"}
-              </button>
-              <button
-                type="button"
-                disabled={
-                  dialog.mode === "prompt" && !promptValue.trim()
-                }
-                onClick={() =>
-                  closeDialog(
-                    dialog.mode === "prompt"
-                      ? promptValue.trim()
-                      : true,
-                  )
-                }
-                className={`rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                  isDanger
+              <div className="flex justify-end gap-3 px-6 py-5">
+                <button
+                  type="button"
+                  onClick={() => closeDialog(null)}
+                  className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50"
+                >
+                  {dialogOptions.cancelLabel ?? "Cancel"}
+                </button>
+                <button
+                  type="button"
+                  disabled={
+                    dialog.mode === "prompt" && !promptValue.trim()
+                  }
+                  onClick={() =>
+                    closeDialog(
+                      dialog.mode === "prompt"
+                        ? promptValue.trim()
+                        : true,
+                    )
+                  }
+                  className={`rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 ${isDanger
                     ? "bg-gradient-to-r from-rose-600 to-red-600 hover:shadow-rose-500/25"
                     : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-blue-500/25"
-                }`}
-              >
-                {dialogOptions.confirmLabel ??
-                  (dialog.mode === "prompt" ? "Continue" : "Confirm")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                    }`}
+                >
+                  {dialogOptions.confirmLabel ??
+                    (dialog.mode === "prompt" ? "Continue" : "Confirm")}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </FeedbackContext.Provider>
   );
 }

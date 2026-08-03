@@ -86,7 +86,10 @@ export default function DashboardLayout({
       {/* ============================================================ */}
       {/* LEFT FIXED SIDEBAR                                           */}
       {/* ============================================================ */}
-      <aside
+      <motion.aside
+        initial={{ x: -250 }}
+        animate={{ x: 0 }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
         className={`fixed left-0 top-0 h-screen hidden md:flex flex-col bg-white dark:bg-[#111827] text-slate-800 dark:text-white shrink-0 border-r border-slate-100 dark:border-slate-800 transition-all duration-300 z-30 overflow-hidden ${isSidebarCollapsed ? "w-20" : "w-[250px]"
           }`}
       >
@@ -123,12 +126,19 @@ export default function DashboardLayout({
               <button
                 key={item.name}
                 onClick={() => handleNavClick(item.href)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 ease-in-out group ${isActive
-                  ? "bg-[#2563EB] text-white dark:bg-gradient-to-r dark:from-[#2563EB] dark:to-[#3B82F6] dark:text-white shadow-md shadow-blue-600/10 font-semibold"
-                  : "bg-transparent text-[#334155] hover:bg-[#EEF4FF] hover:text-[#2563EB] dark:text-[#CBD5E1] dark:hover:bg-[#2563EB] dark:hover:text-white"
+                className={`w-full relative flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold tracking-wide transition-colors duration-200 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${isActive
+                  ? "text-white font-semibold"
+                  : "bg-transparent text-[#334155] hover:bg-[#EEF4FF] hover:text-[#2563EB] dark:text-[#CBD5E1] dark:hover:bg-slate-800/50 dark:hover:text-white"
                   }`}
                 title={item.name}
               >
+                {isActive && (
+                  <motion.div
+                    layoutId="active-pill"
+                    className="absolute inset-0 bg-[#2563EB] dark:bg-gradient-to-r dark:from-[#2563EB] dark:to-[#3B82F6] rounded-xl -z-10 shadow-md shadow-blue-600/10"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
                 <svg
                   className={`w-4 h-4 shrink-0 transition-colors duration-200 ${isActive
                     ? "text-white"
@@ -182,7 +192,7 @@ export default function DashboardLayout({
             </button>
           )}
         </div>
-      </aside>
+      </motion.aside>
 
       {/* ============================================================ */}
       {/* MOBILE DRAWER SIDEBAR                                        */}
@@ -239,9 +249,9 @@ export default function DashboardLayout({
 
         {/* Top Header */}
         <motion.header
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -72 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
           className="sticky top-0 z-50 w-full h-[72px] bg-white dark:bg-[#0F172A] border-b border-[#E5E7EB] dark:border-[#1E293B] px-6 py-4 flex items-center justify-between shadow-[0_8px_30px_rgba(15,23,42,0.06)] dark:shadow-none transition-colors duration-300"
         >
           <div className="flex items-center gap-4">
@@ -250,12 +260,6 @@ export default function DashboardLayout({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
               </svg>
             </button>
-
-            {/* Minimal workspace breadcrumb / label */}
-            <div className="hidden sm:flex flex-col justify-center select-none">
-              <span className="text-[12px] font-bold text-[#94A3B8] uppercase tracking-wider block">DASHBOARD OVERVIEW</span>
-              <span className="text-[16px] font-semibold text-[#2563EB] mt-0.5">Overview</span>
-            </div>
           </div>
 
           <div className="flex items-center gap-4">
@@ -281,8 +285,8 @@ export default function DashboardLayout({
                 </svg>
                 {unreadCount > 0 && (
                   <motion.span
-                    animate={{ scale: [1, 1.25, 1] }}
-                    transition={{ repeat: Infinity, repeatDelay: 5, duration: 0.8 }}
+                    animate={{ scale: [1, 1.15, 1] }}
+                    transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
                     className="absolute top-1.5 right-1.5 bg-rose-500 text-white text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full border border-white dark:border-[#0F172A] px-1 leading-none"
                   >
                     {unreadCount}
@@ -292,10 +296,11 @@ export default function DashboardLayout({
               <AnimatePresence>
                 {isNotifOpen && (
                   <motion.div
-                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                    transition={{ duration: 0.2 }}
+                    initial={{ opacity: 0, scaleY: 0.95 }}
+                    animate={{ opacity: 1, scaleY: 1 }}
+                    exit={{ opacity: 0, scaleY: 0.95 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    style={{ originY: 0 }}
                     className="absolute right-0 mt-3 w-80 bg-white dark:bg-[#1E293B] rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E5E7EB] dark:border-[#1E293B] z-50 overflow-hidden"
                   >
                     <div className="p-4 border-b border-[#E5E7EB] dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/40">
@@ -412,10 +417,11 @@ export default function DashboardLayout({
               <AnimatePresence>
                 {isProfileOpen && (
                   <motion.div
-                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                    transition={{ duration: 0.2 }}
+                    initial={{ opacity: 0, scaleY: 0.95 }}
+                    animate={{ opacity: 1, scaleY: 1 }}
+                    exit={{ opacity: 0, scaleY: 0.95 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    style={{ originY: 0 }}
                     className="absolute right-0 mt-3 w-52 bg-white dark:bg-[#1E293B] rounded-2xl shadow-[0_15px_40px_rgba(15,23,42,0.12)] border border-[#E5E7EB] dark:border-[#1E293B] z-50 py-1.5 overflow-hidden"
                   >
                     <div className="px-4 py-2.5 border-b border-[#E5E7EB] dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-left">
@@ -437,7 +443,7 @@ export default function DashboardLayout({
 
         {/* Master Content Area */}
         <div className="flex-1 flex flex-col min-h-0 relative">
-          <main className="flex-1 overflow-y-auto p-8 bg-[#F5F8FF] dark:bg-background relative overflow-x-hidden">
+          <main className="flex-1 overflow-y-auto pt-6 px-8 pb-8 bg-[#F5F8FF] dark:bg-background relative overflow-x-hidden">
 
             {/* Background Layer 2: Soft Gradient Overlays */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#F5F8FF] via-blue-50/30 to-indigo-50/20 dark:from-background dark:via-blue-950/10 dark:to-indigo-950/10 pointer-events-none" />
@@ -456,7 +462,17 @@ export default function DashboardLayout({
 
             {/* Content Container */}
             <div className="relative z-10">
-              {children}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={pathname}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35, ease: "easeInOut" }}
+                >
+                  {children}
+                </motion.div>
+              </AnimatePresence>
             </div>
 
           </main>
