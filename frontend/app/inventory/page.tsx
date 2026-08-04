@@ -1362,13 +1362,13 @@ export default function InventoryPage() {
 
         {/* Create Project Modal */}
         {showProjectModal && (
-          <div className="fixed inset-0 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 z-50 transition-opacity duration-200 project-modal-overlay">
-            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-border rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] w-full max-w-md p-8 relative overflow-hidden transition-all transform scale-100 translate-y-0 duration-250 ease-out project-modal-content">
+          <div className="fixed inset-0 bg-[#0F172A]/18 dark:bg-[#020617]/70 backdrop-blur-[18px] flex items-center justify-center p-4 z-50 transition-opacity duration-200 project-modal-overlay">
+            <div className="bg-white dark:bg-[#1B2232] border border-slate-200 dark:border-white/[0.08] rounded-[20px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.55),0_8px_24px_rgba(0,0,0,0.30)] w-full max-w-md p-8 relative overflow-hidden transition-all transform scale-100 translate-y-0 duration-250 ease-out project-modal-content">
               {/* Close Button in top-right corner */}
               <button
                 type="button"
                 onClick={() => setShowProjectModal(false)}
-                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-650 transition-all duration-200 cursor-pointer"
+                className="absolute top-8 right-8 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:bg-white/[0.05] dark:hover:bg-white/[0.10] dark:border-white/[0.08] flex items-center justify-center text-slate-400 dark:text-[#CBD5E1] transition-all duration-200 cursor-pointer"
                 aria-label="Close"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1376,32 +1376,32 @@ export default function InventoryPage() {
                 </svg>
               </button>
 
-              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-slate-200 dark:border-slate-800 pb-4 mb-6 leading-none">Create New Project</h3>
+              <h3 className="text-[32px] font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-slate-200 dark:border-white/[0.08] pb-4 mb-6 leading-none">Create New Project</h3>
               <form onSubmit={handleCreateProject} className="space-y-5">
                 <div>
-                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Project Name</label>
+                  <label className="block text-[14px] font-medium text-slate-600 dark:text-[#CBD5E1] mb-2">Project Name</label>
                   <input
                     type="text" required
                     value={newProjectName} onChange={(e) => setNewProjectName(e.target.value)}
-                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
+                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#111827] border border-[#CBD5E1] dark:border-[#334155] hover:border-[#475569] dark:hover:border-[#475569] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#64748B] text-sm focus:outline-none focus:border-blue-500 dark:focus:border-[#3B82F6] focus:ring-4 focus:ring-blue-500/12 dark:focus:ring-[#3B82F6]/18 transition-all duration-200 shadow-sm"
                     placeholder="e.g. Project C"
                   />
                 </div>
                 <div>
-                  <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Location</label>
+                  <label className="block text-[14px] font-medium text-slate-600 dark:text-[#CBD5E1] mb-2">Location</label>
                   <input
                     type="text" required
                     value={newProjectLoc} onChange={(e) => setNewProjectLoc(e.target.value)}
-                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
+                    className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#111827] border border-[#CBD5E1] dark:border-[#334155] hover:border-[#475569] dark:hover:border-[#475569] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#64748B] text-sm focus:outline-none focus:border-blue-500 dark:focus:border-[#3B82F6] focus:ring-4 focus:ring-blue-500/12 dark:focus:ring-[#3B82F6]/18 transition-all duration-200 shadow-sm"
                     placeholder="e.g. Sector 5, Uptown"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-x-4">
                   <div>
-                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Status</label>
+                    <label className="block text-[14px] font-medium text-slate-600 dark:text-[#CBD5E1] mb-2">Status</label>
                     <select
                       value={newProjectStatus} onChange={(e) => setNewProjectStatus(e.target.value)}
-                      className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8] dark:hover:border-slate-500"
+                      className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#111827] border border-[#CBD5E1] dark:border-[#334155] hover:border-[#475569] dark:hover:border-[#475569] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] text-sm focus:outline-none focus:border-blue-500 dark:focus:border-[#3B82F6] focus:ring-4 focus:ring-blue-500/12 dark:focus:ring-[#3B82F6]/18 transition-all duration-200 shadow-sm cursor-pointer"
                     >
                       <option value="Under Construction">Under Construction</option>
                       <option value="Planning">Planning</option>
@@ -1409,17 +1409,17 @@ export default function InventoryPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-350 mb-2">Completion %</label>
+                    <label className="block text-[14px] font-medium text-slate-600 dark:text-[#CBD5E1] mb-2">Completion %</label>
                     <input
                       type="number" min="0" max="100"
                       value={newProjectCompletion} onChange={(e) => setNewProjectCompletion(Number(e.target.value))}
-                      className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
+                      className="w-full h-12 px-4 bg-[#F8FAFC] dark:bg-[#111827] border border-[#CBD5E1] dark:border-[#334155] hover:border-[#475569] dark:hover:border-[#475569] rounded-xl text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#64748B] text-sm focus:outline-none focus:border-blue-500 dark:focus:border-[#3B82F6] focus:ring-4 focus:ring-blue-500/12 dark:focus:ring-[#3B82F6]/18 transition-all duration-200 shadow-sm"
                     />
                   </div>
                 </div>
-                <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-800 mt-6 project-modal-footer">
-                  <button type="button" onClick={() => setShowProjectModal(false)} className="h-11 px-5 border border-[#CBD5E1] dark:border-[#334155] rounded-xl bg-white dark:bg-[#1E293B] hover:bg-[#F8FAFC] dark:hover:bg-slate-800 hover:border-[#94A3B8] transition-all duration-200 text-[#334155] dark:text-slate-300 text-xs font-semibold cursor-pointer project-cancel-btn">Cancel</button>
-                  <button type="submit" className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer project-create-btn">Create</button>
+                <div className="flex justify-end gap-3 pt-7 border-t border-slate-200 dark:border-white/[0.08] mt-6 project-modal-footer">
+                  <button type="button" onClick={() => setShowProjectModal(false)} className="h-11 px-5 border border-[#CBD5E1] dark:border-[#475569] rounded-xl bg-white dark:bg-transparent hover:bg-[#F8FAFC] dark:hover:bg-white/[0.04] hover:border-[#94A3B8] dark:hover:border-[#475569] transition-all duration-200 text-[#334155] dark:text-[#E2E8F0] text-xs font-semibold cursor-pointer project-cancel-btn">Cancel</button>
+                  <button type="submit" className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] dark:bg-gradient-to-br dark:from-[#2563EB] dark:to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] dark:shadow-[0_10px_24px_rgba(37,99,235,0.35)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer project-create-btn">Create</button>
                 </div>
               </form>
             </div>

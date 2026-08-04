@@ -90,6 +90,18 @@ export default function UsersPage() {
     fetchRoleProfiles();
   }, [roleFilter]);
 
+  // Disable background scrolling when any modal is open
+  useEffect(() => {
+    if (showCreateUser || showCreateRole || editUser || resetUser || viewUser) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showCreateUser, showCreateRole, editUser, resetUser, viewUser]);
+
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -515,10 +527,10 @@ export default function UsersPage() {
           {/* Reset Filters button */}
           <button
             onClick={resetAllFilters}
-            className="h-11 px-4.5 bg-slate-100 hover:bg-slate-200 border border-[#E7EEF8] rounded-xl text-xs font-bold text-slate-750 hover:text-slate-900 transition-all duration-200 cursor-pointer shadow-sm shrink-0 flex items-center gap-1.5"
+            className="h-[48px] w-auto px-[22px] bg-slate-100 hover:bg-slate-200 border border-[#E7EEF8] rounded-[12px] text-[14px] font-semibold text-slate-750 hover:text-slate-900 transition-all duration-200 cursor-pointer shadow-sm shrink-0 flex items-center justify-center gap-2 focus:outline-none focus:ring-4 focus:ring-blue-500/10 active:scale-[0.98] active:border-blue-500 dark:bg-transparent dark:border-white/[0.18] dark:text-[#F8FAFC] dark:hover:bg-white/[0.06] dark:hover:border-white/[0.28] dark:active:border-blue-500"
           >
-            <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
+            <svg className="w-4 h-4 shrink-0 dark:text-[#F8FAFC]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
             </svg>
             Reset Filters
           </button>
@@ -707,28 +719,60 @@ export default function UsersPage() {
                 {/* Empty State visual */}
                 {filteredUsers.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
-                      <div className="py-12 text-center flex flex-col items-center justify-center animate-settings-tab-fade">
-                        <div className="w-40 h-40 mb-4 text-slate-350">
-                          <svg viewBox="0 0 200 200" fill="none" className="w-full h-full mx-auto opacity-80">
-                            <circle cx="100" cy="100" r="80" fill="url(#grad)" opacity="0.1" />
-                            <circle cx="100" cy="85" r="28" fill="#E5E7EB" stroke="#9CA3AF" strokeWidth="1.5" />
-                            <path d="M60 145c0-18 16-30 40-30s40 12 40 30" fill="#E5E7EB" stroke="#9CA3AF" strokeWidth="1.5" />
-                            <circle cx="140" cy="140" r="22" fill="#2563EB" opacity="0.95" className="animate-bounce" style={{ animationDuration: '3s' }} />
-                            <path d="M135 140h10M140 135v10" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                    <td colSpan={5} className="p-0">
+                      <div className="flex flex-col items-center justify-center text-center py-16 px-6 min-h-[380px] animate-settings-tab-fade">
+                        {/* Soft enterprise-style team illustration */}
+                        <div className="w-24 h-24 flex items-center justify-center">
+                          <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto text-blue-500 opacity-90">
+                            {/* Background Circle Glow */}
+                            <circle cx="48" cy="48" r="38" fill="url(#bg-glow)" stroke="#DBEAFE" strokeWidth="1.5" strokeDasharray="4 4" />
+                            
+                            {/* Left User (Secondary) */}
+                            <circle cx="32" cy="46" r="10" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="1.5" />
+                            <path d="M18 68c0-8 6-12 14-12s14 4 14 12" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="1.5" strokeLinecap="round" />
+                            
+                            {/* Right User (Secondary) */}
+                            <circle cx="64" cy="46" r="10" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="1.5" />
+                            <path d="M50 68c0-8 6-12 14-12s14 4 14 12" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="1.5" strokeLinecap="round" />
+                            
+                            {/* Center User (Primary) */}
+                            <circle cx="48" cy="40" r="12" fill="url(#user-grad)" stroke="#3B82F6" strokeWidth="1.5" />
+                            <path d="M30 68c0-10 8-16 18-16s18 6 18 16" fill="url(#user-grad)" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" />
+
+                            {/* Accent elements */}
+                            <circle cx="22" cy="28" r="3" fill="#60A5FA" opacity="0.6" />
+                            <circle cx="76" cy="32" r="4" fill="#3B82F6" opacity="0.4" />
+                            <circle cx="48" cy="18" r="2.5" fill="#93C5FD" opacity="0.8" />
+                            
                             <defs>
-                              <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
-                                <stop offset="0%" stopColor="#2563EB" />
-                                <stop offset="100%" stopColor="#7C3AED" />
+                              <linearGradient id="bg-glow" x1="48" y1="10" x2="48" y2="86" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#F8FAFC" />
+                                <stop offset="1" stopColor="#EFF6FF" />
+                              </linearGradient>
+                              <linearGradient id="user-grad" x1="48" y1="28" x2="48" y2="68" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#E0F2FE" />
+                                <stop offset="1" stopColor="#DBEAFE" />
                               </linearGradient>
                             </defs>
                           </svg>
                         </div>
-                        <h4 className="text-base font-extrabold text-slate-800">No Users Found</h4>
-                        <p className="text-xs text-slate-500 mt-1.5 max-w-sm font-medium">
-                          Try changing filters or create a new user.
+
+                        {/* Title */}
+                        <h4 className="text-[28px] font-bold text-[#0F172A] mt-5 leading-tight select-none">
+                          No Users Found
+                        </h4>
+
+                        {/* Description */}
+                        <p className="text-[15px] font-normal text-[#64748B] max-w-[320px] mt-2 leading-relaxed text-center">
+                          Try changing your filters or create a new user to get started.
                         </p>
-                        <button type="button" onClick={() => setShowCreateUser(true)} className="mt-4 inline-flex items-center gap-1.5 px-4.5 py-2 bg-gradient-to-r from-blue-600 to-purple-650 text-white rounded-full text-xs font-black shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+
+                        {/* Primary Button */}
+                        <button
+                          type="button"
+                          onClick={() => setShowCreateUser(true)}
+                          className="mt-6 h-[44px] px-6 rounded-[12px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white text-sm font-semibold shadow-[0_10px_24px_rgba(37,99,235,0.22)] hover:shadow-[0_12px_28px_rgba(37,99,235,0.32)] hover:-translate-y-[2px] transition-all duration-200 cursor-pointer flex items-center justify-center"
+                        >
                           + Add User
                         </button>
                       </div>
@@ -809,80 +853,95 @@ export default function UsersPage() {
 
       {showCreateRole && (
         <div className="fixed inset-0 z-50 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 transition-opacity duration-200">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto bg-white border border-slate-200 rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] p-8 relative overflow-hidden text-left">
+          <div 
+            style={{ width: 'min(560px, 90vw)' }}
+            className="max-h-[90vh] w-full bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] p-6 md:p-8 relative overflow-hidden text-left flex flex-col animate-modal-fade-scale"
+          >
+            {/* Close Button */}
             <button
               type="button"
               onClick={() => setShowCreateRole(false)}
-              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] flex items-center justify-center text-slate-400 hover:text-slate-650 transition-all duration-200 cursor-pointer"
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-[#E2E8F0] flex items-center justify-center text-slate-400 hover:text-slate-655 transition-all duration-200 cursor-pointer z-10"
               aria-label="Close role dialog"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <div className="mb-6 border-b border-slate-200 pb-4 pr-10">
-              <h3 className="text-[28px] font-bold text-[#0F172A] leading-none mb-2">Add Role</h3>
-              <p className="text-[15px] text-[#64748B]">
+
+            {/* Header section with spacing reduced by ~8-12px */}
+            <div className="mb-4 pr-10 shrink-0 border-b border-slate-200 dark:border-white/10 pb-3">
+              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] leading-none mb-1.5">Add Role</h3>
+              <p className="text-[14px] text-[#64748B] dark:text-slate-400 leading-normal">
                 Business roles map to a secure system access level. The catalogue below includes every primary role from the attached specification.
               </p>
             </div>
 
-            <form onSubmit={createRole} className="grid gap-4 rounded-xl border border-slate-200 bg-[#F8FAFC] p-6 md:grid-cols-2">
-              <div>
-                <label className="block text-[13px] font-semibold text-[#334155] mb-2">Role Name</label>
-                <input
-                  required
-                  value={newRole.name}
-                  onChange={(event) => setNewRole({ ...newRole, name: event.target.value })}
-                  placeholder="Custom business role name"
-                  className="w-full h-12 px-4 bg-white border border-[#CBD5E1] rounded-xl text-[#0F172A] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-[13px] font-semibold text-[#334155] mb-2">Base Access Level</label>
-                <select
-                  value={newRole.base_role}
-                  onChange={(event) => setNewRole({ ...newRole, base_role: event.target.value })}
-                  className="w-full h-12 px-4 bg-white border border-[#CBD5E1] rounded-xl text-[#0F172A] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8]"
-                >
-                  {roleOptions.map((role) => (
-                    <option key={role.value} value={role.value}>
-                      Base access: {role.label}
-                    </option>
+            {/* Main Form Wrapper */}
+            <form onSubmit={createRole} className="flex flex-col flex-1 overflow-hidden">
+              {/* Scrollable Form Body */}
+              <div className="overflow-y-auto pr-1.5 flex-1 space-y-4 pb-4 scrollbar-thin">
+                <div className="grid gap-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-transparent p-4 md:p-5 md:grid-cols-2">
+                  <div>
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-300 mb-1.5">Role Name</label>
+                    <input
+                      required
+                      value={newRole.name}
+                      onChange={(event) => setNewRole({ ...newRole, name: event.target.value })}
+                      placeholder="Custom business role name"
+                      className="w-full h-12 px-4 bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-white/[0.08] rounded-xl text-[#0F172A] dark:text-white placeholder:text-[#94A3B8] dark:placeholder:text-slate-500 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-300 mb-1.5">Base Access Level</label>
+                    <select
+                      value={newRole.base_role}
+                      onChange={(event) => setNewRole({ ...newRole, base_role: event.target.value })}
+                      className="w-full h-12 px-4 bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-white/[0.08] rounded-xl text-[#0F172A] dark:text-white text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8]"
+                    >
+                      {roleOptions.map((role) => (
+                        <option key={role.value} value={role.value}>
+                          Base access: {role.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-300 mb-1.5">Role Description</label>
+                    <textarea
+                      value={newRole.description}
+                      onChange={(event) => setNewRole({ ...newRole, description: event.target.value })}
+                      placeholder="Responsibilities and scope"
+                      className="w-full px-4 py-3 bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-white/[0.08] rounded-xl text-[#0F172A] dark:text-white placeholder:text-[#94A3B8] dark:placeholder:text-slate-500 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm h-[110px] resize-y"
+                    />
+                  </div>
+                </div>
+
+                {/* Catalog Listing */}
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  {roleProfiles.map((role) => (
+                    <div key={role.id} className="rounded-xl border border-slate-200 dark:border-white/10 p-4 bg-white dark:bg-[#1A2333] shadow-sm">
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="text-sm font-bold text-slate-800 dark:text-[#F8FAFC]">{role.name}</p>
+                        <span className="shrink-0 rounded-full bg-indigo-50 dark:bg-indigo-950/40 px-2.5 py-1 text-[9px] font-bold text-indigo-700 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/30 uppercase tracking-wider">
+                          {role.base_role.replaceAll("_", " ")}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-xs leading-5 text-[#64748B] dark:text-slate-400">
+                        {role.description || "Custom organization role profile."}
+                      </p>
+                    </div>
                   ))}
-                </select>
+                </div>
               </div>
-              <div className="md:col-span-2">
-                <label className="block text-[13px] font-semibold text-[#334155] mb-2">Role Description</label>
-                <textarea
-                  value={newRole.description}
-                  onChange={(event) => setNewRole({ ...newRole, description: event.target.value })}
-                  placeholder="Responsibilities and scope"
-                  className="w-full px-4 py-3 bg-white border border-[#CBD5E1] rounded-xl text-[#0F172A] placeholder:text-[#94A3B8] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm min-h-[80px] resize-none"
-                />
-              </div>
-              <div className="flex justify-end md:col-span-2">
-                <button type="submit" className="h-11 px-6 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer">
+
+              {/* Fixed Footer for Button always visible */}
+              <div className="flex justify-end pt-3 border-t border-slate-200 dark:border-white/10 shrink-0">
+                <button type="submit" className="h-11 px-6 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer active:scale-[0.98]">
                   Save Role
                 </button>
               </div>
             </form>
-
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              {roleProfiles.map((role) => (
-                <div key={role.id} className="rounded-xl border border-slate-200 p-4 bg-white">
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-bold text-slate-800">{role.name}</p>
-                    <span className="shrink-0 rounded-full bg-indigo-50 px-2.5 py-1 text-[9px] font-bold text-indigo-700 uppercase tracking-wider">
-                      {role.base_role.replaceAll("_", " ")}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-xs leading-5 text-[#64748B]">
-                    {role.description || "Custom organization role profile."}
-                  </p>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import api from "../../lib/axios";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../../store/authStore";
@@ -41,6 +42,39 @@ export default function BookingsBoardPage() {
 
   // Action Menu dropdown state
   const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
+  const [activeMenuBooking, setActiveMenuBooking] = useState<Booking | null>(null);
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Close action dropdown menu on scroll or click elsewhere
+  useEffect(() => {
+    const handleScrollOrClick = () => {
+      setActiveMenuId(null);
+      setActiveMenuBooking(null);
+    };
+    if (activeMenuId) {
+      window.addEventListener("scroll", handleScrollOrClick, true);
+      window.addEventListener("click", handleScrollOrClick, true);
+    }
+    return () => {
+      window.removeEventListener("scroll", handleScrollOrClick, true);
+      window.removeEventListener("click", handleScrollOrClick, true);
+    };
+  }, [activeMenuId]);
+
+  const handleOpenMenu = (event: React.MouseEvent, booking: Booking) => {
+    event.stopPropagation();
+    const rect = event.currentTarget.getBoundingClientRect();
+    const top = rect.bottom + window.scrollY + 8;
+    const left = rect.right + window.scrollX - 160;
+    setMenuPosition({ top, left });
+    setActiveMenuBooking(booking);
+    setActiveMenuId(activeMenuId === booking.id ? null : booking.id);
+  };
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get("action") === "new") {
@@ -401,7 +435,7 @@ export default function BookingsBoardPage() {
         {/* BOOKINGS TABLE */}
         <div className="bg-white dark:bg-[#111827] border border-[#E8EDF7] dark:border-[rgba(255,255,255,0.08)] rounded-[24px] shadow-sm p-6 overflow-hidden">
           
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-2 border-b border-slate-100 dark:border-border">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5 pb-2 border-b border-slate-100 dark:border-border">
             <div>
               <h3 className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wider">Bookings Log Directory</h3>
               <p className="text-[10px] text-slate-450 dark:text-[#94A3B8] font-bold mt-0.5">Filter, search, and manage transaction milestones</p>
@@ -412,18 +446,18 @@ export default function BookingsBoardPage() {
             <div className="p-8 text-center text-slate-500 dark:text-[#94A3B8] font-semibold text-xs bg-white dark:bg-[#0F172A] rounded-[20px] border border-[#E8EDF7] dark:border-border shadow-sm">Loading bookings log...</div>
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+              <div className="overflow-x-auto md:overflow-x-visible scrollbar-premium-dark">
+                <table className="w-full min-w-[800px] md:min-w-full text-left border-collapse table-auto">
                   <thead>
                     <tr className="sticky top-0 bg-slate-50/60 dark:bg-[#1E293B] border-b border-[#E8EDF7] dark:border-border text-xs font-bold text-slate-500 dark:text-[#94A3B8] uppercase tracking-wider z-10">
-                      <th className="px-6 py-4">Booking ID</th>
-                      <th className="px-6 py-4">Customer</th>
-                      <th className="px-6 py-4">Property</th>
-                      <th className="px-6 py-4">Unit</th>
-                      <th className="px-6 py-4">Amount</th>
-                      <th className="px-6 py-4">Status</th>
-                      <th className="px-6 py-4">Booking Date</th>
-                      <th className="px-6 py-4 text-right">Actions</th>
+                      <th className="w-[10%] px-5 py-3.5">Booking ID</th>
+                      <th className="w-[20%] px-5 py-3.5">Customer</th>
+                      <th className="w-[22%] px-5 py-3.5">Property</th>
+                      <th className="w-[10%] px-5 py-3.5">Unit</th>
+                      <th className="w-[10%] px-5 py-3.5">Amount</th>
+                      <th className="w-[12%] px-5 py-3.5">Status</th>
+                      <th className="w-[10%] px-5 py-3.5">Booking Date</th>
+                      <th className="w-[6%] min-w-[110px] px-5 py-3.5 text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#E8EDF7] dark:divide-border text-sm">
@@ -442,61 +476,51 @@ export default function BookingsBoardPage() {
                       return (
                         <tr 
                           key={b.id} 
-                          className="hover:bg-slate-50/60 dark:hover:bg-[#1E293B] transition-colors group cursor-pointer"
+                          className="hover:bg-slate-50/40 dark:hover:bg-white/[0.03] transition-all duration-200 group cursor-pointer"
                           onClick={() => router.push(`/bookings/${b.id}`)}
                         >
-                          <td className="px-6 py-4 font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-455 transition-colors">Booking #{b.id}</td>
-                          <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                          <td className="px-5 py-[18px] align-middle font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-455 transition-colors">Booking #{b.id}</td>
+                          <td className="px-5 py-[18px] align-middle" onClick={(e) => e.stopPropagation()}>
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-extrabold text-[11px] shadow-sm">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-extrabold text-[11px] shadow-sm shrink-0">
                                 {cust.name.charAt(0)}
                               </div>
-                              <div>
-                                <span className="block font-bold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-455 transition-colors cursor-pointer" onClick={() => router.push(`/customers/${b.customer_id}`)}>{cust.name}</span>
-                                <span className="text-[10px] text-slate-450 dark:text-[#94A3B8] font-bold">{cust.phone}</span>
+                              <div className="flex flex-col justify-center">
+                                <span className="block font-bold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-455 transition-colors cursor-pointer leading-tight" onClick={() => router.push(`/customers/${b.customer_id}`)}>{cust.name}</span>
+                                <span className="text-[10px] text-slate-455 dark:text-[#94A3B8] font-bold leading-normal mt-0.5">{cust.phone}</span>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4">
-                            <div>
-                              <span className="block font-bold text-slate-900 dark:text-white">{prop.name}</span>
-                              <span className="text-[10px] text-slate-450 dark:text-[#94A3B8] font-bold">{prop.tower}</span>
+                          <td className="px-5 py-[18px] align-middle">
+                            <div className="flex flex-col justify-center">
+                              <span className="block font-bold text-slate-900 dark:text-white leading-tight">{prop.name}</span>
+                              <span className="text-[10px] text-slate-455 dark:text-[#94A3B8] font-bold leading-normal mt-0.5">{prop.tower}</span>
                             </div>
                           </td>
-                          <td className="px-6 py-4 font-black text-slate-800 dark:text-white">Unit #{b.unit_id}</td>
-                          <td className="px-6 py-4 font-bold text-slate-800 dark:text-white">{prop.amount}</td>
-                          <td className="px-6 py-4">
-                            <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${statusStyles[b.status]}`}>
+                          <td className="px-5 py-[18px] align-middle font-black text-slate-800 dark:text-white">Unit #{b.unit_id}</td>
+                          <td className="px-5 py-[18px] align-middle font-bold text-slate-800 dark:text-white">{prop.amount}</td>
+                          <td className="px-5 py-[18px] align-middle">
+                            <span className={`px-4 py-1 rounded-full text-xs font-bold border ${statusStyles[b.status]}`}>
                               {b.status.replace('_', ' ')}
                             </span>
                           </td>
-                          <td className="px-6 py-4 font-semibold text-slate-500 dark:text-[#CBD5E1]">
+                          <td className="px-5 py-[18px] align-middle font-semibold text-slate-500 dark:text-[#CBD5E1]">
                             {b.created_at ? new Date(b.created_at).toLocaleDateString() : new Date().toLocaleDateString()}
                           </td>
-                          <td className="px-6 py-4 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                            <div className="relative inline-block text-left">
-                              <button 
-                                onClick={() => setActiveMenuId(activeMenuId === b.id ? null : b.id)}
-                                className="px-2.5 py-1 bg-slate-50 dark:bg-[#1E293B] border border-slate-200 dark:border-[#334155] hover:bg-slate-100 dark:hover:bg-[#273449] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold rounded-lg transition shadow-sm cursor-pointer"
-                              >
-                                Options
-                              </button>
-                              
-                              {activeMenuId === b.id && (
-                                <div className="absolute right-0 mt-1.5 w-40 bg-white dark:bg-[#1E293B] rounded-xl shadow-xl border border-[#E8EDF7] dark:border-border z-50 py-1 font-semibold text-xs">
-                                  <button onClick={() => router.push(`/bookings/${b.id}`)} className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#273449] text-slate-700 dark:text-[#CBD5E1]">View Details</button>
-                                  <button onClick={() => router.push(`/customers/${b.customer_id}`)} className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#273449] text-slate-700 dark:text-[#CBD5E1]">View Client</button>
-                                  <button onClick={() => router.push(`/collections?booking=${b.id}`)} className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#273449] text-slate-700 dark:text-[#CBD5E1]">Schedule Payment</button>
-                                </div>
-                              )}
-                            </div>
+                          <td className="px-5 py-[18px] align-middle text-center whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                            <button 
+                              onClick={(e) => handleOpenMenu(e, b)}
+                              className="w-[84px] py-1 bg-slate-50 dark:bg-[#1E293B] border border-slate-200 dark:border-[#334155] hover:bg-slate-100 dark:hover:bg-[#273449] text-slate-700 dark:text-[#CBD5E1] text-xs font-bold rounded-lg transition shadow-sm cursor-pointer mx-auto block"
+                            >
+                              Options
+                            </button>
                           </td>
                         </tr>
                       );
                     })}
                     {paginatedBookings.length === 0 && (
                       <tr>
-                        <td colSpan={8} className="px-6 py-12">
+                        <td colSpan={8} className="px-5 py-12">
                           <div className="flex flex-col items-center justify-center text-center p-6 bg-[#0F172A] rounded-2xl border border-dashed border-[rgba(255,255,255,0.08)] max-w-lg mx-auto my-6 animate-fade-in">
                             <div className="w-16 h-16 rounded-full bg-blue-950/20 border border-blue-900/30 flex items-center justify-center text-blue-400 mb-4 shadow-sm shadow-blue-500/5">
                               <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -521,7 +545,7 @@ export default function BookingsBoardPage() {
 
               {/* Pagination */}
               {filteredBookings.length > 0 && (
-                <div className="flex justify-between items-center border-t border-slate-100 dark:border-border pt-6 mt-6 text-xs font-bold text-slate-455 dark:text-slate-400 uppercase">
+                <div className="flex justify-between items-center border-t border-slate-100 dark:border-border pt-4 mt-4 text-xs font-bold text-slate-455 dark:text-slate-400 uppercase">
                   <span>Showing {Math.min(filteredBookings.length, (currentPage - 1) * bookingsPerPage + 1)} to {Math.min(filteredBookings.length, currentPage * bookingsPerPage)} of {filteredBookings.length} Bookings</span>
                   <div className="flex gap-2">
                     <button 
@@ -588,6 +612,25 @@ export default function BookingsBoardPage() {
               </form>
             </div>
           </div>
+        )}
+
+        {/* OPTIONS POPUP PORTAL */}
+        {mounted && activeMenuId && activeMenuBooking && menuPosition && createPortal(
+          <div 
+            style={{ 
+              position: "absolute", 
+              top: `${menuPosition.top}px`, 
+              left: `${menuPosition.left}px`,
+              width: "160px"
+            }}
+            className="bg-white dark:bg-[#1E293B] rounded-xl shadow-xl border border-[#E8EDF7] dark:border-border z-[100] py-1 font-semibold text-xs animate-modal-fade-scale"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button onClick={() => { setActiveMenuId(null); setActiveMenuBooking(null); router.push(`/bookings/${activeMenuBooking.id}`); }} className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#273449] text-slate-700 dark:text-[#CBD5E1] cursor-pointer">View Details</button>
+            <button onClick={() => { setActiveMenuId(null); setActiveMenuBooking(null); router.push(`/customers/${activeMenuBooking.customer_id}`); }} className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#273449] text-slate-700 dark:text-[#CBD5E1] cursor-pointer">View Client</button>
+            <button onClick={() => { setActiveMenuId(null); setActiveMenuBooking(null); router.push(`/collections?booking=${activeMenuBooking.id}`); }} className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#273449] text-slate-700 dark:text-[#CBD5E1] cursor-pointer">Schedule Payment</button>
+          </div>,
+          document.body
         )}
 
       </div>

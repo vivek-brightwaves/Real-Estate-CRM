@@ -460,9 +460,12 @@ export default function CustomersPage() {
 
               <button
                 onClick={resetFilters}
-                className="h-10 px-3.5 py-2 bg-slate-50 dark:bg-[#1E293B] border border-[#E8EDF7] dark:border-[#334155] hover:bg-slate-100 dark:hover:bg-[#273449] rounded-xl text-slate-700 dark:text-[#CBD5E1] text-xs font-bold transition shadow-sm cursor-pointer"
+                className="h-[48px] w-auto px-[22px] bg-slate-50 dark:bg-transparent border border-[#E8EDF7] dark:border-white/[0.18] rounded-[12px] text-[14px] font-semibold text-slate-700 dark:text-[#F8FAFC] hover:bg-slate-100 dark:hover:bg-white/[0.06] hover:border-slate-350 dark:hover:border-white/[0.28] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 focus:outline-none focus:ring-4 focus:ring-blue-500/10 active:scale-[0.98] active:border-blue-500 dark:active:border-blue-500"
               >
-                Reset Filter
+                <svg className="w-4 h-4 shrink-0 dark:text-[#F8FAFC]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
+                </svg>
+                Reset Filters
               </button>
             </div>
           </div>

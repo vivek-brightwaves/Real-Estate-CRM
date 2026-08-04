@@ -1305,3 +1305,185 @@ body:not(.dark) .toast-error button[aria-label="Dismiss notification"]:hover {
 .dark tr.sticky {
   background-color: #1B2230 !important;
 }
+
+/* Modal animations */
+@keyframes modalFadeScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-modal-fade-scale {
+  animation: modalFadeScale 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ============================================================ */
+/* GLOBAL MODAL STYLING OVERRIDES (DARK MODE ONLY)              */
+/* ============================================================ */
+
+/* Modal Overlay Backdrop Blur & tint in Dark Mode */
+.dark div.fixed.inset-0.z-50,
+.dark div.fixed.inset-0.z-\[80\],
+.dark div.fixed.inset-0.project-modal-overlay {
+  background-color: rgba(2, 6, 23, 0.70) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+/* Modal Container surface, borders, shadows in Dark Mode */
+.dark div.fixed.inset-0.z-50 div.bg-white,
+.dark div.fixed.inset-0.z-50 form.bg-white,
+.dark div.fixed.inset-0.z-\[80\] div.bg-white,
+.dark div.fixed.inset-0.z-\[80\] form.bg-white,
+.dark div.fixed.inset-0 div.bg-white,
+.dark div.fixed.inset-0 form.bg-white,
+.dark .project-modal-content {
+  background-color: #1B2232 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 8px 24px rgba(0, 0, 0, 0.30) !important;
+  color: #F8FAFC !important;
+}
+
+/* Title colors & borders in Dark Mode */
+.dark div.fixed.inset-0 h3,
+.dark .project-modal-content h3 {
+  color: #F8FAFC !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Label text styles in Dark Mode */
+.dark div.fixed.inset-0 label,
+.dark .project-modal-content label {
+  color: #CBD5E1 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+/* Input, select, textarea elements in Dark Mode */
+.dark div.fixed.inset-0 div.bg-white input,
+.dark div.fixed.inset-0 div.bg-white select,
+.dark div.fixed.inset-0 div.bg-white textarea,
+.dark div.fixed.inset-0 form.bg-white input,
+.dark div.fixed.inset-0 form.bg-white select,
+.dark div.fixed.inset-0 form.bg-white textarea,
+.dark .project-modal-content input,
+.dark .project-modal-content select {
+  background-color: #111827 !important;
+  border: 1px solid #334155 !important;
+  color: #F8FAFC !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.dark div.fixed.inset-0 div.bg-white input,
+.dark div.fixed.inset-0 div.bg-white select,
+.dark div.fixed.inset-0 form.bg-white input,
+.dark div.fixed.inset-0 form.bg-white select,
+.dark .project-modal-content input,
+.dark .project-modal-content select {
+  height: 48px !important;
+}
+
+/* Hover states for inputs */
+.dark div.fixed.inset-0 div.bg-white input:hover,
+.dark div.fixed.inset-0 div.bg-white select:hover,
+.dark div.fixed.inset-0 div.bg-white textarea:hover,
+.dark div.fixed.inset-0 form.bg-white input:hover,
+.dark div.fixed.inset-0 form.bg-white select:hover,
+.dark div.fixed.inset-0 form.bg-white textarea:hover,
+.dark .project-modal-content input:hover,
+.dark .project-modal-content select:hover {
+  border-color: #475569 !important;
+}
+
+/* Focus states for inputs */
+.dark div.fixed.inset-0 div.bg-white input:focus,
+.dark div.fixed.inset-0 div.bg-white select:focus,
+.dark div.fixed.inset-0 div.bg-white textarea:focus,
+.dark div.fixed.inset-0 form.bg-white input:focus,
+.dark div.fixed.inset-0 form.bg-white select:focus,
+.dark div.fixed.inset-0 form.bg-white textarea:focus,
+.dark .project-modal-content input:focus,
+.dark .project-modal-content select:focus {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18) !important;
+}
+
+/* Input placeholder text in Dark Mode */
+.dark div.fixed.inset-0 div.bg-white input::placeholder,
+.dark div.fixed.inset-0 div.bg-white textarea::placeholder,
+.dark div.fixed.inset-0 form.bg-white input::placeholder,
+.dark div.fixed.inset-0 form.bg-white textarea::placeholder,
+.dark .project-modal-content input::placeholder {
+  color: #64748B !important;
+}
+
+/* Divider lines in Dark Mode */
+.dark div.fixed.inset-0 div.bg-white .border-t,
+.dark div.fixed.inset-0 div.bg-white .border-b,
+.dark div.fixed.inset-0 form.bg-white .border-t,
+.dark div.fixed.inset-0 form.bg-white .border-b,
+.dark .project-modal-content .border-t,
+.dark .project-modal-content .border-b {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Close Button (absolute positioned top-right) in Dark Mode */
+.dark div.fixed.inset-0 div.bg-white button.absolute,
+.dark div.fixed.inset-0 form.bg-white button.absolute,
+.dark .project-modal-content button.absolute {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #CBD5E1 !important;
+}
+.dark div.fixed.inset-0 div.bg-white button.absolute:hover,
+.dark div.fixed.inset-0 form.bg-white button.absolute:hover,
+.dark .project-modal-content button.absolute:hover {
+  background-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+/* Cancel Button in Dark Mode */
+.dark div.fixed.inset-0 div.bg-white button[type="button"]:not(.absolute),
+.dark div.fixed.inset-0 form.bg-white button[type="button"]:not(.absolute),
+.dark .project-cancel-btn {
+  background-color: transparent !important;
+  border: 1px solid #475569 !important;
+  color: #E2E8F0 !important;
+}
+.dark div.fixed.inset-0 div.bg-white button[type="button"]:not(.absolute):hover,
+.dark div.fixed.inset-0 form.bg-white button[type="button"]:not(.absolute):hover,
+.dark .project-cancel-btn:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Submit Button in Dark Mode */
+.dark div.fixed.inset-0 div.bg-white button[type="submit"],
+.dark div.fixed.inset-0 form.bg-white button[type="submit"],
+.dark .project-create-btn {
+  background: linear-gradient(135deg, #2563EB, #3B82F6) !important;
+  color: white !important;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35) !important;
+  border: none !important;
+}
+
+/* Premium scrollbar styling for Dark Mode */
+.dark .scrollbar-premium-dark::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.dark .scrollbar-premium-dark::-webkit-scrollbar-track {
+  background: #111827;
+  border-radius: 9999px;
+}
+.dark .scrollbar-premium-dark::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+.dark .scrollbar-premium-dark::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
