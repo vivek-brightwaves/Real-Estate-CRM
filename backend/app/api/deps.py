@@ -1,5 +1,5 @@
 from typing import List, Any
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 from jwt import InvalidTokenError as JWTError
@@ -11,7 +11,7 @@ from app.db.session import get_db
 from app.models.users import User, RoleEnum
 from app.models.system import TokenBlacklist
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
 
 def _credentials_error(detail: str = "Could not validate credentials") -> HTTPException:
@@ -22,8 +22,14 @@ def _credentials_error(detail: str = "Could not validate credentials") -> HTTPEx
     )
 
 def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+    db: Session = Depends(get_db),
+    token: str | None = Depends(oauth2_scheme),
+    request: Request = None,
 ) -> User:
+    if not token and request:
+        token = request.cookies.get("access_token")
+    if not token:
+        raise _credentials_error()
     if db.query(TokenBlacklist.id).filter(TokenBlacklist.token == token).first():
         raise _credentials_error("Token has been revoked")
     try:
@@ -50,6 +56,7 @@ def get_current_user(
         )
     if user.is_locked:
         raise HTTPException(status_code=403, detail="Account is locked")
+
     return user
 
 def require_roles(allowed_roles: List[RoleEnum]):

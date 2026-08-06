@@ -14,9 +14,23 @@ interface User {
   role: string;
   branch_id?: number;
   manager_id?: number;
+  project_id?: number;
+  department?: string;
+  is_locked?: boolean;
   is_active: boolean;
   created_at?: string;
   role_profiles?: RoleProfile[];
+}
+
+interface Project {
+  id: number;
+  name: string;
+}
+
+interface Permission {
+  id: number;
+  name: string;
+  description?: string;
 }
 
 interface Branch {
@@ -46,6 +60,7 @@ export default function UsersPage() {
   const { confirmAction, notify } = useFeedback();
   const [users, setUsers] = useState<User[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [roleProfiles, setRoleProfiles] = useState<RoleProfile[]>([]);
   const [loading, setLoading] = useState(false);
   
@@ -69,6 +84,9 @@ export default function UsersPage() {
   const [viewUser, setViewUser] = useState<User | null>(null);
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [showCreateRole, setShowCreateRole] = useState(false);
+  const [activeRoleForPermissions, setActiveRoleForPermissions] = useState<RoleProfile | null>(null);
+  const [allPermissions, setAllPermissions] = useState<Permission[]>([]);
+  const [selectedPermissionIds, setSelectedPermissionIds] = useState<number[]>([]);
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
@@ -77,6 +95,8 @@ export default function UsersPage() {
     role: "EMPLOYEE",
     role_profile_id: "",
     branch_id: "",
+    project_id: "",
+    department: "",
   });
   const [newRole, setNewRole] = useState({
     name: "",
@@ -88,6 +108,7 @@ export default function UsersPage() {
     fetchUsers();
     fetchBranches();
     fetchRoleProfiles();
+    fetchProjects();
   }, [roleFilter]);
 
   // Disable background scrolling when any modal is open
@@ -124,6 +145,49 @@ export default function UsersPage() {
     }
   };
 
+  const fetchProjects = async () => {
+    try {
+      const res = await api.get("/organization/projects");
+      setProjects(res.data ?? []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const openPermissionsEditor = async (role: RoleProfile) => {
+    setActiveRoleForPermissions(role);
+    try {
+      let perms = allPermissions;
+      if (perms.length === 0) {
+        const res = await api.get("/users/permissions");
+        perms = res.data ?? [];
+        setAllPermissions(perms);
+      }
+      const rolePermsRes = await api.get(`/users/roles/${role.id}/permissions`);
+      setSelectedPermissionIds(rolePermsRes.data ?? []);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load role permissions");
+    }
+  };
+
+  const saveRolePermissions = async () => {
+    if (!activeRoleForPermissions) return;
+    try {
+      await api.post(`/users/roles/${activeRoleForPermissions.id}/permissions`, {
+        permission_ids: selectedPermissionIds,
+      });
+      notify({
+        title: "Permissions updated",
+        message: `Successfully configured permissions for ${activeRoleForPermissions.name}.`,
+      });
+      setActiveRoleForPermissions(null);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update role permissions");
+    }
+  };
+
   const toggleUserStatus = async (user: User) => {
     const action = user.is_active ? "deactivate" : "activate";
     const confirmed = await confirmAction({
@@ -157,6 +221,8 @@ export default function UsersPage() {
         phone: editUser.phone,
         branch_id: editUser.branch_id,
         manager_id: editUser.manager_id,
+        project_id: editUser.project_id ? Number(editUser.project_id) : null,
+        department: editUser.department || null,
       });
       setEditUser(null);
       fetchUsers();
@@ -234,9 +300,21 @@ export default function UsersPage() {
           ? Number(newUser.role_profile_id)
           : null,
         branch_id: newUser.branch_id ? Number(newUser.branch_id) : null,
+        project_id: newUser.project_id ? Number(newUser.project_id) : null,
+        department: newUser.department || null,
       });
       setShowCreateUser(false);
-      setNewUser({ name: "", email: "", phone: "", password: "", role: "EMPLOYEE", role_profile_id: "", branch_id: "" });
+      setNewUser({
+        name: "",
+        email: "",
+        phone: "",
+        password: "",
+        role: "EMPLOYEE",
+        role_profile_id: "",
+        branch_id: "",
+        project_id: "",
+        department: "",
+      });
       await fetchUsers();
       notify({
         title: "User created",
@@ -631,17 +709,24 @@ export default function UsersPage() {
 
                       {/* Status Badges */}
                       <td className="px-6 py-3">
-                        {u.is_active ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border bg-emerald-50 text-emerald-700 border-emerald-100">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            Active
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border bg-rose-50 text-rose-700 border-rose-100">
-                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                            Inactive
-                          </span>
-                        )}
+                        <div className="flex flex-col gap-1.5 items-start">
+                          {u.is_active ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border bg-emerald-50 text-emerald-700 border-emerald-100">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                              Active
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border bg-rose-50 text-rose-700 border-rose-100">
+                              <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                              Inactive
+                            </span>
+                          )}
+                          {u.is_locked && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-100">
+                              🔒 Locked Out
+                            </span>
+                          )}
+                        </div>
                       </td>
 
                       {/* Action buttons */}
@@ -672,6 +757,39 @@ export default function UsersPage() {
                               <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                           </button>
+
+                          {/* Unlock User Button */}
+                          {u.is_locked && (
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                const confirmed = await confirmAction({
+                                  title: "Unlock user account?",
+                                  message: `Unlock login access for ${u.name}.`,
+                                  confirmLabel: "Unlock User",
+                                  tone: "primary",
+                                });
+                                if (!confirmed) return;
+                                try {
+                                  await api.post(`/users/${u.id}/unlock`);
+                                  notify({
+                                    title: "User unlocked",
+                                    message: `${u.name}'s account has been unlocked.`,
+                                  });
+                                  fetchUsers();
+                                } catch (err) {
+                                  console.error(err);
+                                  alert("Failed to unlock user");
+                                }
+                              }}
+                              title="Unlock user"
+                              className="w-10 h-10 rounded-xl border border-slate-100 hover:border-emerald-100 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                              </svg>
+                            </button>
+                          )}
 
                           {/* Reset Password Button */}
                           <button
@@ -796,58 +914,110 @@ export default function UsersPage() {
       </div>
 
       {showCreateUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] p-4">
-          <form onSubmit={createUser} className="w-full max-w-lg space-y-4 rounded-[24px] border border-white/40 bg-white p-6 shadow-2xl">
-            <h3 className="border-b border-slate-100 pb-3 text-lg font-black text-slate-900">Add User</h3>
-            <input required value={newUser.name} onChange={(event) => setNewUser({ ...newUser, name: event.target.value })} placeholder="Full name" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-            <input required type="email" value={newUser.email} onChange={(event) => setNewUser({ ...newUser, email: event.target.value })} placeholder="Email" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-            <input value={newUser.phone} onChange={(event) => setNewUser({ ...newUser, phone: event.target.value })} placeholder="Phone" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-            <input required type="password" minLength={8} value={newUser.password} onChange={(event) => setNewUser({ ...newUser, password: event.target.value })} placeholder="Strong temporary password" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-            <label className="block space-y-1.5 text-xs font-bold text-slate-600">
-              Business role from the specification
-              <select
-                required
-                value={newUser.role_profile_id}
-                onChange={(event) => {
-                  const profile = roleProfiles.find(
-                    (item) => item.id === Number(event.target.value),
-                  );
-                  setNewUser({
-                    ...newUser,
-                    role_profile_id: event.target.value,
-                    role: profile?.base_role ?? "EMPLOYEE",
-                  });
-                }}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"
-              >
-                <option value="">Select documented role</option>
-                {roleProfiles.map((role) => (
-                  <option key={role.id} value={role.id}>
-                    {role.name} ({role.base_role.replaceAll("_", " ")})
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              <select
-                aria-label="System access level"
-                value={newUser.role}
-                disabled={Boolean(newUser.role_profile_id)}
-                onChange={(event) => setNewUser({ ...newUser, role: event.target.value })}
-                className="rounded-xl border border-slate-200 px-4 py-3 text-sm disabled:bg-slate-50 disabled:text-slate-500"
-              >
-                {roleOptions.map((role) => <option key={role.value} value={role.value}>{role.label}</option>)}
-              </select>
-              <select value={newUser.branch_id} onChange={(event) => setNewUser({ ...newUser, branch_id: event.target.value })} className="rounded-xl border border-slate-200 px-4 py-3 text-sm">
-                <option value="">No branch</option>
-                {branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}
-              </select>
+        <div className="fixed inset-0 z-50 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 transition-opacity duration-200">
+          <div 
+            style={{ width: 'min(500px, 90vw)' }}
+            className="max-h-[90vh] w-full bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] p-6 relative overflow-hidden text-left flex flex-col animate-modal-fade-scale"
+          >
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setShowCreateUser(false)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] dark:bg-white/[0.05] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-slate-655 transition-all duration-200 cursor-pointer z-10"
+              aria-label="Close user dialog"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Header */}
+            <div className="mb-4 pr-10 shrink-0 border-b border-slate-200 dark:border-white/10 pb-3">
+              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] leading-none mb-1.5">Add User</h3>
+              <p className="text-[14px] text-[#64748B] dark:text-slate-400 leading-normal">
+                Create a new CRM workspace account.
+              </p>
             </div>
-            <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
-              <button type="button" onClick={() => setShowCreateUser(false)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-600">Cancel</button>
-              <button type="submit" className="rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-bold text-white">Create User</button>
-            </div>
-          </form>
+
+            {/* Form */}
+            <form onSubmit={createUser} className="flex flex-col flex-1 overflow-hidden space-y-4" autoComplete="off">
+              <div className="overflow-y-auto pr-1.5 flex-1 space-y-4 pb-2 scrollbar-thin">
+                <input required value={newUser.name} onChange={(event) => setNewUser({ ...newUser, name: event.target.value })} placeholder="Full name" className="w-full h-12 px-4 bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-white/[0.08] rounded-xl text-[#0F172A] dark:text-white placeholder:text-[#94A3B8] dark:placeholder:text-slate-500 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm" />
+                <input required type="email" value={newUser.email} onChange={(event) => setNewUser({ ...newUser, email: event.target.value })} placeholder="Email" className="w-full h-12 px-4 bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-white/[0.08] rounded-xl text-[#0F172A] dark:text-white placeholder:text-[#94A3B8] dark:placeholder:text-slate-500 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm" />
+                <input value={newUser.phone} onChange={(event) => setNewUser({ ...newUser, phone: event.target.value })} placeholder="Phone" className="w-full h-12 px-4 bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-white/[0.08] rounded-xl text-[#0F172A] dark:text-white placeholder:text-[#94A3B8] dark:placeholder:text-slate-500 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm" />
+                <input required type="password" minLength={8} autoComplete="new-password" value={newUser.password} onChange={(event) => setNewUser({ ...newUser, password: event.target.value })} placeholder="Temporary password" className="w-full h-12 px-4 bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-white/[0.08] rounded-xl text-[#0F172A] dark:text-white placeholder:text-[#94A3B8] dark:placeholder:text-slate-500 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm" />
+                
+                {/* Department and Project Scopes */}
+                <div className="grid grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-300 mb-1.5">Department</label>
+                    <input value={newUser.department} onChange={(event) => setNewUser({ ...newUser, department: event.target.value })} placeholder="e.g. Sales, Finance" className="w-full h-12 px-4 bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-white/[0.08] rounded-xl text-[#0F172A] dark:text-white placeholder:text-[#94A3B8] dark:placeholder:text-slate-500 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-300 mb-1.5">Project Scope</label>
+                    <select value={newUser.project_id} onChange={(event) => setNewUser({ ...newUser, project_id: event.target.value })} className="w-full h-12 px-4 bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-white/[0.08] rounded-xl text-[#0F172A] dark:text-white text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8]">
+                      <option value="">No Project</option>
+                      {projects.map((p) => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-300 mb-1.5">
+                  Business Role Profile
+                  <select
+                    required
+                    value={newUser.role_profile_id}
+                    onChange={(event) => {
+                      const profile = roleProfiles.find(
+                        (item) => item.id === Number(event.target.value),
+                      );
+                      setNewUser({
+                        ...newUser,
+                        role_profile_id: event.target.value,
+                        role: profile?.base_role ?? "EMPLOYEE",
+                      });
+                    }}
+                    className="w-full h-12 px-4 bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-white/[0.08] rounded-xl text-[#0F172A] dark:text-white text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer mt-1"
+                  >
+                    <option value="">Select documented role</option>
+                    {roleProfiles.map((role) => (
+                      <option key={role.id} value={role.id}>
+                        {role.name} ({role.base_role.replaceAll("_", " ")})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="grid grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-300 mb-1.5">Access Level</label>
+                    <select
+                      aria-label="System access level"
+                      value={newUser.role}
+                      disabled={Boolean(newUser.role_profile_id)}
+                      onChange={(event) => setNewUser({ ...newUser, role: event.target.value })}
+                      className="w-full h-12 px-4 bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-white/[0.08] rounded-xl text-[#0F172A] dark:text-white text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer disabled:opacity-50"
+                    >
+                      {roleOptions.map((role) => <option key={role.value} value={role.value}>{role.label}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-semibold text-[#334155] dark:text-slate-300 mb-1.5">Branch</label>
+                    <select value={newUser.branch_id} onChange={(event) => setNewUser({ ...newUser, branch_id: event.target.value })} className="w-full h-12 px-4 bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-white/[0.08] rounded-xl text-[#0F172A] dark:text-white text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8]">
+                      <option value="">No Branch</option>
+                      {branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 border-t border-slate-200 dark:border-white/10 pt-4 shrink-0">
+                <button type="button" onClick={() => setShowCreateUser(false)} className="h-11 px-5 border border-[#CBD5E1] dark:border-white/10 rounded-xl bg-white dark:bg-transparent hover:bg-slate-50 dark:hover:bg-white/[0.05] text-[#334155] dark:text-slate-350 text-xs font-semibold cursor-pointer">Cancel</button>
+                <button type="submit" className="h-11 px-5 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] transition-all duration-200 text-xs font-semibold cursor-pointer">Create User</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
@@ -920,16 +1090,33 @@ export default function UsersPage() {
                 {/* Catalog Listing */}
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                   {roleProfiles.map((role) => (
-                    <div key={role.id} className="rounded-xl border border-slate-200 dark:border-white/10 p-4 bg-white dark:bg-[#1A2333] shadow-sm">
-                      <div className="flex items-start justify-between gap-3">
-                        <p className="text-sm font-bold text-slate-800 dark:text-[#F8FAFC]">{role.name}</p>
-                        <span className="shrink-0 rounded-full bg-indigo-50 dark:bg-indigo-950/40 px-2.5 py-1 text-[9px] font-bold text-indigo-700 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/30 uppercase tracking-wider">
-                          {role.base_role.replaceAll("_", " ")}
-                        </span>
+                    <div key={role.id} className="rounded-xl border border-slate-200 dark:border-white/10 p-4 bg-white dark:bg-[#1A2333] shadow-sm flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="text-sm font-bold text-slate-800 dark:text-[#F8FAFC]">{role.name}</p>
+                          <span className="shrink-0 rounded-full bg-indigo-50 dark:bg-indigo-950/40 px-2.5 py-1 text-[9px] font-bold text-indigo-700 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/30 uppercase tracking-wider">
+                            {role.base_role.replaceAll("_", " ")}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-xs leading-5 text-[#64748B] dark:text-slate-400">
+                          {role.description || "Custom organization role profile."}
+                        </p>
                       </div>
-                      <p className="mt-2 text-xs leading-5 text-[#64748B] dark:text-slate-400">
-                        {role.description || "Custom organization role profile."}
-                      </p>
+                      <div className="mt-4 pt-3 border-t border-slate-100 dark:border-white/5 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowCreateRole(false);
+                            openPermissionsEditor(role);
+                          }}
+                          className="text-[11px] font-bold text-indigo-650 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1.5 cursor-pointer bg-transparent border-0"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                          </svg>
+                          Configure Permissions
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1079,6 +1266,54 @@ export default function UsersPage() {
                 </div>
               </div>
 
+              {/* Department */}
+              <div>
+                <label className="block text-[13px] font-semibold text-[#334155] mb-2">Department</label>
+                <div className="relative group/input">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-[#2563EB] transition-colors z-10 pointer-events-none">
+                    <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9m4 0V7m0 0h4m-4 0H9" />
+                    </svg>
+                  </span>
+                  <input
+                    type="text"
+                    value={editUser.department || ""}
+                    onChange={(e) => setEditUser({ ...editUser, department: e.target.value })}
+                    className="w-full h-12 pl-11 pr-4 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-[#0F172A] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
+                    placeholder="e.g. Sales, CRM"
+                  />
+                </div>
+              </div>
+
+              {/* Project Assignment */}
+              <div>
+                <label className="block text-[13px] font-semibold text-[#334155] mb-2">Project Assignment</label>
+                <div className="relative group/select">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/select:text-[#2563EB] transition-colors z-10 pointer-events-none">
+                    <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9m4 0V7m0 0h4m-4 0H9" />
+                    </svg>
+                  </span>
+                  <select
+                    value={editUser.project_id || ""}
+                    onChange={(e) =>
+                      setEditUser({
+                        ...editUser,
+                        project_id: e.target.value ? Number(e.target.value) : undefined,
+                      })
+                    }
+                    className="w-full h-12 pl-10 pr-8 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-[#0F172A] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm cursor-pointer hover:border-[#94A3B8]"
+                  >
+                    <option value="">No Project assigned</option>
+                    {projects.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
               {/* Form Buttons */}
               <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 mt-6">
                 <button
@@ -1122,7 +1357,7 @@ export default function UsersPage() {
               Set a new password for <strong className="text-[#0F172A]">{resetUser.name}</strong>.
             </p>
             
-            <form onSubmit={handleResetPassword} className="space-y-5">
+            <form onSubmit={handleResetPassword} className="space-y-5" autoComplete="off">
               
               <div>
                 <label className="block text-[13px] font-semibold text-[#334155] mb-2">New Password</label>
@@ -1136,6 +1371,7 @@ export default function UsersPage() {
                     type="password"
                     required
                     minLength={8}
+                    autoComplete="new-password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full h-12 pl-11 pr-4 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-[#0F172A] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/12 transition-all duration-200 shadow-sm"
@@ -1230,13 +1466,25 @@ export default function UsersPage() {
               <div className="flex justify-between border-b border-slate-100 pb-2.5">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status</span>
                 <span className={`font-bold ${viewUser.is_active ? "text-emerald-600" : "text-rose-600"}`}>
-                  {viewUser.is_active ? "Active" : "Inactive"}
+                  {viewUser.is_active ? "Active" : "Inactive"} {viewUser.is_locked ? "(Locked)" : ""}
+                </span>
+              </div>
+              
+              <div className="flex justify-between border-b border-slate-100 pb-2.5">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Department</span>
+                <span className="font-bold text-slate-800">{viewUser.department || "N/A"}</span>
+              </div>
+              
+              <div className="flex justify-between border-b border-slate-100 pb-2.5">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Project Scope</span>
+                <span className="font-bold text-slate-800">
+                  {projects.find((p) => p.id === viewUser.project_id)?.name || "N/A"}
                 </span>
               </div>
               
               <div className="flex justify-between pb-1">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Created At</span>
-                <span className="font-bold text-slate-850">
+                <span className="font-bold text-slate-800">
                   {viewUser.created_at ? new Date(viewUser.created_at).toLocaleString() : "N/A"}
                 </span>
               </div>
@@ -1254,6 +1502,105 @@ export default function UsersPage() {
               </button>
             </div>
             
+          </div>
+        </div>
+      )}
+
+      {activeRoleForPermissions && (
+        <div className="fixed inset-0 z-50 bg-[#0F172A]/18 dark:bg-black/60 backdrop-blur-[12px] flex items-center justify-center p-4 transition-opacity duration-200">
+          <div 
+            style={{ width: 'min(800px, 95vw)' }}
+            className="max-h-[90vh] w-full bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-[18px] shadow-[0_20px_50px_rgba(15,23,42,0.12)] p-6 md:p-8 relative overflow-hidden text-left flex flex-col animate-modal-fade-scale"
+          >
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setActiveRoleForPermissions(null)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F8FAFC] dark:bg-white/[0.05] hover:bg-[#EEF2FF] border border-[#E2E8F0] dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-slate-655 transition-all duration-200 cursor-pointer z-10"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Header */}
+            <div className="mb-4 pr-10 shrink-0 border-b border-slate-200 dark:border-white/10 pb-3">
+              <h3 className="text-[28px] font-bold text-[#0F172A] dark:text-[#F8FAFC] leading-none mb-1.5">Configure Role Permissions</h3>
+              <p className="text-[14px] text-[#64748B] dark:text-slate-400 leading-normal">
+                Manage dynamic capability access levels for <span className="font-bold text-indigo-650 dark:text-indigo-400">{activeRoleForPermissions.name}</span> profile.
+              </p>
+            </div>
+
+            {/* Matrix Sheet */}
+            <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin space-y-4 pb-4">
+              <div className="overflow-x-auto border border-slate-200 dark:border-white/10 rounded-xl shadow-sm">
+                <table className="min-w-full divide-y divide-slate-200 dark:divide-white/10 text-left text-[11px]">
+                  <thead className="bg-slate-50 dark:bg-[#1A2333]">
+                    <tr>
+                      <th className="px-4 py-3 font-bold text-slate-500 dark:text-slate-400">Module / System Resource</th>
+                      {["view", "create", "edit", "delete", "approve", "assign", "export"].map((action) => (
+                        <th key={action} className="px-3 py-3 text-center font-bold text-slate-500 dark:text-slate-400 capitalize">
+                          {action}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/5 bg-white dark:bg-[#111827]">
+                    {[
+                      "users", "roles", "projects", "inventory", "leads", "site_visits",
+                      "customers", "bookings", "payments", "rentals", "possession",
+                      "tasks", "messages", "audit", "scheduler", "files"
+                    ].map((module) => (
+                      <tr key={module} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors">
+                        <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-200 capitalize">
+                          {module.replaceAll("_", " ")}
+                        </td>
+                        {["view", "create", "edit", "delete", "approve", "assign", "export"].map((action) => {
+                          const permName = `${module}:${action}`;
+                          const perm = allPermissions.find((p) => p.name === permName);
+                          if (!perm) return <td key={action} className="px-3 py-3 text-center text-slate-350 dark:text-slate-600">-</td>;
+                          const isChecked = selectedPermissionIds.includes(perm.id);
+                          return (
+                            <td key={action} className="px-3 py-3 text-center">
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelectedPermissionIds([...selectedPermissionIds, perm.id]);
+                                  } else {
+                                    setSelectedPermissionIds(selectedPermissionIds.filter((id) => id !== perm.id));
+                                  }
+                                }}
+                                className="w-4.5 h-4.5 rounded text-blue-600 border-slate-300 dark:border-white/10 dark:bg-slate-800 focus:ring-blue-500 cursor-pointer transition"
+                              />
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end gap-3 border-t border-slate-200 dark:border-white/10 pt-4 shrink-0">
+              <button
+                type="button"
+                onClick={() => setActiveRoleForPermissions(null)}
+                className="h-11 px-5 border border-[#CBD5E1] dark:border-white/10 rounded-xl bg-white dark:bg-transparent hover:bg-slate-50 dark:hover:bg-white/[0.05] text-[#334155] dark:text-slate-350 text-xs font-semibold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={saveRolePermissions}
+                className="h-11 px-6 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white rounded-xl shadow-[0_10px_25px_rgba(37,99,235,0.25)] hover:-translate-y-[1px] hover:shadow-[0_12px_28px_rgba(37,99,235,0.30)] transition-all duration-200 text-xs font-semibold cursor-pointer active:scale-[0.98]"
+              >
+                Save Mappings
+              </button>
+            </div>
           </div>
         </div>
       )}

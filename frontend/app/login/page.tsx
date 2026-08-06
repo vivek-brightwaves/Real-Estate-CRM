@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../../store/authStore";
 import api from "../../lib/axios";
@@ -18,6 +18,15 @@ export default function LoginPage() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
 
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+    setPassword("");
+  }, []);
+
   const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
     setIsCapsLockOn(e.getModifierState("CapsLock"));
   };
@@ -33,18 +42,27 @@ export default function LoginPage() {
       formData.append("username", email);
       formData.append("password", password);
 
-      const res = await api.post("/auth/login", formData, {
+      const res = await api.post(`/auth/login?remember=${rememberMe}`, formData, {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
 
       setIsSuccess(true);
-      setAuth(res.data.access_token, res.data.refresh_token, res.data.user);
+      setAuth(res.data.access_token, res.data.refresh_token, res.data.user, rememberMe);
+      
+      if (rememberMe) {
+        localStorage.setItem("rememberedEmail", email);
+      } else {
+        localStorage.removeItem("rememberedEmail");
+      }
+      
+      setPassword("");
 
       setTimeout(() => {
         router.push("/");
       }, 500);
     } catch (err: any) {
       setError(err.response?.data?.detail || "Invalid email or password");
+      setPassword("");
     } finally {
       setLoading(false);
     }
@@ -230,7 +248,7 @@ export default function LoginPage() {
               )}
 
               {/* Login Form: Spacing between inputs 16px (space-y-4) */}
-              <form onSubmit={handleLogin} className="space-y-4">
+              <form onSubmit={handleLogin} className="space-y-4" autoComplete="off">
 
                 {/* Email Address */}
                 <div>
@@ -246,6 +264,7 @@ export default function LoginPage() {
                     <input
                       type="email"
                       required
+                      autoComplete="username"
                       className="w-full h-[46px] pl-10 pr-4 py-2 bg-white/35 backdrop-blur-md border border-white/30 rounded-xl text-slate-900 placeholder:text-slate-500 text-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 shadow-sm"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -270,6 +289,7 @@ export default function LoginPage() {
                     <input
                       type={showPassword ? "text" : "password"}
                       required
+                      autoComplete="new-password"
                       className="w-full h-[46px] pl-10 pr-11 py-2 bg-white/35 backdrop-blur-md border border-white/30 rounded-xl text-slate-900 placeholder:text-slate-500 text-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 shadow-sm"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}

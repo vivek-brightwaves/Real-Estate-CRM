@@ -6,6 +6,7 @@ import { useAuthStore } from "../../store/authStore";
 import api from "../../lib/axios";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
+import ChangePasswordModal from "../../components/ui/ChangePasswordModal";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [notifications, setNotifications] = useState<any[]>([]);
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   useEffect(() => {
     const updateClock = () => setCurrentTime(new Date());
@@ -480,6 +482,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       <p className="text-[10px] text-[#94A3B8] font-semibold mt-0.5">{getRoleLabel(user.role)}</p>
                     </div>
                     <button
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        setIsChangePasswordOpen(true);
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-xs text-slate-700 dark:text-[#CBD5E1] hover:bg-slate-50 dark:hover:bg-slate-800/40 font-bold transition-all cursor-pointer"
+                    >
+                      Change Password
+                    </button>
+                    <button
                       onClick={handleLogout}
                       disabled={isLoggingOut}
                       className="w-full text-left px-4 py-2.5 text-xs text-rose-600 dark:text-rose-455 hover:bg-rose-50 dark:hover:bg-rose-950/20 font-bold border-t border-[#E5E7EB] dark:border-slate-800/60 transition-all cursor-pointer"
@@ -529,6 +540,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       </div>
 
+      <ChangePasswordModal isOpen={isChangePasswordOpen} onClose={() => setIsChangePasswordOpen(false)} />
     </div>
   );
 }

@@ -45,7 +45,13 @@ def record_login_attempt(db: Session, user_id: int, request: Request, status_str
     db.commit()
 
 @router.post("/login", response_model=Token)
-def login(request: Request, db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
+def login(
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    remember: bool = Query(False)
+):
     normalized_email = form_data.username.strip().lower()
     if len(normalized_email) > 254:
         security.verify_password(form_data.password, DUMMY_PASSWORD_HASH)
@@ -113,16 +119,45 @@ def login(request: Request, db: Session = Depends(get_db), form_data: OAuth2Pass
 
     log_audit(db, user.id, "AUTH", user.id, "LOGIN", new_values={"session_id": session.id}, ip_address=request.client.host if request.client else None, user_agent=request.headers.get("user-agent"))
 
+    # Set access token and refresh token in secure HttpOnly cookies
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        path="/",
+        max_age=3600 if remember else None,
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        path="/",
+        max_age=7 * 24 * 3600 if remember else None,
+    )
+
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer", "user": user}
 
 @router.post("/refresh", response_model=Token)
-def refresh_token(request: RefreshTokenRequest, req: Request, db: Session = Depends(get_db)):
-    is_blacklisted = db.query(TokenBlacklist).filter(TokenBlacklist.token == request.refresh_token).first()
+def refresh_token(
+    request: RefreshTokenRequest,
+    req: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+):
+    refresh_token = request.refresh_token or req.cookies.get("refresh_token")
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Refresh token missing")
+
+    is_blacklisted = db.query(TokenBlacklist).filter(TokenBlacklist.token == refresh_token).first()
     if is_blacklisted:
         raise HTTPException(status_code=401, detail="Token blacklisted")
 
     db_session = db.query(UserSession).filter(
-        UserSession.refresh_token == request.refresh_token,
+        UserSession.refresh_token == refresh_token,
         UserSession.is_active.is_(True),
         UserSession.expires_at > _utcnow()
     ).first()
@@ -131,7 +166,7 @@ def refresh_token(request: RefreshTokenRequest, req: Request, db: Session = Depe
         raise HTTPException(status_code=401, detail="Invalid or expired session")
 
     try:
-        payload = security.jwt.decode(request.refresh_token, security.settings.SECRET_KEY, algorithms=[security.ALGORITHM])
+        payload = security.jwt.decode(refresh_token, security.settings.SECRET_KEY, algorithms=[security.ALGORITHM])
         if payload.get("type") != "refresh":
             raise HTTPException(status_code=401, detail="Invalid token type")
 
@@ -142,7 +177,7 @@ def refresh_token(request: RefreshTokenRequest, req: Request, db: Session = Depe
 
         # Invalidate old session and token
         db_session.is_active = False
-        db.add(TokenBlacklist(token=request.refresh_token))
+        db.add(TokenBlacklist(token=refresh_token))
 
         access_token = security.create_access_token(subject=user.id)
         new_refresh_token = security.create_refresh_token(subject=user.id)
@@ -157,6 +192,26 @@ def refresh_token(request: RefreshTokenRequest, req: Request, db: Session = Depe
         db.add(new_session)
         db.commit()
 
+        # Set new cookies on response
+        response.set_cookie(
+            key="access_token",
+            value=access_token,
+            httponly=True,
+            secure=True,
+            samesite="lax",
+            path="/",
+            max_age=3600 if request.remember else None,
+        )
+        response.set_cookie(
+            key="refresh_token",
+            value=new_refresh_token,
+            httponly=True,
+            secure=True,
+            samesite="lax",
+            path="/",
+            max_age=7 * 24 * 3600 if request.remember else None,
+        )
+
         return {"access_token": access_token, "refresh_token": new_refresh_token, "token_type": "bearer", "user": user}
     except (security.JWTError, TypeError, ValueError):
         raise HTTPException(status_code=401, detail="Invalid token")
@@ -165,28 +220,38 @@ def refresh_token(request: RefreshTokenRequest, req: Request, db: Session = Depe
 def logout(
     request: RefreshTokenRequest,
     http_request: Request,
+    response: Response,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    refresh_token = request.refresh_token or http_request.cookies.get("refresh_token")
+    if not refresh_token:
+        raise HTTPException(status_code=400, detail="Invalid session")
+
     db_session = db.query(UserSession).filter(
-        UserSession.refresh_token == request.refresh_token,
+        UserSession.refresh_token == refresh_token,
         UserSession.user_id == current_user.id
     ).first()
     if db_session is None:
         raise HTTPException(status_code=400, detail="Invalid session")
+
     db_session.is_active = False
 
-    is_blacklisted = db.query(TokenBlacklist).filter(TokenBlacklist.token == request.refresh_token).first()
+    is_blacklisted = db.query(TokenBlacklist).filter(TokenBlacklist.token == refresh_token).first()
     if not is_blacklisted:
-        db.add(TokenBlacklist(token=request.refresh_token))
+        db.add(TokenBlacklist(token=refresh_token))
     db.commit()
     record_login_attempt(db, current_user.id, http_request, "LOGOUT")
     log_audit(db, current_user.id, "AUTH", current_user.id, "LOGOUT")
+
+    response.delete_cookie(key="access_token", path="/")
+    response.delete_cookie(key="refresh_token", path="/")
     return {"message": "Successfully logged out"}
 
 @router.post("/logout-all", response_model=MessageResponse)
 def logout_all(
     request: Request,
+    response: Response,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -203,6 +268,9 @@ def logout_all(
     db.commit()
     record_login_attempt(db, current_user.id, request, "LOGOUT")
     log_audit(db, current_user.id, "AUTH", current_user.id, "LOGOUT_ALL")
+
+    response.delete_cookie(key="access_token", path="/")
+    response.delete_cookie(key="refresh_token", path="/")
     return {"message": "Successfully logged out of all devices"}
 
 @router.post("/forgot-password", response_model=MessageResponse)
@@ -269,6 +337,7 @@ def change_password(request: ChangePasswordRequest, db: Session = Depends(get_db
         raise HTTPException(status_code=400, detail="New password cannot be the same as old password")
 
     current_user.password_hash = security.get_password_hash(request.new_password)
+    current_user.must_change_password = False
 
     sessions = db.query(UserSession).filter(
         UserSession.user_id == current_user.id,

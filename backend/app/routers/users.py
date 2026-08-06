@@ -18,6 +18,8 @@ from app.schemas.users import (
     UserOut,
     RoleProfileCreate,
     RoleProfileOut,
+    PermissionOut,
+    RolePermissionUpdate,
 )
 from app.core.security import get_password_hash
 from app.services.audit import log_audit
@@ -70,14 +72,64 @@ def create_role_profile(
     return profile
 
 
+@router.get("/permissions", response_model=List[PermissionOut])
+def get_permissions(db: Session = Depends(get_db)):
+    from app.models.auth import Permission
+    return db.query(Permission).order_by(Permission.name.asc(), Permission.id.asc()).all()
+
+
+@router.get("/roles/{role_id}/permissions", response_model=List[int])
+def get_role_permissions(role_id: int, db: Session = Depends(get_db)):
+    role = db.get(Role, role_id)
+    if not role:
+        raise HTTPException(status_code=404, detail="Role not found")
+    return [p.id for p in role.permissions]
+
+
+@router.post("/roles/{role_id}/permissions", response_model=MessageResponse)
+def update_role_permissions(
+    role_id: int,
+    payload: RolePermissionUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.models.auth import Permission
+    role = db.get(Role, role_id)
+    if not role:
+        raise HTTPException(status_code=404, detail="Role not found")
+    
+    # Resolve all permissions
+    perms = db.query(Permission).filter(Permission.id.in_(payload.permission_ids)).all()
+    if len(perms) != len(payload.permission_ids):
+        raise HTTPException(status_code=400, detail="Some permission IDs are invalid")
+        
+    role.permissions = perms
+    db.commit()
+    
+    log_audit(
+        db,
+        current_user.id,
+        "ROLE",
+        role.id,
+        "UPDATE_PERMISSIONS",
+        new_values={"permission_ids": payload.permission_ids},
+    )
+    return {"message": "Role permissions updated successfully"}
+
+
 def validate_user_relations(
     db: Session,
     *,
     branch_id: int | None,
     manager_id: int | None,
+    project_id: int | None = None,
 ) -> None:
     if branch_id is not None and db.get(Branch, branch_id) is None:
         raise HTTPException(status_code=404, detail="Branch not found")
+    if project_id is not None:
+        from app.models.projects import Project
+        if db.get(Project, project_id) is None:
+            raise HTTPException(status_code=404, detail="Project not found")
     if manager_id is None:
         return
     manager = db.query(User).filter(
@@ -109,6 +161,7 @@ def create_user(
         db,
         branch_id=user_in.branch_id,
         manager_id=user_in.manager_id,
+        project_id=user_in.project_id,
     )
     hashed_pw = get_password_hash(user_in.password)
     role_profile = None
@@ -122,7 +175,7 @@ def create_user(
     if role_profile is not None:
         user_data["role"] = role_profile.base_role
 
-    new_user = User(**user_data, password_hash=hashed_pw)
+    new_user = User(**user_data, password_hash=hashed_pw, must_change_password=True)
     if role_profile is not None:
         new_user.role_profiles.append(role_profile)
     db.add(new_user)
@@ -193,6 +246,7 @@ def update_user(
         db,
         branch_id=update_data.get("branch_id", user.branch_id),
         manager_id=update_data.get("manager_id", user.manager_id),
+        project_id=update_data.get("project_id", user.project_id),
     )
     old_vals = {k: getattr(user, k) for k in update_data}
     for field, value in update_data.items():
@@ -324,4 +378,22 @@ def reassign_manager(
         old_values={"manager_id": old_manager_id},
         new_values={"manager_id": user.manager_id},
     )
+    return user
+
+
+@router.post("/{user_id}/unlock", response_model=UserOut)
+def unlock_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles([RoleEnum.SUPER_ADMIN, RoleEnum.ADMIN])),
+):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.is_locked = False
+    user.failed_login_attempts = 0
+    user.locked_until = None
+    db.commit()
+    db.refresh(user)
+    log_audit(db, current_user.id, "USER", user.id, "UNLOCK", new_values={"unlocked_by": current_user.id})
     return user

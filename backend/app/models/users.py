@@ -46,12 +46,32 @@ class User(Base):
     is_locked = Column(Boolean, default=False)
     locked_until = Column(DateTime(timezone=True), nullable=True)
     is_email_verified = Column(Boolean, default=False)
+    department = Column(String(100), nullable=True)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True, index=True)
+    must_change_password = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     branch = relationship("Branch", back_populates="users")
     manager = relationship("User", remote_side=[id], backref="subordinates")
+    project = relationship("Project", foreign_keys=[project_id])
     role_profiles = relationship(
         "Role",
         secondary="user_roles",
         backref="users",
     )
+
+    @property
+    def permissions(self) -> list[str]:
+        from sqlalchemy.orm import object_session
+        from app.models.auth import Permission
+        from app.models.users import RoleEnum
+        
+        session = object_session(self)
+        if session is not None and (self.role == RoleEnum.SUPER_ADMIN or getattr(self.role, "value", None) == "SUPER_ADMIN"):
+            return [p.name for p in session.query(Permission).all()]
+            
+        perms = set()
+        for rp in self.role_profiles:
+            for p in rp.permissions:
+                perms.add(p.name)
+        return sorted(list(perms))

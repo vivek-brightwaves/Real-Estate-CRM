@@ -12,6 +12,8 @@ class UserBase(BaseModel):
     branch_id: Optional[int] = None
     manager_id: Optional[int] = None
     is_active: bool = True
+    department: Optional[str] = Field(None, max_length=100)
+    project_id: Optional[int] = None
 
 class UserCreate(UserBase):
     password: str = Field(min_length=8, max_length=128)
@@ -34,6 +36,9 @@ class UserUpdate(BaseModel):
         pattern=r"^\+?[0-9][0-9 -]{6,19}$",
     )
     branch_id: Optional[int] = Field(None, gt=0)
+    manager_id: Optional[int] = Field(None, gt=0)
+    department: Optional[str] = Field(None, max_length=100)
+    project_id: Optional[int] = None
 
 class UserUpdateRole(BaseModel):
     role: RoleEnum
@@ -75,4 +80,18 @@ class UserOut(UserBase):
 
     id: int
     created_at: datetime
+    must_change_password: bool
     role_profiles: list[RoleProfileOut] = Field(default_factory=list)
+    permissions: list[str] = Field(default_factory=list)
+
+
+class PermissionOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    description: Optional[str] = None
+
+
+class RolePermissionUpdate(BaseModel):
+    permission_ids: list[int]

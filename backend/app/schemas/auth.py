@@ -16,12 +16,14 @@ class RefreshTokenRequest(BaseModel):
             "example": {
                 "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                 "device_info": "Chrome on Windows",
+                "remember": False,
             }
         }
     )
 
-    refresh_token: str = Field(min_length=20, max_length=500)
+    refresh_token: Optional[str] = Field(default=None, min_length=20, max_length=500)
     device_info: Optional[str] = Field(None, max_length=255)
+    remember: Optional[bool] = Field(default=False)
 
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr = Field(examples=["user@example.com"])
